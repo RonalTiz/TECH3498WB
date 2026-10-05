@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technological Knowledge | Ronald De La Cruz Acevedo</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Theme Controller (Dark mode default with toggle) -->
+  <script src="theme.js"></script>
+  <!-- Auth State Sync -->
+  <script src="auth.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+        <i class="bi bi-shield-check text-info fs-4"></i>
+        <span>TECH 3498<span class="text-info">.sec</span></span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">About Me</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active text-info" aria-current="page" href="technology.html">Technological Knowledge</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="cybersecurity.html">CyberSecurity</a>
+          </li>
+          <li class="nav-item nav-security-item d-none">
+            <a class="nav-link text-warning fw-semibold" href="security.html">
+              <i class="bi bi-shield-shaded me-1"></i>Security Control
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-outline-info text-info px-3 ms-lg-2 py-1" href="#contact">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-login-link" href="login.html">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
+            </a>
+          </li>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <button class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center" type="button" title="Switch to Original Light Theme">
+              <i class="bi bi-sun-fill text-warning me-1"></i> <span class="theme-label">Light Theme</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Header -->
+  <header class="hero-section text-center">
+    <div class="container hero-content">
+      <div class="avatar-wrapper mb-4">
+        <div class="avatar-inner">
+          <i class="bi bi-hdd-network-fill"></i>
+        </div>
+      </div>
+      <h1 class="display-5 fw-bold mb-2">Technological Knowledge</h1>
+      <p class="lead text-light opacity-75 mb-3 mx-auto" style="max-width: 680px;">
+        Core focus areas spanning enterprise virtualization, cloud architecture, and Linux administration.
+      </p>
+      <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+        <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-semibold">
+          <i class="bi bi-database-fill-gear me-1"></i> SQL &amp; AI Integration
+        </span>
+        <span class="badge rounded-pill bg-info text-dark px-3 py-2 fw-semibold">
+          <i class="bi bi-hdd-rack me-1"></i> Homelab &amp; Virtualization
+        </span>
+        <span class="badge rounded-pill bg-primary px-3 py-2 fw-semibold">
+          <i class="bi bi-cloud-check me-1"></i> Cloud
+        </span>
+        <span class="badge rounded-pill bg-success px-3 py-2 fw-semibold">
+          <i class="bi bi-terminal-fill me-1"></i> Linux Server Management
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Section: Core Tech Pillars -->
+    <section class="py-5 bg-white">
+      <div class="container py-4">
+        <div class="text-center">
+          <h2 class="section-title">Technical Domains</h2>
+          <p class="text-muted mx-auto" style="max-width: 680px;">
+            In-depth breakdown of hands-on technical proficiencies, architectures, database systems, and system administration skills.
+          </p>
+        </div>
+
+        <div class="row g-4 mt-2">
+          <!-- Pillar 1: SQL Database Knowledge -->
+          <div class="col-md-6 col-lg-3">
+            <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-warning">
+              <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                <i class="bi bi-database-fill-check"></i>
+              </div>
+              <h5 class="fw-bold mb-2">SQL Database Systems</h5>
+              <p class="text-muted small mb-3">
+                Designing normalized schemas, writing complex queries, data modeling, and hardening relational databases against tampering and injection.
+              </p>
+              <ul class="list-unstyled d-flex flex-column gap-2 small text-secondary mb-3">
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-warning mt-1"></i>
+                  <span>Relational schema design, normalization, &amp; foreign key constraints.</span>
+                </li>
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-warning mt-1"></i>
+                  <span>Complex joins, aggregations, indexing, and query optimization.</span>
+                </li>
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-warning mt-1"></i>
+                  <span>Prepared statements &amp; defense against SQL Injection (SQLi).</span>
+                </li>
+              </ul>
+              <div class="mt-auto pt-2 border-top">
+                <span class="badge bg-light text-dark border me-1 mb-1">SQL</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">PostgreSQL</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">MySQL</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">Data Modeling</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pillar 2: Homelab & Virtualization -->
+          <div class="col-md-6 col-lg-3">
+            <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-info">
+              <div class="icon-box bg-info bg-opacity-10 text-info">
+                <i class="bi bi-hdd-rack"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Homelab &amp; Virtualization</h5>
+              <p class="text-muted small mb-3">
+                Self-hosting simulated enterprise networks, hypervisors, and testing with Proxmox to replicate real-world multi-node IT environments.
+              </p>
+              <ul class="list-unstyled d-flex flex-column gap-2 small text-secondary mb-3">
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-info mt-1"></i>
+                  <span>Proxmox VE installation, VM provisioning, &amp; LXC containers.</span>
+                </li>
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-info mt-1"></i>
+                  <span>Virtual switches, VLAN isolation, &amp; granular routing rules.</span>
+                </li>
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-info mt-1"></i>
+                  <span>Deploying and tuning pfSense/OPNsense gateways for test labs.</span>
+                </li>
+              </ul>
+              <div class="mt-auto pt-2 border-top">
+                <span class="badge bg-light text-dark border me-1 mb-1">Proxmox</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">pfSense</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">VLANs</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">LXC</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pillar 3: Cloud -->
+          <div class="col-md-6 col-lg-3">
+            <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-primary">
+              <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                <i class="bi bi-cloud-check"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Cloud Infrastructure</h5>
+              <p class="text-muted small mb-3">
+                Understanding cloud infrastructure paradigms, identity governance, access policies, and scalable workload isolation.
+              </p>
+              <ul class="list-unstyled d-flex flex-column gap-2 small text-secondary mb-3">
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-primary mt-1"></i>
+                  <span>Role-based access control (RBAC) &amp; least-privilege policies.</span>
+                </li>
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-primary mt-1"></i>
+                  <span>Virtual Private Clouds (VPCs), subnets, &amp; security groups.</span>
+                </li>
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-primary mt-1"></i>
+                  <span>Guarding cloud storage buckets and secure virtual instances.</span>
+                </li>
+              </ul>
+              <div class="mt-auto pt-2 border-top">
+                <span class="badge bg-light text-dark border me-1 mb-1">AWS Basics</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">Azure IAM</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">VPC</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">NACLs</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pillar 4: Linux Server Management -->
+          <div class="col-md-6 col-lg-3">
+            <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-success">
+              <div class="icon-box bg-success bg-opacity-10 text-success">
+                <i class="bi bi-terminal-fill"></i>
+              </div>
+              <h5 class="fw-bold mb-2">Linux Server Management</h5>
+              <p class="text-muted small mb-3">
+                End-to-end command-line administration, service orchestration, permission management, and operating system hardening.
+              </p>
+              <ul class="list-unstyled d-flex flex-column gap-2 small text-secondary mb-3">
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-success mt-1"></i>
+                  <span>Bash automation for administrative maintenance &amp; log analysis.</span>
+                </li>
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-success mt-1"></i>
+                  <span>Managing systemd units, daemons, and process monitoring.</span>
+                </li>
+                <li class="d-flex align-items-start gap-1">
+                  <i class="bi bi-check2 text-success mt-1"></i>
+                  <span>SSH key-only auth, fail2ban setup, UFW rules, &amp; permission audits.</span>
+                </li>
+              </ul>
+              <div class="mt-auto pt-2 border-top">
+                <span class="badge bg-light text-dark border me-1 mb-1">Ubuntu / Debian</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">Bash</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">systemd</span>
+                <span class="badge bg-light text-dark border me-1 mb-1">UFW / SSH</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Project: AI & SQL Database Integration -->
+        <div class="project-spotlight-card p-4 p-md-5 my-5 text-light shadow-lg position-relative">
+          <div class="row align-items-center position-relative" style="z-index: 2;">
+            <div class="col-lg-7">
+              <div class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-warning bg-opacity-25 rounded-pill text-warning mb-3">
+                <i class="bi bi-stars"></i>
+                <span class="small fw-bold text-uppercase tracking-wider">Featured Technical Project</span>
+              </div>
+              <h3 class="display-6 fw-bold text-white mb-3">AI-Powered SQL Database Analytics Platform</h3>
+              <p class="text-light opacity-90 leading-relaxed mb-4">
+                I engineered a full-stack web application that seamlessly integrates a <strong>relational SQL database</strong> with <strong>Artificial Intelligence</strong> to dynamically inspect, query, and analyze database tables using SQL commands.
+              </p>
+              
+              <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="bi bi-check-circle-fill text-warning mt-1"></i>
+                    <div>
+                      <strong class="text-white">Natural Language to SQL:</strong>
+                      <div class="small text-white-50">Generates and executes syntactically correct SQL commands from analytical prompts.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="bi bi-check-circle-fill text-warning mt-1"></i>
+                    <div>
+                      <strong class="text-white">Automated Schema Analysis:</strong>
+                      <div class="small text-white-50">Maps relational tables, primary keys, and foreign keys to infer data relationships.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="bi bi-check-circle-fill text-warning mt-1"></i>
+                    <div>
+                      <strong class="text-white">AI Data Diagnostics:</strong>
+                      <div class="small text-white-50">Synthesizes query execution output into plain-language summaries and statistical trends.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="bi bi-check-circle-fill text-warning mt-1"></i>
+                    <div>
+                      <strong class="text-white">Defensive SQL Sanitization:</strong>
+                      <div class="small text-white-50">Built-in guardrails against SQL injection and destructive DDL commands.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-secondary bg-opacity-50 text-white p-2">
+                  <i class="bi bi-database me-1"></i> Relational SQL
+                </span>
+                <span class="badge bg-secondary bg-opacity-50 text-white p-2">
+                  <i class="bi bi-robot me-1"></i> AI Integration
+                </span>
+                <span class="badge bg-secondary bg-opacity-50 text-white p-2">
+                  <i class="bi bi-shield-check me-1"></i> Query Sanitization
+                </span>
+                <span class="badge bg-secondary bg-opacity-50 text-white p-2">
+                  <i class="bi bi-graph-up me-1"></i> Data Analytics
+                </span>
+              </div>
+            </div>
+
+            <div class="col-lg-5 mt-4 mt-lg-0">
+              <div class="card bg-dark border-secondary p-3 text-light font-monospace small shadow">
+                <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom border-secondary border-opacity-50">
+                  <span class="text-info"><i class="bi bi-terminal me-2"></i>sql_ai_engine.py</span>
+                  <span class="badge bg-success bg-opacity-25 text-success">Active</span>
+                </div>
+                <div class="text-white-50 mb-2"># Sample Execution Flow</div>
+                <div class="text-warning">&gt; Prompt: "Find top 5 customers by sales volume"</div>
+                <div class="text-info mt-2">-- AI Generated SQL Query:</div>
+                <div class="text-light ps-2">
+                  SELECT c.name, SUM(o.total) AS total_spent<br>
+                  FROM customers c<br>
+                  JOIN orders o ON c.id = o.customer_id<br>
+                  GROUP BY c.name<br>
+                  ORDER BY total_spent DESC LIMIT 5;
+                </div>
+                <div class="mt-2 text-success">&gt; Execution: SUCCESS (0.012s)</div>
+                <div class="text-white-50 mt-1">&gt; AI Insights: "Top customer accounts for 34% of volume..."</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Hands-On Troubleshooting & Lab Workflow -->
+    <section class="py-5 bg-light">
+      <div class="container py-4">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-6">
+            <h3 class="fw-bold mb-3">Hands-On Troubleshooting Approach</h3>
+            <p class="text-secondary leading-relaxed">
+              Ronald's career interest in <strong>troubleshooting problems</strong> directly informs his approach to technology. Rather than simply using tools, he focuses on understanding underlying protocols, inspecting error logs, and tracing packet flows to diagnose root causes systematically.
+            </p>
+            <div class="d-flex flex-column gap-3 mt-3">
+              <div class="d-flex align-items-start gap-3">
+                <div class="icon-box bg-info bg-opacity-20 text-info mb-0" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                  <i class="bi bi-search"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-1">Diagnose &amp; Isolate</h6>
+                  <p class="text-muted small mb-0">Reproducing issues in controlled homelab environments before rolling out configurations.</p>
+                </div>
+              </div>
+              <div class="d-flex align-items-start gap-3">
+                <div class="icon-box bg-success bg-opacity-20 text-success mb-0" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                  <i class="bi bi-shield-check"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-1">Secure Baseline</h6>
+                  <p class="text-muted small mb-0">Ensuring all resolved services comply with least privilege and encrypted communication.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card bg-dark border-secondary p-4 text-light shadow">
+              <h5 class="text-info fw-bold mb-3">
+                <i class="bi bi-cpu-fill me-2"></i>Lab Environment Overview
+              </h5>
+              <p class="small text-secondary mb-3">
+                A typical topology utilized for coursework testing and independent skill building:
+              </p>
+              <div class="p-3 bg-black bg-opacity-50 rounded border border-secondary border-opacity-50 font-monospace small">
+                <div class="text-success">[Internet Gateway]</div>
+                <div class="text-secondary ps-3">│</div>
+                <div class="text-info ps-3">├── pfSense Virtual Firewall / Router</div>
+                <div class="text-secondary ps-5">│</div>
+                <div class="text-light ps-5">├── [VLAN 10] Isolated Management (Proxmox Web UI)</div>
+                <div class="text-light ps-5">├── [VLAN 20] Linux Lab Servers (SSH, Web, DNS)</div>
+                <div class="text-light ps-5">└── [VLAN 30] Security Testing Sandbox (Isolated)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Contact -->
+    <section id="contact" class="py-5 bg-white border-top">
+      <div class="container py-4 text-center">
+        <h2 class="section-title">Connect &amp; Collaborate</h2>
+        <p class="text-muted mx-auto mb-4" style="max-width: 600px;">
+          Interested in discussing homelabs, Linux tips, or cloud architecture? Reach out!
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a href="mailto:student@example.com" class="btn btn-outline-primary px-4 py-2">
+            <i class="bi bi-envelope-fill me-2"></i>Email Me
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark px-4 py-2">
+            <i class="bi bi-github me-2"></i>GitHub Profile
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info px-4 py-2">
+            <i class="bi bi-linkedin me-2"></i>LinkedIn
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer with Cybersecurity Tip -->
+  <footer class="pt-5 pb-4">
+    <div class="container">
+      
+      <!-- Cybersecurity Tip Callout -->
+      <div id="cyber-tip" class="cyber-tip-box p-4 rounded-4 text-start mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+          <div class="tip-icon">
+            <i class="bi bi-shield-fill-exclamation text-info fs-3"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge bg-info text-dark fw-bold">PRO TIP</span>
+              <h5 class="text-white mb-0 fw-bold">Cybersecurity Tip of the Day</h5>
+            </div>
+            <p class="mb-0 text-light opacity-90 small">
+              <strong>Enforce Multi-Factor Authentication (MFA) &amp; Use a Password Manager:</strong> Over 80% of data breaches involve compromised or reused passwords. Enabling MFA (preferably using an authenticator app or hardware FIDO2 key rather than SMS) blocks more than <strong>99% of bulk automated credential attacks</strong> according to CISA and Microsoft threat intelligence. Pair this with unique, generated 16+ character passphrases for every account.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="text-center pt-3 border-top border-secondary border-opacity-25">
+        <div class="mb-2">
+          <i class="bi bi-shield-lock text-info fs-4"></i>
+        </div>
+        <p class="mb-1 text-light small">&copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio</p>
+        <p class="small mb-0 text-secondary">Built with Bootstrap 5 &bull; Designed for TECH 3498 Project</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Floating Chatbot Launcher Button -->
+  <button id="chatbot-toggle" aria-label="Open AI Chatbot" title="Chat with CyberBot">
+    <div class="chatbot-pulse-ring"></div>
+    <i class="bi bi-robot"></i>
+  </button>
+
+  <!-- Floating Chat Window Container -->
+  <div id="chatbot-window" class="d-none" role="dialog" aria-modal="true" aria-labelledby="chatbot-title">
+    <div class="chat-header">
+      <div class="d-flex align-items-center gap-2">
+        <div class="icon-box bg-info bg-opacity-20 text-info p-2 mb-0" style="width: 36px; height: 36px; border-radius: 8px;">
+          <i class="bi bi-robot fs-5"></i>
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h6 id="chatbot-title" class="fw-bold mb-0 text-white">CyberBot</h6>
+            <span class="chat-status-dot" title="Online"></span>
+          </div>
+          <span class="text-secondary" style="font-size: 0.72rem;">TECH 3498 AI Assistant</span>
+        </div>
+      </div>
+      <button id="chatbot-close" class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" aria-label="Close Chat">
+        <i class="bi bi-x-lg fs-5"></i>
+      </button>
+    </div>
+
+    <div id="chatbot-messages"></div>
+
+    <form id="chatbot-form" class="chat-input-bar d-flex align-items-center gap-2">
+      <input id="chatbot-input" type="text" class="form-control px-3 py-2" placeholder="Ask about Ronald or TECH 3498..." autocomplete="off">
+      <button type="button" id="chatbot-mic" class="chat-mic-btn flex-shrink-0" aria-label="Voice command" title="Speak to CyberBot (Voice Command)">
+        <i class="bi bi-mic"></i>
+      </button>
+      <button type="submit" class="chat-send-btn flex-shrink-0" aria-label="Send message">
+        <i class="bi bi-arrow-up-short fs-4"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS (Includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- Chatbot Engine Script -->
+  <script src="chatbot.js"></script>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberSecurity | TECH 3498 IT Computer Security</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Theme Controller (Dark mode default with toggle) -->
+  <script src="theme.js"></script>
+  <!-- Auth State Sync -->
+  <script src="auth.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+        <i class="bi bi-shield-check text-info fs-4"></i>
+        <span>TECH 3498<span class="text-info">.sec</span></span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">About Me</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="technology.html">Technological Knowledge</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active text-info" aria-current="page" href="cybersecurity.html">CyberSecurity</a>
+          </li>
+          <li class="nav-item nav-security-item d-none">
+            <a class="nav-link text-warning fw-semibold" href="security.html">
+              <i class="bi bi-shield-shaded me-1"></i>Security Control
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-outline-info text-info px-3 ms-lg-2 py-1" href="#contact">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-login-link" href="login.html">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
+            </a>
+          </li>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <button class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center" type="button" title="Switch to Original Light Theme">
+              <i class="bi bi-sun-fill text-warning me-1"></i> <span class="theme-label">Light Theme</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Header -->
+  <header class="hero-section text-center">
+    <div class="container hero-content">
+      <div class="avatar-wrapper mb-4">
+        <div class="avatar-inner">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+      </div>
+      <h1 class="display-5 fw-bold mb-2">Threat Assessment: GitHub Pages</h1>
+      <p class="lead text-light opacity-75 mb-3 mx-auto" style="max-width: 740px;">
+        Architectural vulnerability analysis, STRIDE threat modeling, and defensive hardening review for this portfolio website hosted on <strong>GitHub Pages</strong>.
+      </p>
+      <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+        <span class="badge rounded-pill bg-info text-dark px-3 py-2 fw-semibold">
+          <i class="bi bi-github me-1"></i> Hosting: GitHub Pages Static
+        </span>
+        <span class="badge rounded-pill bg-primary px-3 py-2 fw-semibold">
+          <i class="bi bi-shield-check me-1"></i> Model: STRIDE Framework
+        </span>
+        <span class="badge rounded-pill bg-dark border border-secondary px-3 py-2 fw-semibold">
+          <i class="bi bi-diagram-3-fill me-1"></i> Target: TECH3498WB Portfolio
+        </span>
+        <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-semibold">
+          <i class="bi bi-lock-fill me-1"></i> Security Posture: Hardened Static
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+     <!-- Section 2: Short STRIDE Threat Assessment -->
+     <section class="py-5 bg-light">
+       <div class="container py-4">
+         <div class="text-center mb-5">
+           <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 mb-2">Threat Review</span>
+           <h2 class="section-title">STRIDE Threat Assessment</h2>
+           <p class="text-muted mx-auto" style="max-width: 720px;">
+             Key risks for a static portfolio hosted on GitHub Pages and practical ways to reduce them.
+           </p>
+         </div>
+     
+         <div class="row g-4">
+           <!-- Spoofing -->
+           <div class="col-md-6 col-lg-4">
+             <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-warning">
+               <span class="badge bg-warning text-dark align-self-start mb-3">Spoofing</span>
+               <h5 class="fw-bold text-white">Client-Side Login</h5>
+               <p class="text-secondary small mb-0">
+                 Login state stored in <code class="text-info">sessionStorage</code> can be changed by a visitor. It is suitable for a demonstration, not protecting private information.
+               </p>
+             </div>
+           </div>
+     
+           <!-- Tampering -->
+           <div class="col-md-6 col-lg-4">
+             <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-danger">
+               <span class="badge bg-danger align-self-start mb-3">Tampering</span>
+               <h5 class="fw-bold text-white">External Dependencies</h5>
+               <p class="text-secondary small mb-0">
+                 A compromised third-party CDN could affect site visitors. Use Subresource Integrity where supported, and keep dependencies current.
+               </p>
+             </div>
+           </div>
+     
+           <!-- Repudiation -->
+           <div class="col-md-6 col-lg-4">
+             <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-info">
+               <span class="badge bg-info text-dark align-self-start mb-3">Repudiation</span>
+               <h5 class="fw-bold text-white">Limited Audit Visibility</h5>
+               <p class="text-secondary small mb-0">
+                 The site has no application server for recording detailed user actions. Avoid relying on it for audit trails or incident investigation.
+               </p>
+             </div>
+           </div>
+     
+           <!-- Information Disclosure -->
+           <div class="col-md-6 col-lg-4">
+             <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-danger">
+               <span class="badge bg-danger align-self-start mb-3">Information Disclosure</span>
+               <h5 class="fw-bold text-white">Public Repository</h5>
+               <p class="text-secondary small mb-0">
+                 Website source and repository history may be public. Do not commit passwords, API keys, or sensitive personal information.
+               </p>
+             </div>
+           </div>
+     
+           <!-- Denial of Service -->
+           <div class="col-md-6 col-lg-4">
+             <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-secondary">
+               <span class="badge bg-secondary align-self-start mb-3">Denial of Service</span>
+               <h5 class="fw-bold text-white">Service Availability</h5>
+               <p class="text-secondary small mb-0">
+                 Traffic spikes or hosting-service issues could make the site unavailable. Keep assets lightweight and maintain a copy of the site files.
+               </p>
+             </div>
+           </div>
+     
+           <!-- Elevation of Privilege -->
+           <div class="col-md-6 col-lg-4">
+             <div class="card feature-card h-100 shadow-sm p-4 border-top border-4 border-primary">
+               <span class="badge bg-primary align-self-start mb-3">Elevation of Privilege</span>
+               <h5 class="fw-bold text-white">Direct Page Access</h5>
+               <p class="text-secondary small mb-0">
+                 Static pages can be requested directly by URL. Treat admin pages and client-side checks as demonstrations, not security boundaries.
+               </p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </section>
+     
+<!-- Section: Security Implementation Overview -->
+<section id="security-implementation" class="py-5 bg-white">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="badge bg-info-subtle text-info fw-bold px-3 py-1 mb-2">
+        Security Overview
+      </span>
+      <h2 class="section-title">How Security Is Implemented</h2>
+      <p class="text-muted mx-auto" style="max-width: 720px;">
+        Security controls and limitations across this static GitHub Pages portfolio.
+      </p>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100 p-3">
+          <h5 class="fw-bold">Frontend</h5>
+          <p class="text-secondary small mb-0">
+            Bootstrap CSS and JavaScript use Subresource Integrity (SRI). Chatbot messages from visitors are displayed as text rather than interpreted as HTML.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100 p-3">
+          <h5 class="fw-bold">Web Server</h5>
+          <p class="text-secondary small mb-0">
+            GitHub Pages hosts the static files and supports HTTPS to encrypt traffic in transit. It does not run this site's login checks or provide server-side access control.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100 p-3">
+          <h5 class="fw-bold">Application Layer</h5>
+          <p class="text-secondary small mb-0">
+            Site features run in browser-side JavaScript. Because visitors can inspect or modify that code, it cannot securely enforce protected actions.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100 p-3">
+          <h5 class="fw-bold">Database</h5>
+          <p class="text-secondary small mb-0">
+            This portfolio does not connect to a database or store database records.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100 p-3">
+          <h5 class="fw-bold">Authentication &amp; Authorization</h5>
+          <p class="text-secondary small mb-0">
+            The demo login uses credentials checked in browser code. The security page checks a session-storage flag. These client-side checks can be bypassed and do not protect private content.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100 p-3">
+          <h5 class="fw-bold">Encryption</h5>
+          <p class="text-secondary small mb-0">
+            HTTPS encrypts data in transit when the site is visited over HTTPS. Theme preferences and login flags in browser storage are not encrypted secrets.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100 p-3">
+          <h5 class="fw-bold">Session Management</h5>
+          <p class="text-secondary small mb-0">
+            The demo stores login state in sessionStorage, which is controlled by the visitor's browser and should not be treated as a secure session.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100 p-3">
+          <h5 class="fw-bold">Input Validation</h5>
+          <p class="text-secondary small mb-0">
+            Login fields use required form attributes, and chatbot input is trimmed before processing. These are browser-side checks; there is no backend validation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Section: Contact -->
+    <section id="contact" class="py-5 bg-white border-top">
+      <div class="container py-4 text-center">
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="text-muted mx-auto mb-4" style="max-width: 600px;">
+          Feel free to connect regarding course projects, study groups, or cybersecurity discussions!
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a href="mailto:student@example.com" class="btn btn-outline-primary px-4 py-2">
+            <i class="bi bi-envelope-fill me-2"></i>Email Me
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark px-4 py-2">
+            <i class="bi bi-github me-2"></i>GitHub Profile
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info px-4 py-2">
+            <i class="bi bi-linkedin me-2"></i>LinkedIn
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer with Cybersecurity Tip -->
+  <footer class="pt-5 pb-4">
+    <div class="container">
+      
+      <!-- Cybersecurity Tip Callout -->
+      <div id="cyber-tip" class="cyber-tip-box p-4 rounded-4 text-start mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+          <div class="tip-icon">
+            <i class="bi bi-shield-fill-exclamation text-info fs-3"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge bg-info text-dark fw-bold">PRO TIP</span>
+              <h5 class="text-white mb-0 fw-bold">Cybersecurity Tip of the Day</h5>
+            </div>
+            <p class="mb-0 text-light opacity-90 small">
+              <strong>Enforce Multi-Factor Authentication (MFA) &amp; Use a Password Manager:</strong> Over 80% of data breaches involve compromised or reused passwords. Enabling MFA (preferably using an authenticator app or hardware FIDO2 key rather than SMS) blocks more than <strong>99% of bulk automated credential attacks</strong> according to CISA and Microsoft threat intelligence. Pair this with unique, generated 16+ character passphrases for every account.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="text-center pt-3 border-top border-secondary border-opacity-25">
+        <div class="mb-2">
+          <i class="bi bi-shield-lock text-info fs-4"></i>
+        </div>
+        <p class="mb-1 text-light small">&copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio</p>
+        <p class="small mb-0 text-secondary">Built with Bootstrap 5 &bull; Designed for TECH 3498 Project</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Floating Chatbot Launcher Button -->
+  <button id="chatbot-toggle" aria-label="Open AI Chatbot" title="Chat with CyberBot">
+    <div class="chatbot-pulse-ring"></div>
+    <i class="bi bi-robot"></i>
+  </button>
+
+  <!-- Floating Chat Window Container -->
+  <div id="chatbot-window" class="d-none" role="dialog" aria-modal="true" aria-labelledby="chatbot-title">
+    <div class="chat-header">
+      <div class="d-flex align-items-center gap-2">
+        <div class="icon-box bg-info bg-opacity-20 text-info p-2 mb-0" style="width: 36px; height: 36px; border-radius: 8px;">
+          <i class="bi bi-robot fs-5"></i>
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h6 id="chatbot-title" class="fw-bold mb-0 text-white">CyberBot</h6>
+            <span class="chat-status-dot" title="Online"></span>
+          </div>
+          <span class="text-secondary" style="font-size: 0.72rem;">TECH 3498 AI Assistant</span>
+        </div>
+      </div>
+      <button id="chatbot-close" class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" aria-label="Close Chat">
+        <i class="bi bi-x-lg fs-5"></i>
+      </button>
+    </div>
+
+    <div id="chatbot-messages"></div>
+
+    <form id="chatbot-form" class="chat-input-bar d-flex align-items-center gap-2">
+      <input id="chatbot-input" type="text" class="form-control px-3 py-2" placeholder="Ask about Ronald or TECH 3498..." autocomplete="off">
+      <button type="button" id="chatbot-mic" class="chat-mic-btn flex-shrink-0" aria-label="Voice command" title="Speak to CyberBot (Voice Command)">
+        <i class="bi bi-mic"></i>
+      </button>
+      <button type="submit" class="chat-send-btn flex-shrink-0" aria-label="Send message">
+        <i class="bi bi-arrow-up-short fs-4"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS (Includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- Chatbot Engine Script -->
+  <script src="chatbot.js"></script>
+</body>
+</html>

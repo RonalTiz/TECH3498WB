@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Control | TECH 3498 IT Computer Security</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Theme Controller (Dark mode default with toggle) -->
+  <script src="theme.js"></script>
+  <!-- Auth State & Dynamic Palette Engine -->
+  <script src="auth.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+        <i class="bi bi-shield-check text-info fs-4"></i>
+        <span>TECH 3498<span class="text-info">.sec</span></span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">About Me</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="technology.html">Technological Knowledge</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="cybersecurity.html">CyberSecurity</a>
+          </li>
+          <li class="nav-item nav-security-item">
+            <a class="nav-link active text-warning fw-semibold" aria-current="page" href="security.html">
+              <i class="bi bi-shield-shaded me-1"></i>Security Control
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-outline-info text-info px-3 ms-lg-2 py-1" href="#contact">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-login-link text-info" href="login.html">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
+            </a>
+          </li>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <button class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center" type="button" title="Switch to Original Light Theme">
+              <i class="bi bi-sun-fill text-warning me-1"></i> <span class="theme-label">Light Theme</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ACCESS CONTROL GATE: Shown if NOT signed in -->
+  <div id="unauthorized-view" class="d-none" style="min-height: 80vh; padding-top: 140px;">
+    <div class="container text-center">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+          <div class="card feature-card shadow-lg p-5 border-danger border-2 text-center">
+            <div class="icon-box bg-danger bg-opacity-10 text-danger mx-auto mb-4" style="width: 80px; height: 80px; font-size: 2.4rem;">
+              <i class="bi bi-shield-slash-fill"></i>
+            </div>
+            <h2 class="fw-bold text-white mb-2">Restricted Access</h2>
+            <p class="text-secondary mb-4">
+              The <strong>Security Operations &amp; Webpage Control Console</strong> requires active administrator clearance. You are not currently authenticated.
+            </p>
+            <div class="alert alert-secondary py-2 small mb-4">
+              Redirecting to login portal in <span id="countdown" class="fw-bold text-warning">5</span> seconds...
+            </div>
+            <a href="login.html" class="btn btn-info text-dark fw-bold px-4 py-2">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Go to Login Page Now
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATED SECURITY CONSOLE: Shown when signed in -->
+  <div id="authorized-view" class="d-none">
+
+    <!-- Hero Header -->
+    <header class="hero-section text-center">
+      <div class="container hero-content">
+        <div class="avatar-wrapper mb-4">
+          <div class="avatar-inner" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+            <i class="bi bi-shield-shaded"></i>
+          </div>
+        </div>
+        <h1 class="display-5 fw-bold mb-2">Security Control Console</h1>
+        <p class="lead text-light opacity-75 mb-3 mx-auto" style="max-width: 680px;">
+          Administrative control room for <strong>TECH 3498: IT Computer Security</strong>. Command and customize the site theme palette in real time.
+        </p>
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-2">
+          <span class="badge rounded-pill bg-success text-white px-3 py-2 fw-semibold">
+            <i class="bi bi-shield-lock-fill me-1"></i> Authenticated Admin
+          </span>
+          <span class="badge rounded-pill bg-warning text-dark px-3 py-2 fw-semibold">
+            <i class="bi bi-award-fill me-1"></i> Level 5 Clearance
+          </span>
+          <span class="badge rounded-pill bg-dark border border-secondary px-3 py-2 fw-semibold">
+            <i class="bi bi-palette-fill me-1"></i> Webpage Palette Modifier Active
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <main class="py-5">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-12 col-lg-8">
+
+            <!-- Webpage Palette Modifier Card -->
+            <div class="sec-console-card p-4 p-md-5 shadow-lg mb-4">
+              <div class="d-flex align-items-center justify-content-between mb-4 border-bottom border-secondary border-opacity-25 pb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-palette2 text-info fs-3"></i>
+                  <div>
+                    <h4 class="fw-bold mb-0 text-white">Webpage Color Palette Modifier</h4>
+                    <small class="text-secondary">Select a palette to dynamically modify the visual theme across all website pages</small>
+                  </div>
+                </div>
+                <span class="badge bg-info text-dark px-3 py-2 fw-bold" id="active-palette-badge">Cyan Matrix</span>
+              </div>
+
+              <p class="text-secondary small mb-4">
+                Clicking any color button below immediately modifies the accent hue, glowing borders, buttons, and highlight typography across <strong>every page</strong> in the project (Home, About Me, Technological Knowledge, CyberSecurity, Login, and Security Control).
+              </p>
+
+              <!-- Color Palette Buttons Grid -->
+              <div class="row g-3 mb-4">
+                <!-- Cyan Matrix (Default) -->
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-info w-100 py-3 text-start fw-semibold d-flex align-items-center justify-content-between" id="palette-cyan">
+                    <span class="d-flex align-items-center">
+                      <span class="d-inline-block rounded-circle me-3" style="width: 20px; height: 20px; background: #0dcaf0; box-shadow: 0 0 10px #0dcaf0;"></span>
+                      Cyan Matrix <span class="badge bg-secondary ms-2 small">Default</span>
+                    </span>
+                    <i class="bi bi-check2 fs-5 palette-check" id="check-cyan"></i>
+                  </button>
+                </div>
+
+                <!-- Terminal Emerald -->
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-success w-100 py-3 text-start fw-semibold d-flex align-items-center justify-content-between" id="palette-emerald">
+                    <span class="d-flex align-items-center">
+                      <span class="d-inline-block rounded-circle me-3" style="width: 20px; height: 20px; background: #10b981; box-shadow: 0 0 10px #10b981;"></span>
+                      Terminal Emerald
+                    </span>
+                    <i class="bi bi-check2 fs-5 palette-check d-none" id="check-emerald"></i>
+                  </button>
+                </div>
+
+                <!-- Crimson Threat -->
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-danger w-100 py-3 text-start fw-semibold d-flex align-items-center justify-content-between" id="palette-crimson">
+                    <span class="d-flex align-items-center">
+                      <span class="d-inline-block rounded-circle me-3" style="width: 20px; height: 20px; background: #ef4444; box-shadow: 0 0 10px #ef4444;"></span>
+                      Crimson Threat
+                    </span>
+                    <i class="bi bi-check2 fs-5 palette-check d-none" id="check-crimson"></i>
+                  </button>
+                </div>
+
+                <!-- Incident Amber -->
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-warning w-100 py-3 text-start fw-semibold d-flex align-items-center justify-content-between" id="palette-amber">
+                    <span class="d-flex align-items-center">
+                      <span class="d-inline-block rounded-circle me-3" style="width: 20px; height: 20px; background: #f59e0b; box-shadow: 0 0 10px #f59e0b;"></span>
+                      Incident Amber
+                    </span>
+                    <i class="bi bi-check2 fs-5 palette-check d-none" id="check-amber"></i>
+                  </button>
+                </div>
+
+                <!-- Cyber Ultraviolet -->
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-secondary w-100 py-3 text-start fw-semibold d-flex align-items-center justify-content-between" style="color: #c084fc; border-color: rgba(168, 85, 247, 0.4);" id="palette-purple">
+                    <span class="d-flex align-items-center">
+                      <span class="d-inline-block rounded-circle me-3" style="width: 20px; height: 20px; background: #a855f7; box-shadow: 0 0 10px #a855f7;"></span>
+                      Cyber Ultraviolet
+                    </span>
+                    <i class="bi bi-check2 fs-5 palette-check d-none" id="check-purple"></i>
+                  </button>
+                </div>
+
+                <!-- Electric Blue -->
+                <div class="col-md-6">
+                  <button type="button" class="btn btn-outline-primary w-100 py-3 text-start fw-semibold d-flex align-items-center justify-content-between" id="palette-blue">
+                    <span class="d-flex align-items-center">
+                      <span class="d-inline-block rounded-circle me-3" style="width: 20px; height: 20px; background: #3b82f6; box-shadow: 0 0 10px #3b82f6;"></span>
+                      Electric Blue
+                    </span>
+                    <i class="bi bi-check2 fs-5 palette-check d-none" id="check-blue"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Reset to Default Button -->
+              <div class="text-center pt-3 border-top border-secondary border-opacity-25">
+                <button type="button" class="btn btn-outline-secondary px-4 py-2 btn-sm fw-semibold" id="btn-reset-palette">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Webpages to Default Cyan Matrix
+                </button>
+              </div>
+            </div>
+
+            <!-- Page Verification Quick Links -->
+            <div class="sec-console-card p-4 shadow-sm text-center">
+              <h6 class="fw-bold text-white mb-2"><i class="bi bi-eye-fill text-info me-2"></i>Verify Theme Across Webpages</h6>
+              <p class="text-secondary small mb-3">Navigate to any webpage below to see the updated palette active site-wide:</p>
+              <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="index.html" class="btn btn-sm btn-outline-info px-3">
+                  <i class="bi bi-house-door me-1"></i> Home
+                </a>
+                <a href="about.html" class="btn btn-sm btn-outline-info px-3">
+                  <i class="bi bi-person me-1"></i> About Me
+                </a>
+                <a href="technology.html" class="btn btn-sm btn-outline-info px-3">
+                  <i class="bi bi-cpu me-1"></i> Technological Knowledge
+                </a>
+                <a href="cybersecurity.html" class="btn btn-sm btn-outline-info px-3">
+                  <i class="bi bi-shield-check me-1"></i> CyberSecurity
+                </a>
+                <a href="login.html" class="btn btn-sm btn-outline-secondary px-3">
+                  <i class="bi bi-person-badge me-1"></i> Login Dashboard
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Section: Contact -->
+  <section id="contact" class="py-5 bg-white border-top">
+    <div class="container py-4 text-center">
+      <h2 class="section-title">Get In Touch</h2>
+      <p class="text-muted mx-auto mb-4" style="max-width: 600px;">
+        Feel free to connect regarding course projects, study groups, or cybersecurity discussions!
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="mailto:student@example.com" class="btn btn-outline-primary px-4 py-2">
+          <i class="bi bi-envelope-fill me-2"></i>Email Me
+        </a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark px-4 py-2">
+          <i class="bi bi-github me-2"></i>GitHub Profile
+        </a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info px-4 py-2">
+          <i class="bi bi-linkedin me-2"></i>LinkedIn
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer with Cybersecurity Tip -->
+  <footer class="pt-5 pb-4">
+    <div class="container">
+      
+      <!-- Cybersecurity Tip Callout -->
+      <div id="cyber-tip" class="cyber-tip-box p-4 rounded-4 text-start mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+          <div class="tip-icon">
+            <i class="bi bi-shield-fill-exclamation text-info fs-3"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge bg-info text-dark fw-bold">PRO TIP</span>
+              <h5 class="text-white mb-0 fw-bold">Cybersecurity Tip of the Day</h5>
+            </div>
+            <p class="mb-0 text-light opacity-90 small">
+              <strong>Enforce Multi-Factor Authentication (MFA) &amp; Use a Password Manager:</strong> Over 80% of data breaches involve compromised or reused passwords. Enabling MFA (preferably using an authenticator app or hardware FIDO2 key rather than SMS) blocks more than <strong>99% of bulk automated credential attacks</strong> according to CISA and Microsoft threat intelligence. Pair this with unique, generated 16+ character passphrases for every account.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="text-center pt-3 border-top border-secondary border-opacity-25">
+        <div class="mb-2">
+          <i class="bi bi-shield-lock text-info fs-4"></i>
+        </div>
+        <p class="mb-1 text-light small">&copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio</p>
+        <p class="small mb-0 text-secondary">Built with Bootstrap 5 &bull; Designed for TECH 3498 Project</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Floating Chatbot Launcher Button -->
+  <button id="chatbot-toggle" aria-label="Open AI Chatbot" title="Chat with CyberBot">
+    <div class="chatbot-pulse-ring"></div>
+    <i class="bi bi-robot"></i>
+  </button>
+
+  <!-- Floating Chat Window Container -->
+  <div id="chatbot-window" class="d-none" role="dialog" aria-modal="true" aria-labelledby="chatbot-title">
+    <div class="chat-header">
+      <div class="d-flex align-items-center gap-2">
+        <div class="icon-box bg-info bg-opacity-20 text-info p-2 mb-0" style="width: 36px; height: 36px; border-radius: 8px;">
+          <i class="bi bi-robot fs-5"></i>
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h6 id="chatbot-title" class="fw-bold mb-0 text-white">CyberBot</h6>
+            <span class="chat-status-dot" title="Online"></span>
+          </div>
+          <span class="text-secondary" style="font-size: 0.72rem;">TECH 3498 AI Assistant</span>
+        </div>
+      </div>
+      <button id="chatbot-close" class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" aria-label="Close Chat">
+        <i class="bi bi-x-lg fs-5"></i>
+      </button>
+    </div>
+
+    <div id="chatbot-messages"></div>
+
+    <form id="chatbot-form" class="chat-input-bar d-flex align-items-center gap-2">
+      <input id="chatbot-input" type="text" class="form-control px-3 py-2" placeholder="Ask about Ronald or TECH 3498..." autocomplete="off">
+      <button type="button" id="chatbot-mic" class="chat-mic-btn flex-shrink-0" aria-label="Voice command" title="Speak to CyberBot (Voice Command)">
+        <i class="bi bi-mic"></i>
+      </button>
+      <button type="submit" class="chat-send-btn flex-shrink-0" aria-label="Send message">
+        <i class="bi bi-arrow-up-short fs-4"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS (Includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- Chatbot Engine Script -->
+  <script src="chatbot.js"></script>
+
+  <!-- Security Page Logic: Palette Modifier -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const unauthorizedView = document.getElementById("unauthorized-view");
+      const authorizedView = document.getElementById("authorized-view");
+      const countdownEl = document.getElementById("countdown");
+      const activeBadge = document.getElementById("active-palette-badge");
+
+      // Verify Authentication Gate
+      const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+      if (!isLoggedIn) {
+        unauthorizedView.classList.remove("d-none");
+        authorizedView.classList.add("d-none");
+
+        let secondsLeft = 5;
+        const timer = setInterval(() => {
+          secondsLeft--;
+          if (countdownEl) countdownEl.textContent = secondsLeft;
+          if (secondsLeft <= 0) {
+            clearInterval(timer);
+            window.location.href = "login.html";
+          }
+        }, 1000);
+        return;
+      }
+
+      unauthorizedView.classList.add("d-none");
+      authorizedView.classList.remove("d-none");
+
+      // Palettes definitions
+      const palettes = {
+        cyan: { name: "Cyan Matrix", color: "#0dcaf0", rgb: "13, 202, 240", checkId: "check-cyan" },
+        emerald: { name: "Terminal Emerald", color: "#10b981", rgb: "16, 185, 129", checkId: "check-emerald" },
+        crimson: { name: "Crimson Threat", color: "#ef4444", rgb: "239, 68, 68", checkId: "check-crimson" },
+        amber: { name: "Incident Amber", color: "#f59e0b", rgb: "245, 158, 11", checkId: "check-amber" },
+        purple: { name: "Cyber Ultraviolet", color: "#a855f7", rgb: "168, 85, 247", checkId: "check-purple" },
+        blue: { name: "Electric Blue", color: "#3b82f6", rgb: "59, 130, 246", checkId: "check-blue" }
+      };
+
+      function updateActiveUI(selectedKey) {
+        document.querySelectorAll(".palette-check").forEach(icon => icon.classList.add("d-none"));
+        const activeItem = palettes[selectedKey] || palettes.cyan;
+        const checkIcon = document.getElementById(activeItem.checkId);
+        if (checkIcon) checkIcon.classList.remove("d-none");
+        if (activeBadge) {
+          activeBadge.textContent = activeItem.name;
+        }
+      }
+
+      function choosePalette(key) {
+        const item = palettes[key];
+        if (!item) return;
+
+        localStorage.setItem("siteCyberPalette", JSON.stringify({
+          key: key,
+          name: item.name,
+          color: item.color,
+          rgb: item.rgb
+        }));
+
+        if (window.applyColorPalette) {
+          window.applyColorPalette(item);
+        }
+
+        updateActiveUI(key);
+      }
+
+      // Read current saved palette or default
+      const savedRaw = localStorage.getItem("siteCyberPalette");
+      let activeKey = "cyan";
+      if (savedRaw) {
+        try {
+          const parsed = JSON.parse(savedRaw);
+          if (parsed && parsed.key) activeKey = parsed.key;
+        } catch (e) {}
+      }
+      updateActiveUI(activeKey);
+
+      // Attach button click listeners
+      document.getElementById("palette-cyan").addEventListener("click", () => choosePalette("cyan"));
+      document.getElementById("palette-emerald").addEventListener("click", () => choosePalette("emerald"));
+      document.getElementById("palette-crimson").addEventListener("click", () => choosePalette("crimson"));
+      document.getElementById("palette-amber").addEventListener("click", () => choosePalette("amber"));
+      document.getElementById("palette-purple").addEventListener("click", () => choosePalette("purple"));
+      document.getElementById("palette-blue").addEventListener("click", () => choosePalette("blue"));
+
+      // Reset button
+      document.getElementById("btn-reset-palette").addEventListener("click", () => {
+        localStorage.removeItem("siteCyberPalette");
+        if (window.applyColorPalette) {
+          window.applyColorPalette(null);
+        }
+        updateActiveUI("cyan");
+      });
+    });
+  </script>
+</body>
+</html>
