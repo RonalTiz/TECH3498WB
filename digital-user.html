@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Digital User Chatbot | TECH 3498</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="theme.js"></script>
+  <script src="auth.js"></script>
+
+  <style>
+    .digital-user-card {
+      background: rgba(11, 17, 32, 0.92);
+      border: 1px solid rgba(13, 202, 240, 0.3);
+      border-radius: 1rem;
+    }
+
+    .avatar-preview {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #172033;
+      border: 3px solid var(--primary-color, #0dcaf0);
+    }
+
+    .chat-history {
+      height: 360px;
+      overflow-y: auto;
+      padding: 1rem;
+      background: rgba(5, 10, 20, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0.75rem;
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 0.7rem 0.9rem;
+      border-radius: 0.85rem;
+      margin-bottom: 0.75rem;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .message-bot {
+      background: #172033;
+      border-left: 3px solid var(--primary-color, #0dcaf0);
+      color: #f8f9fa;
+      margin-right: auto;
+    }
+
+    .message-user {
+      background: rgba(13, 202, 240, 0.18);
+      color: #f8f9fa;
+      margin-left: auto;
+    }
+
+    .small-note {
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">
+        <i class="bi bi-shield-check text-info me-2"></i>TECH 3498<span class="text-info">.sec</span>
+      </a>
+
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a class="nav-link" href="index.html">Back to site</a>
+        <button class="btn btn-outline-warning btn-sm theme-toggle-btn" type="button">
+          <i class="bi bi-sun-fill me-1"></i>
+          <span class="theme-label">Light Theme</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-section text-center">
+    <div class="container hero-content">
+      <div class="avatar-wrapper mb-4">
+        <div class="avatar-inner">
+          <i class="bi bi-person-bounding-box"></i>
+        </div>
+      </div>
+      <h1 class="display-5 fw-bold mb-2">Digital User Chatbot</h1>
+      <p class="lead text-light opacity-75 mx-auto" style="max-width: 700px;">
+        Upload an avatar, describe your digital user, and start a prototype conversation.
+      </p>
+    </div>
+  </header>
+
+  <main class="container py-5">
+    <div class="row g-4 justify-content-center">
+
+      <!-- Create the digital user -->
+      <div class="col-12 col-lg-5">
+        <section class="digital-user-card p-4 h-100">
+          <h2 class="h4 text-white mb-3">
+            <i class="bi bi-person-plus text-info me-2"></i>Create a Digital User
+          </h2>
+
+          <p class="text-secondary small-note">
+            Choose an image and provide a name and description. The image is shown as an avatar;
+            this GitHub Pages prototype does not analyze image contents.
+          </p>
+
+          <div class="text-center my-4">
+            <img
+              id="avatar-preview"
+              class="avatar-preview"
+              alt="Digital user avatar preview"
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='112' viewBox='0 0 112 112'%3E%3Crect width='112' height='112' fill='%23172033'/%3E%3Ctext x='56' y='68' text-anchor='middle' font-size='48' fill='%230dcaf0'%3E%3F%3C/text%3E%3C/svg%3E">
+          </div>
+
+          <form id="profile-form">
+            <div class="mb-3">
+              <label for="avatar-file" class="form-label text-light">Avatar image</label>
+              <input
+                id="avatar-file"
+                class="form-control"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif">
+              <div class="form-text">PNG, JPEG, WebP, or GIF; maximum 5 MB.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="persona-name" class="form-label text-light">Digital user name</label>
+              <input
+                id="persona-name"
+                class="form-control"
+                type="text"
+                maxlength="50"
+                placeholder="For example, Alex"
+                required>
+            </div>
+
+            <div class="mb-3">
+              <label for="persona-description" class="form-label text-light">
+                Describe the digital user
+              </label>
+              <textarea
+                id="persona-description"
+                class="form-control"
+                rows="4"
+                maxlength="300"
+                placeholder="For example: Alex is a friendly student who enjoys science fiction and helping people."
+                required></textarea>
+            </div>
+
+            <button class="btn btn-info text-dark fw-bold w-100" type="submit">
+              <i class="bi bi-stars me-1"></i>Create Digital User
+            </button>
+          </form>
+
+          <div class="alert alert-warning small mt-3 mb-0">
+            Prototype notice: the chat uses scripted replies based on your description.
+            It is not connected to an AI service and does not identify people in images.
+          </div>
+        </section>
+      </div>
+
+      <!-- Chat with the digital user -->
+      <div class="col-12 col-lg-7">
+        <section class="digital-user-card p-4">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <img
+              id="chat-avatar"
+              class="avatar-preview"
+              style="width: 58px; height: 58px;"
+              alt="Digital user avatar"
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='112' viewBox='0 0 112 112'%3E%3Crect width='112' height='112' fill='%23172033'/%3E%3Ctext x='56' y='68' text-anchor='middle' font-size='48' fill='%230dcaf0'%3E%3F%3C/text%3E%3C/svg%3E">
+
+            <div>
+              <h2 id="chat-title" class="h4 text-white mb-1">Your Digital User</h2>
+              <span id="chat-status" class="text-secondary small">Create a profile to begin chatting.</span>
+            </div>
+          </div>
+
+          <div
+            id="chat-history"
+            class="chat-history mb-3"
+            role="log"
+            aria-live="polite"
+            aria-label="Chat messages">
+            <div class="message message-bot">
+              Hi! Create a digital user with the form, then you can chat with that persona here.
+            </div>
+          </div>
+
+          <form id="chat-form" class="d-flex gap-2">
+            <input
+              id="chat-input"
+              class="form-control"
+              type="text"
+              placeholder="Create a digital user first..."
+              autocomplete="off"
+              disabled>
+            <button id="send-button" class="btn btn-info text-dark" type="submit" disabled>
+              <i class="bi bi-send-fill"></i>
+              <span class="visually-hidden">Send</span>
+            </button>
+          </form>
+
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <small class="text-secondary">Replies are generated locally by this prototype.</small>
+            <button id="speak-toggle" class="btn btn-sm btn-outline-info" type="button" aria-pressed="false">
+              <i class="bi bi-volume-up me-1"></i>Voice off
+            </button>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const profileForm = document.getElementById("profile-form");
+      const fileInput = document.getElementById("avatar-file");
+      const nameInput = document.getElementById("persona-name");
+      const descriptionInput = document.getElementById("persona-description");
+      const avatarPreview = document.getElementById("avatar-preview");
+      const chatAvatar = document.getElementById("chat-avatar");
+      const chatTitle = document.getElementById("chat-title");
+      const chatStatus = document.getElementById("chat-status");
+      const chatHistory = document.getElementById("chat-history");
+      const chatForm = document.getElementById("chat-form");
+      const chatInput = document.getElementById("chat-input");
+      const sendButton = document.getElementById("send-button");
+      const speakToggle = document.getElementById("speak-toggle");
+
+      let selectedImageUrl = "";
+      let persona = null;
+      let voiceEnabled = false;
+
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+
+        const validTypes = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+
+        if (!validTypes.includes(file.type)) {
+          alert("Choose a PNG, JPEG, WebP, or GIF image.");
+          fileInput.value = "";
+          return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          alert("Please choose an image smaller than 5 MB.");
+          fileInput.value = "";
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          selectedImageUrl = reader.result;
+          avatarPreview.src = selectedImageUrl;
+          chatAvatar.src = selectedImageUrl;
+        };
+
+        reader.onerror = () => {
+          alert("The image could not be read. Please try another file.");
+          fileInput.value = "";
+        };
+
+        reader.readAsDataURL(file);
+      });
+
+      function addMessage(text, sender) {
+        const message = document.createElement("div");
+        message.className = `message ${sender === "user" ? "message-user" : "message-bot"}`;
+        message.textContent = text;
+        chatHistory.appendChild(message);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }
+
+      function respondTo(message) {
+        const name = persona.name;
+        const description = persona.description;
+        const lower = message.toLowerCase();
+
+        if (/\b(hi|hello|hey)\b/.test(lower)) {
+          return `Hi! I'm ${name}. It's nice to meet you. What would you like to talk about?`;
+        }
+
+        if (lower.includes("who are you") || lower.includes("your name")) {
+          return `I'm ${name}. Here's how you described me: ${description}`;
+        }
+
+        if (lower.includes("image") || lower.includes("look like") || lower.includes("see")) {
+          return `You created my avatar from an uploaded image. I can't inspect the image itself, but you described me this way: ${description}`;
+        }
+
+        if (lower.includes("describe") || lower.includes("about you")) {
+          return `I'm ${name}. Based on your description, ${description}`;
+        }
+
+        if (lower.includes("help") || lower.includes("what can you do")) {
+          return `I'm ${name}, a digital-user prototype. You can ask about my name, my description, or just start a conversation. My persona is based on this description: ${description}`;
+        }
+
+        return `That's interesting. I'm ${name}, and I'm responding as the digital user you described: ${description}`;
+      }
+
+      profileForm.addEventListener("submit", event => {
+        event.preventDefault();
+
+        const name = nameInput.value.trim();
+        const description = descriptionInput.value.trim();
+
+        if (!name || !description) {
+          alert("Please enter a name and description for the digital user.");
+          return;
+        }
+
+        persona = { name, description };
+
+        chatTitle.textContent = name;
+        chatStatus.textContent = "Digital user ready to chat.";
+        chatInput.disabled = false;
+        sendButton.disabled = false;
+        chatInput.placeholder = `Message ${name}...`;
+
+        if (selectedImageUrl) {
+          chatAvatar.src = selectedImageUrl;
+        }
+
+        chatHistory.replaceChildren();
+        addMessage(
+          `Hi! I'm ${name}. You described me as: ${description} What would you like to talk about?`,
+          "bot"
+        );
+
+        chatInput.focus();
+      });
+
+      chatForm.addEventListener("submit", event => {
+        event.preventDefault();
+
+        const text = chatInput.value.trim();
+        if (!text || !persona) return;
+
+        addMessage(text, "user");
+        chatInput.value = "";
+
+        const reply = respondTo(text);
+        addMessage(reply, "bot");
+
+        if (voiceEnabled && "speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
+        }
+      });
+
+      speakToggle.addEventListener("click", () => {
+        voiceEnabled = !voiceEnabled;
+        speakToggle.setAttribute("aria-pressed", String(voiceEnabled));
+        speakToggle.innerHTML = voiceEnabled
+          ? '<i class="bi bi-volume-up-fill me-1"></i>Voice on'
+          : '<i class="bi bi-volume-up me-1"></i>Voice off';
+
+        if (!voiceEnabled && "speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

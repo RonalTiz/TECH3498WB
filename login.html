@@ -3,61 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login | TECH 3498 IT Computer Security</title>
-  
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <!-- Custom Stylesheet -->
+  <title>Login | TECH 3498 IT Computer Security</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+        crossorigin="anonymous">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="style.css">
-  <!-- Theme Controller (Dark mode default with toggle) -->
+
   <script src="theme.js"></script>
-  <!-- Auth State Sync -->
   <script src="auth.js"></script>
 </head>
 <body>
 
-  <!-- Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
       <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
         <i class="bi bi-shield-check text-info fs-4"></i>
         <span>TECH 3498<span class="text-info">.sec</span></span>
       </a>
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+
+      <button class="navbar-toggler border-0" type="button"
+              data-bs-toggle="collapse" data-bs-target="#navbarContent"
+              aria-controls="navbarContent" aria-expanded="false"
+              aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-lg-center">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="about.html">About Me</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="technology.html">Technological Knowledge</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="cybersecurity.html">CyberSecurity</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About Me</a></li>
+          <li class="nav-item"><a class="nav-link" href="technology.html">Technological Knowledge</a></li>
+          <li class="nav-item"><a class="nav-link" href="cybersecurity.html">CyberSecurity</a></li>
           <li class="nav-item nav-security-item d-none">
             <a class="nav-link text-warning fw-semibold" href="security.html">
               <i class="bi bi-shield-shaded me-1"></i>Security Control
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link btn btn-outline-info text-info px-3 ms-lg-2 py-1" href="#contact">Contact</a>
+            <a class="nav-link btn btn-outline-info text-info px-3 ms-lg-2 py-1"
+               href="#contact">Contact</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link nav-login-link active text-info" aria-current="page" href="login.html">
+            <a class="nav-link nav-login-link active text-info"
+               aria-current="page" href="login.html">
               <i class="bi bi-box-arrow-in-right me-1"></i>Login
             </a>
           </li>
           <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-            <button class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center" type="button" title="Switch to Original Light Theme">
-              <i class="bi bi-sun-fill text-warning me-1"></i> <span class="theme-label">Light Theme</span>
+            <button class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center"
+                    type="button" title="Switch to Original Light Theme">
+              <i class="bi bi-sun-fill text-warning me-1"></i>
+              <span class="theme-label">Light Theme</span>
             </button>
           </li>
         </ul>
@@ -65,7 +65,6 @@
     </div>
   </nav>
 
-  <!-- Hero Header -->
   <header class="hero-section text-center">
     <div class="container hero-content">
       <div class="avatar-wrapper mb-4">
@@ -73,16 +72,18 @@
           <i class="bi bi-shield-lock-fill"></i>
         </div>
       </div>
+
       <h1 class="display-5 fw-bold mb-2">Portal Authentication</h1>
       <p class="lead text-light opacity-75 mb-3 mx-auto" style="max-width: 680px;">
-        Administrative access portal for <strong>TECH 3498: IT Computer Security</strong>
+        Sign in to the <strong>TECH 3498: IT Computer Security</strong> prototype.
       </p>
+
       <div class="d-flex flex-wrap justify-content-center gap-2 mb-2">
         <span class="badge rounded-pill bg-info text-dark px-3 py-2 fw-semibold">
-          <i class="bi bi-key-fill me-1"></i> Single Admin Account
+          <i class="bi bi-people-fill me-1"></i>Two Demo Accounts
         </span>
         <span class="badge rounded-pill bg-dark border border-secondary px-3 py-2 fw-semibold">
-          <i class="bi bi-shield-check me-1"></i> Role-Based Access Control
+          <i class="bi bi-shield-check me-1"></i>Role-Based Demo Access
         </span>
       </div>
     </div>
@@ -93,104 +94,132 @@
       <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-5">
 
-          <!-- Login Form Card (Shown when logged out) -->
           <div id="login-card" class="card feature-card shadow-lg p-4 p-md-5 border-0">
             <div class="text-center mb-4">
-              <div class="icon-box bg-info bg-opacity-10 text-info mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem;">
+              <div class="icon-box bg-info bg-opacity-10 text-info mx-auto mb-3"
+                   style="width: 64px; height: 64px; font-size: 1.8rem;">
                 <i class="bi bi-person-lock"></i>
               </div>
               <h3 class="fw-bold mb-1">Account Login</h3>
-              <p class="text-muted small">Sign in to manage course telemetry and admin resources</p>
+              <p class="text-muted small">Sign in with one of the prototype accounts.</p>
             </div>
 
-            <!-- Error Alert -->
-            <div id="login-error-alert" class="alert alert-danger d-none py-2 px-3 small align-items-center gap-2 mb-4" role="alert">
+            <div id="login-error-alert"
+                 class="alert alert-danger d-none py-2 px-3 small align-items-center gap-2 mb-4"
+                 role="alert">
               <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
-              <div id="error-message">Invalid username or password. Please verify credentials.</div>
+              <div id="error-message">Invalid username or password.</div>
             </div>
 
-            <!-- Login Form -->
             <form id="login-form" novalidate>
-              <!-- Username -->
               <div class="mb-3">
-                <label for="username" class="form-label small fw-bold text-uppercase text-secondary">Username</label>
+                <label for="username"
+                       class="form-label small fw-bold text-uppercase text-secondary">
+                  Username
+                </label>
                 <div class="input-group">
                   <span class="input-group-text bg-transparent border-end-0 text-secondary">
                     <i class="bi bi-person-fill"></i>
                   </span>
-                  <input type="text" class="form-control border-start-0" id="username" placeholder="e.g. admin" required autocomplete="username">
+                  <input type="text" class="form-control border-start-0"
+                         id="username" placeholder="Enter username" required
+                         autocomplete="username">
                 </div>
               </div>
 
-              <!-- Password -->
               <div class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                  <label for="password" class="form-label small fw-bold text-uppercase text-secondary mb-0">Password</label>
-                </div>
+                <label for="password"
+                       class="form-label small fw-bold text-uppercase text-secondary">
+                  Password
+                </label>
                 <div class="input-group">
                   <span class="input-group-text bg-transparent border-end-0 text-secondary">
                     <i class="bi bi-lock-fill"></i>
                   </span>
-                  <input type="password" class="form-control border-start-0 border-end-0" id="password" placeholder="Enter password" required autocomplete="current-password">
-                  <button class="btn btn-outline-secondary border-start-0" type="button" id="toggle-password" title="Show/Hide Password">
+                  <input type="password"
+                         class="form-control border-start-0 border-end-0"
+                         id="password" placeholder="Enter password" required
+                         autocomplete="current-password">
+                  <button class="btn btn-outline-secondary border-start-0"
+                          type="button" id="toggle-password"
+                          title="Show/Hide Password" aria-label="Show or hide password">
                     <i class="bi bi-eye" id="toggle-icon"></i>
                   </button>
                 </div>
               </div>
 
-              <!-- Submit Button -->
-              <button type="submit" class="btn btn-info text-dark fw-bold w-100 py-2 mb-3 shadow-sm">
-                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+              <button type="submit"
+                      class="btn btn-info text-dark fw-bold w-100 py-2 mb-3 shadow-sm">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
               </button>
             </form>
+
           </div>
 
-          <!-- Logged-in Dashboard Card (Shown when authenticated) -->
-          <div id="dashboard-card" class="card feature-card shadow-lg p-4 p-md-5 border-0 d-none">
+          <div id="dashboard-card"
+               class="card feature-card shadow-lg p-4 p-md-5 border-0 d-none">
             <div class="text-center mb-4">
-              <div class="icon-box bg-success bg-opacity-10 text-success mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem;">
+              <div class="icon-box bg-success bg-opacity-10 text-success mx-auto mb-3"
+                   style="width: 64px; height: 64px; font-size: 1.8rem;">
                 <i class="bi bi-shield-check"></i>
               </div>
-              <span class="badge bg-success bg-opacity-25 text-success mb-2 px-3 py-1 fw-bold">AUTHENTICATED</span>
-              <h3 class="fw-bold mb-1">Welcome, Administrator</h3>
-              <p class="text-muted small">You are currently logged into the TECH 3498 Security Dashboard.</p>
+              <span class="badge bg-success bg-opacity-25 text-success mb-2 px-3 py-1 fw-bold">
+                AUTHENTICATED
+              </span>
+              <h3 id="welcome-title" class="fw-bold mb-1">Welcome</h3>
+              <p class="text-muted small">
+                You are signed into the TECH 3498 prototype.
+              </p>
             </div>
 
             <div class="d-flex flex-column gap-3 mb-4">
               <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
                 <span class="small text-secondary">Logged in user:</span>
-                <span class="fw-bold text-info"><i class="bi bi-person-badge me-1"></i>admin</span>
+                <span id="logged-in-user" class="fw-bold text-info">
+                  <i class="bi bi-person-badge me-1"></i>
+                </span>
               </div>
+
               <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
-                <span class="small text-secondary">Clearance Level:</span>
-                <span class="badge bg-primary px-2 py-1">Level 5 (Course Admin)</span>
+                <span class="small text-secondary">Role:</span>
+                <span id="clearance-badge" class="badge bg-primary px-2 py-1"></span>
               </div>
+
               <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
-                <span class="small text-secondary">Session Status:</span>
-                <span class="text-success small fw-semibold"><i class="bi bi-circle-fill fs-6 me-1"></i>Active Secure Session</span>
+                <span class="small text-secondary">Session status:</span>
+                <span class="text-success small fw-semibold">
+                  <i class="bi bi-circle-fill fs-6 me-1"></i>Active
+                </span>
               </div>
             </div>
 
-            <!-- Quick Action Links -->
-            <div class="mb-4">
-              <a href="security.html" class="btn btn-warning text-dark w-100 py-2 fw-bold shadow-sm">
-                <i class="bi bi-shield-shaded me-1"></i> Open Security Control Console &rarr;
+            <div id="admin-actions" class="mb-4 d-none">
+              <a href="security.html"
+                 class="btn btn-warning text-dark w-100 py-2 fw-bold shadow-sm">
+                <i class="bi bi-shield-shaded me-1"></i>
+                Open Admin Console →
               </a>
             </div>
 
-            <!-- Logout Button -->
-            <button id="logout-btn" class="btn btn-outline-danger w-100 py-2 fw-semibold">
-              <i class="bi bi-box-arrow-left me-1"></i> Log Out
+            <div id="user-actions" class="mb-4 d-none">
+              <a href="user.html" class="btn btn-info text-dark w-100 py-2 fw-bold">
+                <i class="bi bi-person-circle me-1"></i>Open My Profile
+              </a>
+            </div>
+
+            <button id="logout-btn"
+                    class="btn btn-outline-danger w-100 py-2 fw-semibold">
+              <i class="bi bi-box-arrow-left me-1"></i>Log Out
             </button>
           </div>
 
-          <!-- Academic Cybersecurity Educational Callout -->
           <div class="alert alert-warning bg-warning bg-opacity-10 border-warning border-opacity-25 mt-4 p-3 rounded-3 small text-secondary">
             <div class="d-flex align-items-start gap-2">
               <i class="bi bi-shield-exclamation text-warning fs-5 flex-shrink-0 mt-1"></i>
               <div>
-                <strong class="text-dark-emphasis">Cybersecurity Course Notice:</strong>
-                Using default or predictable credentials is recognized in <strong>OWASP Top 10 (A05: Security Misconfiguration)</strong> as a primary vector for credential spraying and automated brute-force breaches. In production environments, accounts must always require complex passphrases, account lockout thresholds, and Multi-Factor Authentication (MFA).
+                <strong class="text-dark-emphasis">Prototype notice:</strong>
+                These demo credentials and role checks are stored in client-side code.
+                They are for demonstration only and are not secure authentication.
               </div>
             </div>
           </div>
@@ -200,7 +229,6 @@
     </div>
   </main>
 
-  <!-- Section: Contact -->
   <section id="contact" class="py-5 bg-white border-top">
     <div class="container py-4 text-center">
       <h2 class="section-title">Get In Touch</h2>
@@ -211,21 +239,20 @@
         <a href="mailto:student@example.com" class="btn btn-outline-primary px-4 py-2">
           <i class="bi bi-envelope-fill me-2"></i>Email Me
         </a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark px-4 py-2">
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+           class="btn btn-outline-dark px-4 py-2">
           <i class="bi bi-github me-2"></i>GitHub Profile
         </a>
-        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info px-4 py-2">
+        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
+           class="btn btn-outline-info px-4 py-2">
           <i class="bi bi-linkedin me-2"></i>LinkedIn
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Footer with Cybersecurity Tip -->
   <footer class="pt-5 pb-4">
     <div class="container">
-      
-      <!-- Cybersecurity Tip Callout -->
       <div id="cyber-tip" class="cyber-tip-box p-4 rounded-4 text-start mb-4">
         <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
           <div class="tip-icon">
@@ -237,35 +264,36 @@
               <h5 class="text-white mb-0 fw-bold">Cybersecurity Tip of the Day</h5>
             </div>
             <p class="mb-0 text-light opacity-90 small">
-              <strong>Enforce Multi-Factor Authentication (MFA) &amp; Use a Password Manager:</strong> Over 80% of data breaches involve compromised or reused passwords. Enabling MFA (preferably using an authenticator app or hardware FIDO2 key rather than SMS) blocks more than <strong>99% of bulk automated credential attacks</strong> according to CISA and Microsoft threat intelligence. Pair this with unique, generated 16+ character passphrases for every account.
+              Use unique passwords and enable multi-factor authentication on real accounts.
+              This prototype does not provide production-grade authentication.
             </p>
           </div>
         </div>
       </div>
 
-      <!-- Footer Bottom -->
       <div class="text-center pt-3 border-top border-secondary border-opacity-25">
-        <div class="mb-2">
-          <i class="bi bi-shield-lock text-info fs-4"></i>
-        </div>
-        <p class="mb-1 text-light small">&copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio</p>
-        <p class="small mb-0 text-secondary">Built with Bootstrap 5 &bull; Designed for TECH 3498 Project</p>
+        <div class="mb-2"><i class="bi bi-shield-lock text-info fs-4"></i></div>
+        <p class="mb-1 text-light small">
+          &copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio
+        </p>
+        <p class="small mb-0 text-secondary">
+          Built with Bootstrap 5 &bull; Designed for TECH 3498 Project
+        </p>
       </div>
-
     </div>
   </footer>
 
-  <!-- Floating Chatbot Launcher Button -->
   <button id="chatbot-toggle" aria-label="Open AI Chatbot" title="Chat with CyberBot">
     <div class="chatbot-pulse-ring"></div>
     <i class="bi bi-robot"></i>
   </button>
 
-  <!-- Floating Chat Window Container -->
-  <div id="chatbot-window" class="d-none" role="dialog" aria-modal="true" aria-labelledby="chatbot-title">
+  <div id="chatbot-window" class="d-none" role="dialog" aria-modal="true"
+       aria-labelledby="chatbot-title">
     <div class="chat-header">
       <div class="d-flex align-items-center gap-2">
-        <div class="icon-box bg-info bg-opacity-20 text-info p-2 mb-0" style="width: 36px; height: 36px; border-radius: 8px;">
+        <div class="icon-box bg-info bg-opacity-20 text-info p-2 mb-0"
+             style="width: 36px; height: 36px; border-radius: 8px;">
           <i class="bi bi-robot fs-5"></i>
         </div>
         <div>
@@ -276,7 +304,9 @@
           <span class="text-secondary" style="font-size: 0.72rem;">TECH 3498 AI Assistant</span>
         </div>
       </div>
-      <button id="chatbot-close" class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" aria-label="Close Chat">
+      <button id="chatbot-close"
+              class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+              aria-label="Close Chat">
         <i class="bi bi-x-lg fs-5"></i>
       </button>
     </div>
@@ -284,8 +314,10 @@
     <div id="chatbot-messages"></div>
 
     <form id="chatbot-form" class="chat-input-bar d-flex align-items-center gap-2">
-      <input id="chatbot-input" type="text" class="form-control px-3 py-2" placeholder="Ask about Ronald or TECH 3498..." autocomplete="off">
-      <button type="button" id="chatbot-mic" class="chat-mic-btn flex-shrink-0" aria-label="Voice command" title="Speak to CyberBot (Voice Command)">
+      <input id="chatbot-input" type="text" class="form-control px-3 py-2"
+             placeholder="Ask about Ronald or TECH 3498..." autocomplete="off">
+      <button type="button" id="chatbot-mic" class="chat-mic-btn flex-shrink-0"
+              aria-label="Voice command" title="Speak to CyberBot">
         <i class="bi bi-mic"></i>
       </button>
       <button type="submit" class="chat-send-btn flex-shrink-0" aria-label="Send message">
@@ -294,14 +326,13 @@
     </form>
   </div>
 
-  <!-- Bootstrap 5 Bundle JS (Includes Popper) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  <!-- Chatbot Engine Script -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
   <script src="chatbot.js"></script>
 
-  <!-- Page-Specific Login Logic -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", () => {
       const loginCard = document.getElementById("login-card");
       const dashboardCard = document.getElementById("dashboard-card");
       const loginForm = document.getElementById("login-form");
@@ -312,76 +343,115 @@
       const togglePasswordBtn = document.getElementById("toggle-password");
       const toggleIcon = document.getElementById("toggle-icon");
       const logoutBtn = document.getElementById("logout-btn");
+      const logsKey = "siteCyberLoginLogs";
 
-      // Check current login state
+      // Demo credentials only; do not use this pattern for real authentication.
+      const accounts = {
+        admin: { password: "password", role: "admin" },
+        user: { password: "user123", role: "user" }
+      };
+
+      function recordLogin(username, success, details) {
+        let logs = [];
+
+        try {
+          const storedLogs = JSON.parse(localStorage.getItem(logsKey) || "[]");
+          if (Array.isArray(storedLogs)) logs = storedLogs;
+        } catch {
+          logs = [];
+        }
+
+        logs.push({
+          timestamp: new Date().toISOString(),
+          username: username || "Unknown",
+          success,
+          details
+        });
+
+        localStorage.setItem(logsKey, JSON.stringify(logs.slice(-100)));
+      }
+
+      function updateDashboard() {
+        const username = sessionStorage.getItem("authUser") || "";
+        const role = sessionStorage.getItem("authRole");
+        const isAdmin = role === "admin";
+
+        document.getElementById("welcome-title").textContent =
+          isAdmin ? "Welcome, Administrator" : "Welcome, User";
+
+        // Set only the username text, leaving the icon in place.
+        const userElement = document.getElementById("logged-in-user");
+        userElement.replaceChildren(
+          document.createElement("i"),
+          document.createTextNode(username)
+        );
+        userElement.firstElementChild.className = "bi bi-person-badge me-1";
+        userElement.firstElementChild.setAttribute("aria-hidden", "true");
+
+        document.getElementById("clearance-badge").textContent =
+          isAdmin ? "Level 5 (Course Admin)" : "Standard User";
+
+        document.getElementById("admin-actions").classList.toggle("d-none", !isAdmin);
+        document.getElementById("user-actions").classList.toggle("d-none", isAdmin);
+      }
+
       function checkAuthState() {
         const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
-        if (isLoggedIn) {
-          loginCard.classList.add("d-none");
-          dashboardCard.classList.remove("d-none");
-        } else {
-          loginCard.classList.remove("d-none");
-          dashboardCard.classList.add("d-none");
+
+        loginCard.classList.toggle("d-none", isLoggedIn);
+        dashboardCard.classList.toggle("d-none", !isLoggedIn);
+
+        if (isLoggedIn) updateDashboard();
+
+        if (window.syncNavbarAuthState) {
+          window.syncNavbarAuthState();
         }
       }
 
       checkAuthState();
 
-      // Show/Hide password toggle
-      if (togglePasswordBtn && passwordInput) {
-        togglePasswordBtn.addEventListener("click", function () {
-          const isPassword = passwordInput.type === "password";
-          passwordInput.type = isPassword ? "text" : "password";
-          toggleIcon.className = isPassword ? "bi bi-eye-slash" : "bi bi-eye";
-        });
-      }
+      togglePasswordBtn.addEventListener("click", () => {
+        const showingPassword = passwordInput.type === "password";
+        passwordInput.type = showingPassword ? "text" : "password";
+        toggleIcon.className = showingPassword ? "bi bi-eye-slash" : "bi bi-eye";
+      });
 
-      // Handle Login Form Submit
-      loginForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const username = usernameInput.value.trim();
+      loginForm.addEventListener("submit", event => {
+        event.preventDefault();
+
+        const username = usernameInput.value.trim().toLowerCase();
         const password = passwordInput.value;
+        const account = accounts[username];
 
-        // Requirement: Single account with username 'admin' and password 'password'
-        if (username === "admin" && password === "password") {
-          errorAlert.classList.add("d-none");
-          sessionStorage.setItem("isLoggedIn", "true");
-          sessionStorage.setItem("authUser", "admin");
-
-          // Update navbar state
-          const navLoginLink = document.querySelector(".nav-login-link");
-          if (navLoginLink) {
-            navLoginLink.innerHTML = '<i class="bi bi-shield-check text-success me-1"></i>Dashboard (admin)';
-          }
-
-          checkAuthState();
-          if (window.applySiteModifications) window.applySiteModifications();
-        } else {
+        if (!account || account.password !== password) {
+          recordLogin(username, false, "Invalid username or password");
           errorMessage.textContent = "Invalid username or password.";
           errorAlert.classList.remove("d-none");
           passwordInput.value = "";
           passwordInput.focus();
+          return;
         }
+
+        recordLogin(username, true, "Login successful");
+        errorAlert.classList.add("d-none");
+
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("authUser", username);
+        sessionStorage.setItem("authRole", account.role);
+
+        checkAuthState();
       });
 
-      // Handle Logout
-      logoutBtn.addEventListener("click", function () {
+      logoutBtn.addEventListener("click", () => {
         sessionStorage.removeItem("isLoggedIn");
         sessionStorage.removeItem("authUser");
+        sessionStorage.removeItem("authRole");
 
-        // Reset inputs
         usernameInput.value = "";
         passwordInput.value = "";
         errorAlert.classList.add("d-none");
 
-        // Update navbar state
-        const navLoginLink = document.querySelector(".nav-login-link");
-        if (navLoginLink) {
-          navLoginLink.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i>Login';
-        }
-
         checkAuthState();
-        if (window.applySiteModifications) window.applySiteModifications();
       });
     });
   </script>

@@ -185,6 +185,7 @@
     const chatForm = document.getElementById("chatbot-form");
     const chatInput = document.getElementById("chatbot-input");
     const micBtn = document.getElementById("chatbot-mic");
+    
 
     if (!toggleBtn || !chatWindow || !messagesContainer || !chatForm || !chatInput) {
       return;
