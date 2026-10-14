@@ -216,6 +216,14 @@
               aria-label="Slide 4: Limitations">
               Limitations
             </button>
+            <button
+              type="button"
+              data-bs-target="#securityCarousel"
+              data-bs-slide-to="4"
+              aria-label="Slide 5: Input security">
+              Input Security
+            </button>
+            
           </div>
 
           <div class="carousel-inner">
@@ -477,7 +485,170 @@
                 </div>
               </div>
             </div>
-
+            <!-- Slide 5: User Input Security -->
+            <div class="carousel-item">
+              <div class="security-slide-content card feature-card shadow-sm p-4 p-md-5">
+                <div class="mb-4">
+                  <span class="badge bg-danger mb-2">05 · User Input Security</span>
+                  <h3 class="fw-bold">Handling User Input Safely</h3>
+                  <p class="text-secondary mb-0">
+                    Login details, profile names, chatbot messages, and persona descriptions
+                    are all untrusted input. Validate them, display them safely, and enforce
+                    access rules where data is stored or processed.
+                  </p>
+                </div>
+            
+                <div class="row g-3">
+            
+                  <!-- Input validation -->
+                  <div class="col-12">
+                    <article class="card feature-card h-100 p-3">
+                      <h4 class="h5 fw-bold">
+                        <i class="bi bi-check2-square text-info me-2"></i>Input Validation
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <h5 class="h6 text-danger">Vulnerable: trust browser checks alone</h5>
+                          <pre class="bg-dark text-light rounded p-3 small mb-0"><code>&lt;input maxlength="50" required&gt;</code></pre>
+                          <p class="text-secondary small mt-2 mb-0">
+                            Browser checks help with usability, but visitors can bypass them
+                            or send requests directly to an API.
+                          </p>
+                        </div>
+                        <div class="col-md-6">
+                          <h5 class="h6 text-success">Safer: validate again on the server</h5>
+                          <pre class="bg-dark text-light rounded p-3 small mb-0"><code>function validMessage(value) {
+              return typeof value === "string" &amp;&amp;
+                value.trim().length &gt; 0 &amp;&amp;
+                value.length &lt;= 2000;
+            }
+            
+            if (!validMessage(req.body?.message)) {
+              return res.status(400).json({ error: "Invalid message." });
+            }</code></pre>
+                          <p class="text-secondary small mt-2 mb-0">
+                            Define allowed types, formats, and maximum lengths for each field.
+                            Client-side validation is useful, but server-side validation is
+                            essential.
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+            
+                  <!-- Parameterized queries and prepared statements -->
+                  <div class="col-12">
+                    <article class="card feature-card h-100 p-3">
+                      <h4 class="h5 fw-bold">
+                        <i class="bi bi-database-lock text-info me-2"></i>
+                        Parameterized Queries &amp; Prepared Statements
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <h5 class="h6 text-danger">Vulnerable: concatenate input into SQL</h5>
+                          <pre class="bg-dark text-light rounded p-3 small mb-0"><code>const sql =
+              "SELECT * FROM users WHERE email = '" + email + "'";
+            
+            const result = await db.query(sql);</code></pre>
+                          <p class="text-secondary small mt-2 mb-0">
+                            SQL syntax entered as part of the value may change the query.
+                          </p>
+                        </div>
+                        <div class="col-md-6">
+                          <h5 class="h6 text-success">Safer: pass values separately</h5>
+                          <pre class="bg-dark text-light rounded p-3 small mb-0"><code>const result = await db.query(
+              "SELECT id, email FROM users WHERE email = $1",
+              [email]
+            );</code></pre>
+                          <p class="text-secondary small mt-2 mb-0">
+                            Parameterized queries treat input as data. A prepared statement
+                            uses a separately defined query and supplied values; database
+                            drivers often support both together. Don’t interpolate user
+                            values into SQL.
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+            
+                  <!-- Secure database access -->
+                  <div class="col-12">
+                    <article class="card feature-card h-100 p-3">
+                      <h4 class="h5 fw-bold">
+                        <i class="bi bi-person-lock text-info me-2"></i>Secure Database Access
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <h5 class="h6 text-danger">Vulnerable: trust a browser-supplied user ID</h5>
+                          <pre class="bg-dark text-light rounded p-3 small mb-0"><code>// A visitor could change req.body.userId.
+            const result = await db.query(
+              "SELECT * FROM profiles WHERE id = $1",
+              [req.body.userId]
+            );</code></pre>
+                          <p class="text-secondary small mt-2 mb-0">
+                            This query is parameterized, but it does not establish that the
+                            requester owns the requested profile.
+                          </p>
+                        </div>
+                        <div class="col-md-6">
+                          <h5 class="h6 text-success">Safer: use verified identity and authorization</h5>
+                          <pre class="bg-dark text-light rounded p-3 small mb-0"><code>const user = await getAuthenticatedUser(req);
+            
+            if (!user) {
+              return res.status(401).json({ error: "Sign in required." });
+            }
+            
+            const result = await db.query(
+              "SELECT display_name FROM profiles WHERE id = $1",
+              [user.id]
+            );</code></pre>
+                          <p class="text-secondary small mt-2 mb-0">
+                            Derive identity from a verified session, restrict access with
+                            database permissions, and use Supabase Row Level Security (RLS)
+                            so users can access only permitted rows.
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+            
+                  <!-- Safe display and additional protections -->
+                  <div class="col-md-6">
+                    <article class="card feature-card h-100 p-3">
+                      <h4 class="h5 fw-bold">
+                        <i class="bi bi-code-slash text-info me-2"></i>Display Text Safely
+                      </h4>
+                      <p class="text-secondary small">
+                        Avoid interpreting user-provided text as HTML. For plain-text messages,
+                        use <code>textContent</code>, not <code>innerHTML</code>.
+                      </p>
+                      <pre class="bg-dark text-light rounded p-3 small mb-0"><code>messageElement.textContent = userMessage;</code></pre>
+                    </article>
+                  </div>
+            
+                  <div class="col-md-6">
+                    <article class="card feature-card h-100 p-3">
+                      <h4 class="h5 fw-bold">
+                        <i class="bi bi-speedometer2 text-info me-2"></i>Limit Abuse
+                      </h4>
+                      <p class="text-secondary small mb-0">
+                        Add rate limits and usage monitoring to public API routes, especially
+                        AI endpoints. Keep OpenAI and Supabase secret/service-role keys on the
+                        server, never in browser code.
+                      </p>
+                    </article>
+                  </div>
+                </div>
+            
+                <div class="alert alert-warning small mt-4 mb-0" role="note">
+                  Validation checks whether input is acceptable; parameterized queries and
+                  prepared statements help prevent SQL injection; authorization and RLS
+                  determine who may access data. These controls solve different problems
+                  and should be used together where applicable.
+                </div>
+              </div>
+            </div>
+            
           </div>
 
           <div class="d-flex justify-content-between align-items-center gap-3 mt-4">
