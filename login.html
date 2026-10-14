@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login | TECH 3498 IT Computer Security</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -14,53 +14,19 @@
   <link rel="stylesheet" href="style.css">
 
   <script src="theme.js"></script>
-  <script src="auth.js"></script>
 </head>
 <body>
-
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
-      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
-        <i class="bi bi-shield-check text-info fs-4"></i>
-        <span>TECH 3498<span class="text-info">.sec</span></span>
+      <a class="navbar-brand fw-bold" href="index.html">
+        <i class="bi bi-shield-check text-info me-2"></i>TECH 3498<span class="text-info">.sec</span>
       </a>
-
-      <button class="navbar-toggler border-0" type="button"
-              data-bs-toggle="collapse" data-bs-target="#navbarContent"
-              aria-controls="navbarContent" aria-expanded="false"
-              aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarContent">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-lg-center">
-          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html">About Me</a></li>
-          <li class="nav-item"><a class="nav-link" href="technology.html">Technological Knowledge</a></li>
-          <li class="nav-item"><a class="nav-link" href="cybersecurity.html">CyberSecurity</a></li>
-          <li class="nav-item nav-security-item d-none">
-            <a class="nav-link text-warning fw-semibold" href="security.html">
-              <i class="bi bi-shield-shaded me-1"></i>Security Control
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link btn btn-outline-info text-info px-3 ms-lg-2 py-1"
-               href="#contact">Contact</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link nav-login-link active text-info"
-               aria-current="page" href="login.html">
-              <i class="bi bi-box-arrow-in-right me-1"></i>Login
-            </a>
-          </li>
-          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-            <button class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center"
-                    type="button" title="Switch to Original Light Theme">
-              <i class="bi bi-sun-fill text-warning me-1"></i>
-              <span class="theme-label">Light Theme</span>
-            </button>
-          </li>
-        </ul>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a class="nav-link" href="index.html">Back to site</a>
+        <button class="btn btn-outline-warning btn-sm theme-toggle-btn" type="button">
+          <i class="bi bi-sun-fill me-1"></i>
+          <span class="theme-label">Light Theme</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -72,20 +38,10 @@
           <i class="bi bi-shield-lock-fill"></i>
         </div>
       </div>
-
-      <h1 class="display-5 fw-bold mb-2">Portal Authentication</h1>
-      <p class="lead text-light opacity-75 mb-3 mx-auto" style="max-width: 680px;">
-        Sign in to the <strong>TECH 3498: IT Computer Security</strong> prototype.
+      <h1 class="display-5 fw-bold mb-2">Account Sign In</h1>
+      <p class="lead text-light opacity-75 mx-auto" style="max-width: 680px;">
+        Sign in or create an account for the TECH 3498 portfolio.
       </p>
-
-      <div class="d-flex flex-wrap justify-content-center gap-2 mb-2">
-        <span class="badge rounded-pill bg-info text-dark px-3 py-2 fw-semibold">
-          <i class="bi bi-people-fill me-1"></i>Two Demo Accounts
-        </span>
-        <span class="badge rounded-pill bg-dark border border-secondary px-3 py-2 fw-semibold">
-          <i class="bi bi-shield-check me-1"></i>Role-Based Demo Access
-        </span>
-      </div>
     </div>
   </header>
 
@@ -93,366 +49,253 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-5">
+          <section class="card feature-card shadow-lg p-4 p-md-5 border-0">
+            <div id="auth-status" class="alert d-none" role="status" aria-live="polite"></div>
 
-          <div id="login-card" class="card feature-card shadow-lg p-4 p-md-5 border-0">
-            <div class="text-center mb-4">
-              <div class="icon-box bg-info bg-opacity-10 text-info mx-auto mb-3"
-                   style="width: 64px; height: 64px; font-size: 1.8rem;">
-                <i class="bi bi-person-lock"></i>
+            <div id="signed-out-view">
+              <div class="text-center mb-4">
+                <div class="icon-box bg-info bg-opacity-10 text-info mx-auto mb-3"
+                     style="width: 64px; height: 64px; font-size: 1.8rem;">
+                  <i class="bi bi-person-lock"></i>
+                </div>
+                <h2 id="form-title" class="h3 fw-bold mb-1">Sign in</h2>
+                <p class="text-muted small">Use your email address and password.</p>
               </div>
-              <h3 class="fw-bold mb-1">Account Login</h3>
-              <p class="text-muted small">Sign in with one of the prototype accounts.</p>
+
+              <form id="auth-form">
+                <div class="mb-3">
+                  <label for="email" class="form-label small fw-bold text-uppercase text-secondary">
+                    Email
+                  </label>
+                  <input id="email" class="form-control" type="email"
+                         autocomplete="email" maxlength="254" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="password" class="form-label small fw-bold text-uppercase text-secondary">
+                    Password
+                  </label>
+                  <input id="password" class="form-control" type="password"
+                         autocomplete="current-password" minlength="8"
+                         maxlength="128" required>
+                </div>
+
+                <div id="confirm-password-group" class="mb-4 d-none">
+                  <label for="confirm-password"
+                         class="form-label small fw-bold text-uppercase text-secondary">
+                    Confirm password
+                  </label>
+                  <input id="confirm-password" class="form-control" type="password"
+                         autocomplete="new-password" minlength="8" maxlength="128">
+                </div>
+
+                <button id="submit-button" class="btn btn-info text-dark fw-bold w-100 py-2"
+                        type="submit">
+                  Sign in
+                </button>
+              </form>
+
+              <p class="text-center small mt-4 mb-0">
+                <span id="mode-prompt">Need an account?</span>
+                <button id="mode-button" class="btn btn-link p-0 align-baseline" type="button">
+                  Create one
+                </button>
+              </p>
             </div>
 
-            <div id="login-error-alert"
-                 class="alert alert-danger d-none py-2 px-3 small align-items-center gap-2 mb-4"
-                 role="alert">
-              <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
-              <div id="error-message">Invalid username or password.</div>
-            </div>
-
-            <form id="login-form" novalidate>
-              <div class="mb-3">
-                <label for="username"
-                       class="form-label small fw-bold text-uppercase text-secondary">
-                  Username
-                </label>
-                <div class="input-group">
-                  <span class="input-group-text bg-transparent border-end-0 text-secondary">
-                    <i class="bi bi-person-fill"></i>
-                  </span>
-                  <input type="text" class="form-control border-start-0"
-                         id="username" placeholder="Enter username" required
-                         autocomplete="username">
-                </div>
-              </div>
-
-              <div class="mb-4">
-                <label for="password"
-                       class="form-label small fw-bold text-uppercase text-secondary">
-                  Password
-                </label>
-                <div class="input-group">
-                  <span class="input-group-text bg-transparent border-end-0 text-secondary">
-                    <i class="bi bi-lock-fill"></i>
-                  </span>
-                  <input type="password"
-                         class="form-control border-start-0 border-end-0"
-                         id="password" placeholder="Enter password" required
-                         autocomplete="current-password">
-                  <button class="btn btn-outline-secondary border-start-0"
-                          type="button" id="toggle-password"
-                          title="Show/Hide Password" aria-label="Show or hide password">
-                    <i class="bi bi-eye" id="toggle-icon"></i>
-                  </button>
-                </div>
-              </div>
-
-              <button type="submit"
-                      class="btn btn-info text-dark fw-bold w-100 py-2 mb-3 shadow-sm">
-                <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
-              </button>
-            </form>
-
-          </div>
-
-          <div id="dashboard-card"
-               class="card feature-card shadow-lg p-4 p-md-5 border-0 d-none">
-            <div class="text-center mb-4">
+            <div id="signed-in-view" class="text-center d-none">
               <div class="icon-box bg-success bg-opacity-10 text-success mx-auto mb-3"
                    style="width: 64px; height: 64px; font-size: 1.8rem;">
                 <i class="bi bi-shield-check"></i>
               </div>
-              <span class="badge bg-success bg-opacity-25 text-success mb-2 px-3 py-1 fw-bold">
-                AUTHENTICATED
-              </span>
-              <h3 id="welcome-title" class="fw-bold mb-1">Welcome</h3>
-              <p class="text-muted small">
-                You are signed into the TECH 3498 prototype.
+              <h2 class="h3 fw-bold">You’re signed in</h2>
+              <p class="text-muted">
+                Signed in as <strong id="signed-in-email"></strong>
               </p>
+              <button id="sign-out-button" class="btn btn-outline-danger w-100" type="button">
+                <i class="bi bi-box-arrow-left me-1"></i>Sign out
+              </button>
             </div>
 
-            <div class="d-flex flex-column gap-3 mb-4">
-              <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
-                <span class="small text-secondary">Logged in user:</span>
-                <span id="logged-in-user" class="fw-bold text-info">
-                  <i class="bi bi-person-badge me-1"></i>
-                </span>
-              </div>
-
-              <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
-                <span class="small text-secondary">Role:</span>
-                <span id="clearance-badge" class="badge bg-primary px-2 py-1"></span>
-              </div>
-
-              <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
-                <span class="small text-secondary">Session status:</span>
-                <span class="text-success small fw-semibold">
-                  <i class="bi bi-circle-fill fs-6 me-1"></i>Active
-                </span>
-              </div>
-            </div>
-
-            <div id="admin-actions" class="mb-4 d-none">
-              <a href="security.html"
-                 class="btn btn-warning text-dark w-100 py-2 fw-bold shadow-sm">
-                <i class="bi bi-shield-shaded me-1"></i>
-                Open Admin Console →
-              </a>
-            </div>
-
-            <div id="user-actions" class="mb-4 d-none">
-              <a href="user.html" class="btn btn-info text-dark w-100 py-2 fw-bold">
-                <i class="bi bi-person-circle me-1"></i>Open My Profile
-              </a>
-            </div>
-
-            <button id="logout-btn"
-                    class="btn btn-outline-danger w-100 py-2 fw-semibold">
-              <i class="bi bi-box-arrow-left me-1"></i>Log Out
-            </button>
-          </div>
-
-          <div class="alert alert-warning bg-warning bg-opacity-10 border-warning border-opacity-25 mt-4 p-3 rounded-3 small text-secondary">
-            <div class="d-flex align-items-start gap-2">
-              <i class="bi bi-shield-exclamation text-warning fs-5 flex-shrink-0 mt-1"></i>
-              <div>
-                <strong class="text-dark-emphasis">Prototype notice:</strong>
-                These demo credentials and role checks are stored in client-side code.
-                They are for demonstration only and are not secure authentication.
-              </div>
-            </div>
-          </div>
-
+            <p class="text-secondary small mt-4 mb-0">
+              Authentication is handled by Supabase. This page does not provide
+              administrator access.
+            </p>
+          </section>
         </div>
       </div>
     </div>
   </main>
 
-  <section id="contact" class="py-5 bg-white border-top">
-    <div class="container py-4 text-center">
-      <h2 class="section-title">Get In Touch</h2>
-      <p class="text-muted mx-auto mb-4" style="max-width: 600px;">
-        Feel free to connect regarding course projects, study groups, or cybersecurity discussions!
+  <footer class="py-4">
+    <div class="container text-center border-top border-secondary border-opacity-25 pt-3">
+      <p class="mb-1 text-light small">
+        &copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio
       </p>
-      <div class="d-flex justify-content-center gap-3 flex-wrap">
-        <a href="mailto:student@example.com" class="btn btn-outline-primary px-4 py-2">
-          <i class="bi bi-envelope-fill me-2"></i>Email Me
-        </a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer"
-           class="btn btn-outline-dark px-4 py-2">
-          <i class="bi bi-github me-2"></i>GitHub Profile
-        </a>
-        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
-           class="btn btn-outline-info px-4 py-2">
-          <i class="bi bi-linkedin me-2"></i>LinkedIn
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <footer class="pt-5 pb-4">
-    <div class="container">
-      <div id="cyber-tip" class="cyber-tip-box p-4 rounded-4 text-start mb-4">
-        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
-          <div class="tip-icon">
-            <i class="bi bi-shield-fill-exclamation text-info fs-3"></i>
-          </div>
-          <div class="flex-grow-1">
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <span class="badge bg-info text-dark fw-bold">PRO TIP</span>
-              <h5 class="text-white mb-0 fw-bold">Cybersecurity Tip of the Day</h5>
-            </div>
-            <p class="mb-0 text-light opacity-90 small">
-              Use unique passwords and enable multi-factor authentication on real accounts.
-              This prototype does not provide production-grade authentication.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="text-center pt-3 border-top border-secondary border-opacity-25">
-        <div class="mb-2"><i class="bi bi-shield-lock text-info fs-4"></i></div>
-        <p class="mb-1 text-light small">
-          &copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio
-        </p>
-        <p class="small mb-0 text-secondary">
-          Built with Bootstrap 5 &bull; Designed for TECH 3498 Project
-        </p>
-      </div>
     </div>
   </footer>
 
-  <button id="chatbot-toggle" aria-label="Open AI Chatbot" title="Chat with CyberBot">
-    <div class="chatbot-pulse-ring"></div>
-    <i class="bi bi-robot"></i>
-  </button>
+  <script type="module">
+    import { supabase } from "./supabase-client.js";
 
-  <div id="chatbot-window" class="d-none" role="dialog" aria-modal="true"
-       aria-labelledby="chatbot-title">
-    <div class="chat-header">
-      <div class="d-flex align-items-center gap-2">
-        <div class="icon-box bg-info bg-opacity-20 text-info p-2 mb-0"
-             style="width: 36px; height: 36px; border-radius: 8px;">
-          <i class="bi bi-robot fs-5"></i>
-        </div>
-        <div>
-          <div class="d-flex align-items-center gap-2">
-            <h6 id="chatbot-title" class="fw-bold mb-0 text-white">CyberBot</h6>
-            <span class="chat-status-dot" title="Online"></span>
-          </div>
-          <span class="text-secondary" style="font-size: 0.72rem;">TECH 3498 AI Assistant</span>
-        </div>
-      </div>
-      <button id="chatbot-close"
-              class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
-              aria-label="Close Chat">
-        <i class="bi bi-x-lg fs-5"></i>
-      </button>
-    </div>
+    const authForm = document.getElementById("auth-form");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirm-password");
+    const confirmPasswordGroup = document.getElementById("confirm-password-group");
+    const submitButton = document.getElementById("submit-button");
+    const modeButton = document.getElementById("mode-button");
+    const modePrompt = document.getElementById("mode-prompt");
+    const formTitle = document.getElementById("form-title");
+    const statusBox = document.getElementById("auth-status");
+    const signedOutView = document.getElementById("signed-out-view");
+    const signedInView = document.getElementById("signed-in-view");
+    const signedInEmail = document.getElementById("signed-in-email");
+    const signOutButton = document.getElementById("sign-out-button");
 
-    <div id="chatbot-messages"></div>
+    let mode = "signin";
+    let submitting = false;
 
-    <form id="chatbot-form" class="chat-input-bar d-flex align-items-center gap-2">
-      <input id="chatbot-input" type="text" class="form-control px-3 py-2"
-             placeholder="Ask about Ronald or TECH 3498..." autocomplete="off">
-      <button type="button" id="chatbot-mic" class="chat-mic-btn flex-shrink-0"
-              aria-label="Voice command" title="Speak to CyberBot">
-        <i class="bi bi-mic"></i>
-      </button>
-      <button type="submit" class="chat-send-btn flex-shrink-0" aria-label="Send message">
-        <i class="bi bi-arrow-up-short fs-4"></i>
-      </button>
-    </form>
-  </div>
+    function showStatus(message, type = "info") {
+      statusBox.className = `alert alert-${type}`;
+      statusBox.textContent = message;
+    }
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-          crossorigin="anonymous"></script>
-  <script src="chatbot.js"></script>
+    function clearStatus() {
+      statusBox.className = "alert d-none";
+      statusBox.textContent = "";
+    }
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const loginCard = document.getElementById("login-card");
-      const dashboardCard = document.getElementById("dashboard-card");
-      const loginForm = document.getElementById("login-form");
-      const usernameInput = document.getElementById("username");
-      const passwordInput = document.getElementById("password");
-      const errorAlert = document.getElementById("login-error-alert");
-      const errorMessage = document.getElementById("error-message");
-      const togglePasswordBtn = document.getElementById("toggle-password");
-      const toggleIcon = document.getElementById("toggle-icon");
-      const logoutBtn = document.getElementById("logout-btn");
-      const logsKey = "siteCyberLoginLogs";
+    function setMode(nextMode) {
+      mode = nextMode;
+      const isSignUp = mode === "signup";
 
-      // Demo credentials only; do not use this pattern for real authentication.
-      const accounts = {
-        admin: { password: "password", role: "admin" },
-        user: { password: "user123", role: "user" }
-      };
+      formTitle.textContent = isSignUp ? "Create an account" : "Sign in";
+      submitButton.textContent = isSignUp ? "Create account" : "Sign in";
+      modePrompt.textContent = isSignUp ? "Already have an account?" : "Need an account?";
+      modeButton.textContent = isSignUp ? "Sign in" : "Create one";
+      confirmPasswordGroup.classList.toggle("d-none", !isSignUp);
+      confirmPasswordInput.required = isSignUp;
+      passwordInput.autocomplete = isSignUp ? "new-password" : "current-password";
+      clearStatus();
+    }
 
-      function recordLogin(username, success, details) {
-        let logs = [];
+    function showSignedIn(user) {
+      signedOutView.classList.add("d-none");
+      signedInView.classList.remove("d-none");
+      signedInEmail.textContent = user.email || "Authenticated account";
+    }
 
-        try {
-          const storedLogs = JSON.parse(localStorage.getItem(logsKey) || "[]");
-          if (Array.isArray(storedLogs)) logs = storedLogs;
-        } catch {
-          logs = [];
-        }
+    function showSignedOut() {
+      signedInView.classList.add("d-none");
+      signedOutView.classList.remove("d-none");
+    }
 
-        logs.push({
-          timestamp: new Date().toISOString(),
-          username: username || "Unknown",
-          success,
-          details
-        });
+    modeButton.addEventListener("click", () => {
+      setMode(mode === "signin" ? "signup" : "signin");
+    });
 
-        localStorage.setItem(logsKey, JSON.stringify(logs.slice(-100)));
+    authForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (submitting) return;
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (mode === "signup" && password !== confirmPasswordInput.value) {
+        showStatus("The passwords do not match.", "danger");
+        confirmPasswordInput.focus();
+        return;
       }
 
-      function updateDashboard() {
-        const username = sessionStorage.getItem("authUser") || "";
-        const role = sessionStorage.getItem("authRole");
-        const isAdmin = role === "admin";
+      submitting = true;
+      submitButton.disabled = true;
+      submitButton.textContent = mode === "signup" ? "Creating account…" : "Signing in…";
+      clearStatus();
 
-        document.getElementById("welcome-title").textContent =
-          isAdmin ? "Welcome, Administrator" : "Welcome, User";
+      try {
+        if (mode === "signup") {
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: window.location.origin + "/login.html"
+            }
+          });
 
-        // Set only the username text, leaving the icon in place.
-        const userElement = document.getElementById("logged-in-user");
-        userElement.replaceChildren(
-          document.createElement("i"),
-          document.createTextNode(username)
-        );
-        userElement.firstElementChild.className = "bi bi-person-badge me-1";
-        userElement.firstElementChild.setAttribute("aria-hidden", "true");
+          if (error) throw error;
 
-        document.getElementById("clearance-badge").textContent =
-          isAdmin ? "Level 5 (Course Admin)" : "Standard User";
-
-        document.getElementById("admin-actions").classList.toggle("d-none", !isAdmin);
-        document.getElementById("user-actions").classList.toggle("d-none", isAdmin);
-      }
-
-      function checkAuthState() {
-        const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
-
-        loginCard.classList.toggle("d-none", isLoggedIn);
-        dashboardCard.classList.toggle("d-none", !isLoggedIn);
-
-        if (isLoggedIn) updateDashboard();
-
-        if (window.syncNavbarAuthState) {
-          window.syncNavbarAuthState();
-        }
-      }
-
-      checkAuthState();
-
-      togglePasswordBtn.addEventListener("click", () => {
-        const showingPassword = passwordInput.type === "password";
-        passwordInput.type = showingPassword ? "text" : "password";
-        toggleIcon.className = showingPassword ? "bi bi-eye-slash" : "bi bi-eye";
-      });
-
-      loginForm.addEventListener("submit", event => {
-        event.preventDefault();
-
-        const username = usernameInput.value.trim().toLowerCase();
-        const password = passwordInput.value;
-        const account = accounts[username];
-
-        if (!account || account.password !== password) {
-          recordLogin(username, false, "Invalid username or password");
-          errorMessage.textContent = "Invalid username or password.";
-          errorAlert.classList.remove("d-none");
           passwordInput.value = "";
-          passwordInput.focus();
-          return;
+          confirmPasswordInput.value = "";
+
+          if (data.session && data.user) {
+            showSignedIn(data.user);
+            showStatus("Your account was created and you are signed in.", "success");
+          } else {
+            showStatus(
+              "Account created. Check your email for a confirmation link, then return here to sign in.",
+              "success"
+            );
+            setMode("signin");
+          }
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) throw error;
+
+          showSignedIn(data.user);
+          showStatus("You are signed in.", "success");
+          passwordInput.value = "";
         }
+      } catch (error) {
+        console.error("Supabase authentication error:", error);
+        showStatus(error.message || "Authentication failed. Please try again.", "danger");
+      } finally {
+        submitting = false;
+        submitButton.disabled = false;
+        submitButton.textContent = mode === "signup" ? "Create account" : "Sign in";
+      }
+    });
 
-        recordLogin(username, true, "Login successful");
-        errorAlert.classList.add("d-none");
+    signOutButton.addEventListener("click", async () => {
+      signOutButton.disabled = true;
 
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("authUser", username);
-        sessionStorage.setItem("authRole", account.role);
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
 
-        checkAuthState();
-      });
+        showSignedOut();
+        clearStatus();
+        setMode("signin");
+        showStatus("You have been signed out.", "success");
+      } catch (error) {
+        console.error("Supabase sign-out error:", error);
+        showStatus(error.message || "Could not sign out. Please try again.", "danger");
+      } finally {
+        signOutButton.disabled = false;
+      }
+    });
 
-      logoutBtn.addEventListener("click", () => {
-        sessionStorage.removeItem("isLoggedIn");
-        sessionStorage.removeItem("authUser");
-        sessionStorage.removeItem("authRole");
+    // Restore the Supabase session when the page is revisited.
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
-        usernameInput.value = "";
-        passwordInput.value = "";
-        errorAlert.classList.add("d-none");
+    if (sessionError) {
+      console.error("Could not retrieve Supabase session:", sessionError);
+      showStatus("Could not check your sign-in status.", "warning");
+    } else if (sessionData.session?.user) {
+      showSignedIn(sessionData.session.user);
+    }
 
-        checkAuthState();
-      });
+    // Keep the display in sync if the session changes in this browser.
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        showSignedIn(session.user);
+      } else {
+        showSignedOut();
+      }
     });
   </script>
 </body>

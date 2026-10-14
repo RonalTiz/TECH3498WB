@@ -219,159 +219,231 @@
 
     </div>
   </main>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const profileForm = document.getElementById("profile-form");
+    const fileInput = document.getElementById("avatar-file");
+    const nameInput = document.getElementById("persona-name");
+    const descriptionInput = document.getElementById("persona-description");
+    const avatarPreview = document.getElementById("avatar-preview");
+    const chatAvatar = document.getElementById("chat-avatar");
+    const chatTitle = document.getElementById("chat-title");
+    const chatStatus = document.getElementById("chat-status");
+    const chatHistory = document.getElementById("chat-history");
+    const chatForm = document.getElementById("chat-form");
+    const chatInput = document.getElementById("chat-input");
+    const sendButton = document.getElementById("send-button");
+    const speakToggle = document.getElementById("speak-toggle");
+    const createButton = profileForm.querySelector('button[type="submit"]');
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const profileForm = document.getElementById("profile-form");
-      const fileInput = document.getElementById("avatar-file");
-      const nameInput = document.getElementById("persona-name");
-      const descriptionInput = document.getElementById("persona-description");
-      const avatarPreview = document.getElementById("avatar-preview");
-      const chatAvatar = document.getElementById("chat-avatar");
-      const chatTitle = document.getElementById("chat-title");
-      const chatStatus = document.getElementById("chat-status");
-      const chatHistory = document.getElementById("chat-history");
-      const chatForm = document.getElementById("chat-form");
-      const chatInput = document.getElementById("chat-input");
-      const sendButton = document.getElementById("send-button");
-      const speakToggle = document.getElementById("speak-toggle");
+    const defaultAvatar = avatarPreview.src;
+    const conversation = [];
 
-      let selectedImageUrl = "";
-      let persona = null;
-      let voiceEnabled = false;
+    let selectedImageUrl = "";
+    let persona = null;
+    let voiceEnabled = false;
+    let isSending = false;
 
-      fileInput.addEventListener("change", () => {
-        const file = fileInput.files && fileInput.files[0];
-        if (!file) return;
+    chatInput.maxLength = 2000;
 
-        const validTypes = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
 
-        if (!validTypes.includes(file.type)) {
-          alert("Choose a PNG, JPEG, WebP, or GIF image.");
-          fileInput.value = "";
-          return;
-        }
+      const validTypes = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
-        if (file.size > 5 * 1024 * 1024) {
-          alert("Please choose an image smaller than 5 MB.");
-          fileInput.value = "";
-          return;
-        }
+      if (!validTypes.includes(file.type)) {
+        alert("Choose a PNG, JPEG, WebP, or GIF image.");
+        fileInput.value = "";
+        return;
+      }
 
-        const reader = new FileReader();
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Please choose an image smaller than 5 MB.");
+        fileInput.value = "";
+        return;
+      }
 
-        reader.onload = () => {
-          selectedImageUrl = reader.result;
-          avatarPreview.src = selectedImageUrl;
-          chatAvatar.src = selectedImageUrl;
-        };
+      const reader = new FileReader();
 
-        reader.onerror = () => {
+      reader.onload = () => {
+        if (typeof reader.result !== "string") {
           alert("The image could not be read. Please try another file.");
-          fileInput.value = "";
-        };
+          return;
+        }
 
-        reader.readAsDataURL(file);
+        selectedImageUrl = reader.result;
+        avatarPreview.src = selectedImageUrl;
+        chatAvatar.src = selectedImageUrl;
+      };
+
+      reader.onerror = () => {
+        alert("The image could not be read. Please try another file.");
+        fileInput.value = "";
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    function addMessage(text, sender) {
+      const message = document.createElement("div");
+      message.className =
+        `message ${sender === "user" ? "message-user" : "message-bot"}`;
+      message.textContent = text;
+      chatHistory.appendChild(message);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+      return message;
+    }
+
+    function addTypingMessage() {
+      const message = document.createElement("div");
+      message.className = "message message-bot";
+      message.textContent = `${persona.name} is thinking…`;
+      chatHistory.appendChild(message);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+      return message;
+    }
+
+    async function requestAI(messages) {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          assistant: "persona",
+          persona,
+          messages: messages.slice(-12)
+        })
       });
 
-      function addMessage(text, sender) {
-        const message = document.createElement("div");
-        message.className = `message ${sender === "user" ? "message-user" : "message-bot"}`;
-        message.textContent = text;
-        chatHistory.appendChild(message);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error("The chat service returned an invalid response.");
       }
 
-      function respondTo(message) {
-        const name = persona.name;
-        const description = persona.description;
-        const lower = message.toLowerCase();
-
-        if (/\b(hi|hello|hey)\b/.test(lower)) {
-          return `Hi! I'm ${name}. It's nice to meet you. What would you like to talk about?`;
-        }
-
-        if (lower.includes("who are you") || lower.includes("your name")) {
-          return `I'm ${name}. Here's how you described me: ${description}`;
-        }
-
-        if (lower.includes("image") || lower.includes("look like") || lower.includes("see")) {
-          return `You created my avatar from an uploaded image. I can't inspect the image itself, but you described me this way: ${description}`;
-        }
-
-        if (lower.includes("describe") || lower.includes("about you")) {
-          return `I'm ${name}. Based on your description, ${description}`;
-        }
-
-        if (lower.includes("help") || lower.includes("what can you do")) {
-          return `I'm ${name}, a digital-user prototype. You can ask about my name, my description, or just start a conversation. My persona is based on this description: ${description}`;
-        }
-
-        return `That's interesting. I'm ${name}, and I'm responding as the digital user you described: ${description}`;
+      if (!response.ok) {
+        throw new Error(data.error || "The chat request failed.");
       }
 
-      profileForm.addEventListener("submit", event => {
-        event.preventDefault();
+      if (typeof data.reply !== "string" || !data.reply.trim()) {
+        throw new Error("The chat service returned an empty response.");
+      }
 
-        const name = nameInput.value.trim();
-        const description = descriptionInput.value.trim();
+      return data.reply.trim();
+    }
 
-        if (!name || !description) {
-          alert("Please enter a name and description for the digital user.");
-          return;
+    profileForm.addEventListener("submit", event => {
+      event.preventDefault();
+
+      if (isSending) return;
+
+      const name = nameInput.value.trim();
+      const description = descriptionInput.value.trim();
+
+      if (!name || !description) {
+        alert("Please enter a name and description for the digital user.");
+        return;
+      }
+
+      persona = { name, description };
+      conversation.length = 0;
+
+      chatTitle.textContent = name;
+      chatStatus.textContent = "AI digital user ready to chat.";
+      chatInput.disabled = false;
+      sendButton.disabled = false;
+      chatInput.placeholder = `Message ${name}...`;
+
+      chatAvatar.src = selectedImageUrl || defaultAvatar;
+
+      chatHistory.replaceChildren();
+      addMessage(
+        `Hi! I'm ${name}. You described me as: ${description} What would you like to talk about?`,
+        "bot"
+      );
+
+      chatInput.focus();
+    });
+
+    chatForm.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const text = chatInput.value.trim();
+      if (!text || !persona || isSending) return;
+
+      addMessage(text, "user");
+      chatInput.value = "";
+
+      conversation.push({ role: "user", content: text });
+
+      isSending = true;
+      chatInput.disabled = true;
+      sendButton.disabled = true;
+      createButton.disabled = true;
+      chatStatus.textContent = `${persona.name} is thinking…`;
+
+      const typingMessage = addTypingMessage();
+
+      try {
+        const reply = await requestAI(conversation);
+
+        conversation.push({ role: "assistant", content: reply });
+
+        // Keep only the most recent six exchanges.
+        if (conversation.length > 12) {
+          conversation.splice(0, conversation.length - 12);
         }
 
-        persona = { name, description };
-
-        chatTitle.textContent = name;
+        typingMessage.remove();
+        addMessage(reply, "bot");
         chatStatus.textContent = "Digital user ready to chat.";
-        chatInput.disabled = false;
-        sendButton.disabled = false;
-        chatInput.placeholder = `Message ${name}...`;
 
-        if (selectedImageUrl) {
-          chatAvatar.src = selectedImageUrl;
+        if (voiceEnabled && "speechSynthesis" in window &&
+            "SpeechSynthesisUtterance" in window) {
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(
+            new SpeechSynthesisUtterance(reply)
+          );
         }
+      } catch (error) {
+        console.error("Digital user chat error:", error);
+        typingMessage.remove();
 
-        chatHistory.replaceChildren();
         addMessage(
-          `Hi! I'm ${name}. You described me as: ${description} What would you like to talk about?`,
+          error.message === "Failed to fetch"
+            ? "I couldn't reach the chat service. Please try again in a moment."
+            : "Sorry, the AI chat service is unavailable right now.",
           "bot"
         );
 
+        // Remove the unsent turn so a retry doesn't duplicate it in context.
+        conversation.pop();
+        chatStatus.textContent = "Chat service unavailable; please try again.";
+      } finally {
+        isSending = false;
+        chatInput.disabled = !persona;
+        sendButton.disabled = !persona;
+        createButton.disabled = false;
         chatInput.focus();
-      });
-
-      chatForm.addEventListener("submit", event => {
-        event.preventDefault();
-
-        const text = chatInput.value.trim();
-        if (!text || !persona) return;
-
-        addMessage(text, "user");
-        chatInput.value = "";
-
-        const reply = respondTo(text);
-        addMessage(reply, "bot");
-
-        if (voiceEnabled && "speechSynthesis" in window) {
-          window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
-        }
-      });
-
-      speakToggle.addEventListener("click", () => {
-        voiceEnabled = !voiceEnabled;
-        speakToggle.setAttribute("aria-pressed", String(voiceEnabled));
-        speakToggle.innerHTML = voiceEnabled
-          ? '<i class="bi bi-volume-up-fill me-1"></i>Voice on'
-          : '<i class="bi bi-volume-up me-1"></i>Voice off';
-
-        if (!voiceEnabled && "speechSynthesis" in window) {
-          window.speechSynthesis.cancel();
-        }
-      });
+      }
     });
-  </script>
+
+    speakToggle.addEventListener("click", () => {
+      voiceEnabled = !voiceEnabled;
+      speakToggle.setAttribute("aria-pressed", String(voiceEnabled));
+      speakToggle.innerHTML = voiceEnabled
+        ? '<i class="bi bi-volume-up-fill me-1"></i>Voice on'
+        : '<i class="bi bi-volume-up me-1"></i>Voice off';
+
+      if (!voiceEnabled && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    });
+  });
+</script>
+
 </body>
 </html>

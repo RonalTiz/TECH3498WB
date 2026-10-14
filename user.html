@@ -42,6 +42,11 @@
       <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6">
           <div class="sec-console-card p-4 p-md-5">
+            <div class="alert alert-warning small" role="note">
+              Demo only: your profile name is saved in this browser. This page does not
+              use server-verified authentication or protect private account data.
+            </div>
+            
             <div class="text-center mb-4">
               <div class="icon-box bg-info bg-opacity-10 text-info mx-auto mb-3"
                    style="width: 64px; height: 64px; font-size: 1.8rem;">
@@ -87,54 +92,124 @@
       </div>
     </section>
   </main>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const username = sessionStorage.getItem("authUser") || "";
-      const isRegularUser =
-        sessionStorage.getItem("isLoggedIn") === "true" &&
-        sessionStorage.getItem("authRole") === "user";
-
+  <script type="module">
+    import { supabase } from "./supabase-client.js";
+  
+    document.addEventListener("DOMContentLoaded", async () => {
       const denied = document.getElementById("access-denied");
       const profile = document.getElementById("profile-page");
-
-      if (!isRegularUser) {
-        denied.classList.remove("d-none");
-        return;
-      }
-
-      profile.classList.remove("d-none");
-
-      const nameKey = `siteCyberProfileName:${username}`;
       const usernameDisplay = document.getElementById("account-username");
       const displayName = document.getElementById("display-name");
       const nameInput = document.getElementById("name-input");
+      const nameForm = document.getElementById("name-form");
       const saveMessage = document.getElementById("save-message");
-
-      usernameDisplay.textContent = username;
-
-      const savedName = localStorage.getItem(nameKey) || username;
-      displayName.textContent = savedName;
-      nameInput.value = savedName;
-
-      document.getElementById("name-form").addEventListener("submit", event => {
-        event.preventDefault();
-
-        const newName = nameInput.value.trim();
-        if (!newName) return;
-
-        localStorage.setItem(nameKey, newName);
-        displayName.textContent = newName;
+      const logoutButton = document.getElementById("logout-button");
+  
+      function showMessage(message, isError = false) {
+        saveMessage.textContent = message;
+        saveMessage.classList.toggle("text-danger", isError);
+        saveMessage.classList.toggle("text-success", !isError);
         saveMessage.classList.remove("d-none");
-      });
-
-      document.getElementById("logout-button").addEventListener("click", () => {
-        sessionStorage.removeItem("isLoggedIn");
-        sessionStorage.removeItem("authUser");
-        sessionStorage.removeItem("authRole");
-        window.location.href = "login.html";
-      });
+      }
+  
+      try {
+        const { data, error } = await supabase.auth.getUser();
+  
+        if (error) throw error;
+  
+        const user = data.user;
+        if (!user) {
+          denied.classList.remove("d-none");
+          return;
+        }
+  
+        profile.classList.remove("d-none");
+        usernameDisplay.textContent = user.email || "Signed-in user";
+  
+        // Load this user's profile. RLS should restrict access to their own row.
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", user.id)
+          .maybeSingle();
+  
+        if (profileError) throw profileError;
+  
+        const initialName = profileData?.display_name || user.email || "";
+        displayName.textContent = initialName;
+        nameInput.value = initialName;
+  
+        nameForm.addEventListener("submit", async event => {
+          event.preventDefault();
+  
+          const newName = nameInput.value.trim();
+          if (!newName) {
+            nameInput.focus();
+            return;
+          }
+  
+          const saveButton = nameForm.querySelector('button[type="submit"]');
+          saveButton.disabled = true;
+          saveMessage.classList.add("d-none");
+  
+          try {
+            const { error: saveError } = await supabase
+              .from("profiles")
+              .upsert(
+                {
+                  id: user.id,
+                  display_name: newName,
+                  updated_at: new Date().toISOString()
+                },
+                { onConflict: "id" }
+              );
+  
+            if (saveError) throw saveError;
+  
+            displayName.textContent = newName;
+            showMessage("Your profile name has been saved.");
+          } catch (error) {
+            console.error("Could not save profile:", error);
+            showMessage(
+              "Could not save your name. Check the database table and RLS policies.",
+              true
+            );
+          } finally {
+            saveButton.disabled = false;
+          }
+        });
+  
+        nameInput.addEventListener("input", () => {
+          saveMessage.classList.add("d-none");
+        });
+  
+        logoutButton.addEventListener("click", async () => {
+          logoutButton.disabled = true;
+  
+          try {
+            const { error: signOutError } = await supabase.auth.signOut();
+            if (signOutError) throw signOutError;
+  
+            window.location.replace("login.html");
+          } catch (error) {
+            console.error("Could not sign out:", error);
+            showMessage("Could not sign out. Please try again.", true);
+            logoutButton.disabled = false;
+          }
+        });
+      } catch (error) {
+        console.error("Could not load the Supabase profile:", error);
+        denied.classList.remove("d-none");
+  
+        const deniedMessage = denied.querySelector("p");
+        if (deniedMessage) {
+          deniedMessage.textContent =
+            "Could not verify your account or load your profile. Please sign in again and try once more.";
+        }
+      }
     });
   </script>
+  
+
 </body>
 </html>

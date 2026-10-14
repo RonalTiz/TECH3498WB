@@ -1,34 +1,54 @@
 /**
- * Authentication & Theme Palette Controller for TECH 3498 Portfolio
- * Manages admin authentication state, navigation visibility, and
- * executes live theme color palette modifications across all webpages.
+ * TECH 3498 portfolio navbar and color-palette controller.
+ *
+ * Supabase provides the signed-in user and admin-role check. Hiding links in
+ * the navbar is only presentation; protected actions must still verify access
+ * server-side or through database policies.
  */
 
 (function () {
-  // Apply saved color palette dynamically
-  function applyColorPalette(paletteData) {
-    let palette = paletteData;
+  "use strict";
+
+  const PALETTE_STORAGE_KEY = "siteCyberPalette";
+  let supabaseClient = null;
+
+  function getValidPalette(input) {
+    let palette = input;
+
     if (!palette) {
-      const raw = localStorage.getItem("siteCyberPalette");
-      if (raw) {
-        try {
-          palette = JSON.parse(raw);
-          console.log("Palette loaded from localStorage:", palette);
-        } catch (e) {
-          console.error("Error parsing palette JSON:", e);
-          palette = null;
-        }
-      } else {
-        console.warn("No palette data found in localStorage.");
+      try {
+        palette = JSON.parse(
+          localStorage.getItem(PALETTE_STORAGE_KEY) || "null"
+        );
+      } catch (error) {
+        console.warn("Could not read saved color palette.", error);
+        return null;
       }
     }
 
+    if (!palette || typeof palette.color !== "string") return null;
+
+    // Accept only six-digit hex values before inserting a color into CSS.
+    const match = palette.color.match(/^#?([0-9a-f]{6})$/i);
+    if (!match) return null;
+
+    const hex = match[1];
+    return {
+      color: `#${hex.toLowerCase()}`,
+      rgb: [
+        parseInt(hex.slice(0, 2), 16),
+        parseInt(hex.slice(2, 4), 16),
+        parseInt(hex.slice(4, 6), 16)
+      ].join(", ")
+    };
+  }
+
+  function applyColorPalette(paletteData) {
+    const palette = getValidPalette(paletteData);
     let styleTag = document.getElementById("cyber-palette-override");
-    if (!palette || !palette.color) {
-      if (styleTag) {
-        styleTag.remove();
-        console.log("Removed existing style tag due to missing palette.");
-      }
+
+    if (!palette) {
+      if (styleTag) styleTag.remove();
       return;
     }
 
@@ -44,58 +64,75 @@
         --bs-primary-rgb: ${rgb} !important;
         --border-color: rgba(${rgb}, 0.35) !important;
       }
-      .text-info, a.text-info, i.text-info, span.text-info,
-      .text-primary, a.text-primary, i.text-primary, span.text-primary {
+
+      .text-info, .text-primary,
+      a.text-info, a.text-primary,
+      i.text-info, i.text-primary,
+      span.text-info, span.text-primary {
         color: ${color} !important;
       }
-      .navbar-brand span.text-info, .navbar-brand i.text-info {
-        color: ${color} !important;
-      }
+
       .btn-info, .btn-primary {
         background-color: ${color} !important;
         border-color: ${color} !important;
         color: #0b1120 !important;
       }
+
       .btn-outline-info, .btn-outline-primary {
         color: ${color} !important;
         border-color: ${color} !important;
       }
+
       .btn-outline-info:hover, .btn-outline-primary:hover {
         background-color: ${color} !important;
         border-color: ${color} !important;
         color: #0b1120 !important;
       }
-      .badge.bg-info, .badge.bg-primary, .badge.bg-info-subtle, .badge.bg-primary-subtle {
+
+      .badge.bg-info, .badge.bg-primary,
+      .badge.bg-info-subtle, .badge.bg-primary-subtle {
         background-color: ${color} !important;
         color: #0b1120 !important;
       }
+
       .icon-box.bg-info, .icon-box.bg-primary {
         background-color: rgba(${rgb}, 0.15) !important;
         color: ${color} !important;
       }
-      .border-info, .border-primary, .border-info-subtle, .border-primary-subtle {
+
+      .border-info, .border-primary,
+      .border-info-subtle, .border-primary-subtle {
         border-color: ${color} !important;
       }
-      .feature-card:hover, .profile-card:hover, .sec-console-card:hover, .project-spotlight-card, .triad-card {
+
+      .feature-card:hover, .profile-card:hover,
+      .sec-console-card:hover, .project-spotlight-card,
+      .triad-card {
         border-color: ${color} !important;
       }
+
       .avatar-wrapper {
         background: linear-gradient(135deg, ${color}, rgba(${rgb}, 0.6)) !important;
         box-shadow: 0 0 25px rgba(${rgb}, 0.45) !important;
       }
+
       .avatar-wrapper .avatar-inner {
         color: ${color} !important;
       }
+
       .section-title::after {
         background: ${color} !important;
       }
+
       #chatbot-toggle, .chat-mic-btn {
         color: ${color} !important;
         border-color: rgba(${rgb}, 0.5) !important;
       }
+
       .chat-bubble.bot-bubble {
         border-left: 3px solid ${color} !important;
       }
+
       .chat-send-btn:hover {
         background-color: ${color} !important;
         color: #0b1120 !important;
@@ -105,92 +142,182 @@
     if (!styleTag) {
       styleTag = document.createElement("style");
       styleTag.id = "cyber-palette-override";
-      const container = document.head || document.documentElement;
-      container.appendChild(styleTag);
-      console.log("Created new style tag for palette override.");
+      document.head.appendChild(styleTag);
     }
+
     styleTag.textContent = cssRules;
-    console.log("Applied color palette:", palette);
   }
 
-  // Sync Navbar Authentication & Security link
-  function syncNavbarAuthState() {
-    const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
-    const authUser = sessionStorage.getItem("authUser") || "admin";
-    console.log("Authentication state:", isLoggedIn ? "Logged in as " + authUser : "Not logged in");
-
-// 1. Sync Navbar Auth Link
-const loginLinks = document.querySelectorAll(".nav-login-link");
-loginLinks.forEach((link) => {
-  link.replaceChildren();
-
-  const icon = document.createElement("i");
-
-  if (isLoggedIn) {
-    icon.className = "bi bi-person-check-fill text-success me-1";
+  function setLinkContents(link, iconClass, label) {
+    const icon = document.createElement("i");
+    icon.className = `${iconClass} me-1`;
     icon.setAttribute("aria-hidden", "true");
-    link.append(icon, document.createTextNode(`Dashboard (${authUser})`));
-    link.classList.add("text-info");
-    link.setAttribute("title", "Admin Dashboard & Session");
-  } else {
-    icon.className = "bi bi-box-arrow-in-right me-1";
-    icon.setAttribute("aria-hidden", "true");
-    link.append(icon, document.createTextNode("Login"));
-    link.classList.remove("text-info");
-    link.setAttribute("title", "Log in to Admin Portal");
+    link.replaceChildren(icon, document.createTextNode(label));
   }
-});
 
+  function ensureRoleLink(nav, className, href, iconClass, label) {
+    let item = nav.querySelector(`.${className}`);
 
-    // 2. Synchronize "Security Control" Link in Navbar across all pages
-    const navbars = document.querySelectorAll(".navbar-nav");
-    navbars.forEach((nav) => {
-      let secItem = nav.querySelector(".nav-security-item");
-      if (isLoggedIn) {
-        if (!secItem) {
-          secItem = document.createElement("li");
-          secItem.className = "nav-item nav-security-item";
-          const currentPage = window.location.pathname.split("/").pop() || "index.html";
-          const isActive = currentPage === "security.html" ? "active" : "";
-          secItem.innerHTML = `
-            <a class="nav-link text-warning fw-semibold ${isActive}" href="security.html" title="Administrative Security & Control Room">
-              <i class="bi bi-shield-shaded me-1 text-warning"></i>Security Control
-            </a>
-          `;
-          const contactLink = nav.querySelector('a[href*="#contact"]');
-          if (contactLink && contactLink.closest("li")) {
-            nav.insertBefore(secItem, contactLink.closest("li"));
-          } else {
-            nav.appendChild(secItem);
-          }
-          console.log("Added Security Control link to navbar.");
-        } else {
-          secItem.classList.remove("d-none");
-          console.log("Displayed existing Security Control link.");
-        }
-      } else {
-        if (secItem) {
-          secItem.classList.add("d-none");
-          console.log("Hid Security Control link for unauthenticated user.");
-        }
+    if (!item) {
+      item = document.createElement("li");
+      item.className = `nav-item ${className}`;
+
+      const link = document.createElement("a");
+      link.className = "nav-link";
+      link.href = href;
+
+      const icon = document.createElement("i");
+      icon.className = `${iconClass} me-1`;
+      icon.setAttribute("aria-hidden", "true");
+
+      link.append(icon, document.createTextNode(label));
+      item.appendChild(link);
+
+      const contactItem = nav.querySelector('a[href*="#contact"]')?.closest("li");
+      nav.insertBefore(item, contactItem || null);
+    } else {
+      item.classList.remove("d-none");
+    }
+
+    return item;
+  }
+
+  function hideRoleLinks(nav) {
+    nav.querySelector(".nav-security-item")?.classList.add("d-none");
+    nav.querySelector(".nav-user-item")?.classList.add("d-none");
+  }
+
+  async function syncNavbarAuthState() {
+    const links = document.querySelectorAll(".nav-login-link");
+    if (!links.length) return;
+
+    // Fail closed in the navbar if Supabase is unavailable.
+    if (!supabaseClient) {
+      links.forEach(link => {
+        link.href = "login.html";
+        setLinkContents(link, "bi bi-box-arrow-in-right", "Login");
+        link.classList.remove("text-info");
+        link.title = "Sign in";
+      });
+
+      document.querySelectorAll(".navbar-nav").forEach(hideRoleLinks);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabaseClient.auth.getUser();
+      if (error) throw error;
+
+      const user = data.user;
+
+      if (!user) {
+        links.forEach(link => {
+          link.href = "login.html";
+          setLinkContents(link, "bi bi-box-arrow-in-right", "Login");
+          link.classList.remove("text-info");
+          link.title = "Sign in";
+        });
+
+        document.querySelectorAll(".navbar-nav").forEach(hideRoleLinks);
+        return;
       }
-    });
 
-    // Re-apply palette to ensure any dynamic elements pick it up
-    applyColorPalette();
+      let isAdmin = false;
+
+      try {
+        const { data: adminResult, error: roleError } =
+          await supabaseClient.rpc("is_current_user_admin");
+
+        if (roleError) throw roleError;
+        isAdmin = adminResult === true;
+      } catch (error) {
+        // Treat role lookup failures as non-admin for display purposes.
+        console.warn("Could not verify administrator role.", error);
+      }
+
+      links.forEach(link => {
+        if (isAdmin) {
+          link.href = "security.html";
+          setLinkContents(
+            link,
+            "bi bi-person-check-fill text-success",
+            "Admin Console"
+          );
+          link.title = "Open the admin console";
+        } else {
+          link.href = "user.html";
+          setLinkContents(link, "bi bi-person-circle", "My Profile");
+          link.title = "Open your profile";
+        }
+
+        link.classList.add("text-info");
+      });
+
+      document.querySelectorAll(".navbar-nav").forEach(nav => {
+        if (isAdmin) {
+          const item = ensureRoleLink(
+            nav,
+            "nav-security-item",
+            "security.html",
+            "bi bi-shield-shaded text-warning",
+            "Security Control"
+          );
+          item.querySelector("a").classList.add("text-warning", "fw-semibold");
+          nav.querySelector(".nav-user-item")?.classList.add("d-none");
+        } else {
+          nav.querySelector(".nav-security-item")?.classList.add("d-none");
+          ensureRoleLink(
+            nav,
+            "nav-user-item",
+            "user.html",
+            "bi bi-person-circle",
+            "My Profile"
+          );
+        }
+      });
+    } catch (error) {
+      console.error("Could not sync Supabase navbar state.", error);
+      document.querySelectorAll(".navbar-nav").forEach(hideRoleLinks);
+    }
   }
 
-  // Run immediately for instant palette rendering
+  // Apply saved palette early.
   applyColorPalette();
 
-  // Expose global methods
   window.applyColorPalette = applyColorPalette;
   window.syncNavbarAuthState = syncNavbarAuthState;
 
-  document.addEventListener("DOMContentLoaded", syncNavbarAuthState);
-  window.addEventListener("storage", function (e) {
-    if (e.key === "siteCyberPalette") {
-      console.log("Detected change in siteCyberPalette, reapplying palette.");
+  async function initializeSupabaseNavbar() {
+    try {
+      // auth.js is a classic script, so load the ES module dynamically.
+      const module = await import("./supabase-client.js");
+      supabaseClient = module.supabase;
+
+      await syncNavbarAuthState();
+
+      // Refresh navbar after sign-in or sign-out. Defer work out of the
+      // Supabase callback to avoid doing additional auth calls inside it.
+      supabaseClient.auth.onAuthStateChange(() => {
+        setTimeout(() => {
+          syncNavbarAuthState();
+        }, 0);
+      });
+    } catch (error) {
+      console.error("Could not initialize Supabase navbar state.", error);
+      await syncNavbarAuthState();
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeSupabaseNavbar, {
+      once: true
+    });
+  } else {
+    initializeSupabaseNavbar();
+  }
+
+  window.addEventListener("storage", event => {
+    if (event.key === PALETTE_STORAGE_KEY) {
       applyColorPalette();
     }
   });
