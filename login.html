@@ -70,7 +70,16 @@
                   <input id="email" class="form-control" type="email"
                          autocomplete="email" maxlength="254" required>
                 </div>
-
+              
+                <div id="display-name-group" class="mb-3 d-none">
+                  <label for="display-name"
+                         class="form-label small fw-bold text-uppercase text-secondary">
+                    Display name
+                  </label>
+                  <input id="display-name" class="form-control" type="text"
+                         autocomplete="name" maxlength="80">
+                </div>
+                
                 <div class="mb-3">
                   <label for="password" class="form-label small fw-bold text-uppercase text-secondary">
                     Password
@@ -138,6 +147,8 @@
   <script type="module">
     import { supabase } from "./supabase-client.js";
 
+    const displayNameGroup = document.getElementById("display-name-group");
+    const displayNameInput = document.getElementById("display-name");
     const authForm = document.getElementById("auth-form");
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
@@ -170,6 +181,8 @@
       mode = nextMode;
       const isSignUp = mode === "signup";
 
+      displayNameGroup.classList.toggle("d-none", !isSignUp);
+      displayNameInput.required = isSignUp;
       formTitle.textContent = isSignUp ? "Create an account" : "Sign in";
       submitButton.textContent = isSignUp ? "Create account" : "Sign in";
       modePrompt.textContent = isSignUp ? "Already have an account?" : "Need an account?";
@@ -199,6 +212,7 @@
       event.preventDefault();
       if (submitting) return;
 
+      const displayName = displayNameInput.value.trim();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
 
@@ -219,9 +233,11 @@
             email,
             password,
             options: {
+              data: { display_name: displayName },
               emailRedirectTo: window.location.origin + "/login.html"
             }
           });
+          
 
           if (error) throw error;
 
