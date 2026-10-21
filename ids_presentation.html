@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IDS Generalization Study | TECH 3498</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous">
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="theme.js"></script>
+  <script src="auth.js"></script>
+
+  <style>
+    .study-section {
+      scroll-margin-top: 100px;
+    }
+
+    .study-nav {
+      position: sticky;
+      top: 72px;
+      z-index: 10;
+      background: var(--bg-main);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .study-nav .nav-link {
+      white-space: nowrap;
+    }
+
+    .study-lead {
+      max-width: 820px;
+      font-size: 1.08rem;
+      line-height: 1.75;
+    }
+
+    .study-card {
+      height: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+
+    .study-card p:last-child,
+    .study-card ul:last-child {
+      margin-bottom: 0;
+    }
+
+    .study-stat {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--cyber-cyan);
+    }
+
+    .study-stat-label {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    .study-callout {
+      border-left: 4px solid var(--cyber-cyan);
+      background: var(--bg-subtle);
+      border-radius: 0.5rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .study-callout.warning {
+      border-left-color: #f0ad4e;
+    }
+
+    .study-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+    }
+
+    .study-table {
+      --bs-table-bg: var(--bg-card);
+      --bs-table-color: var(--text-main);
+      --bs-table-border-color: var(--border-color);
+      min-width: 720px;
+      margin-bottom: 0;
+      vertical-align: middle;
+    }
+
+    .study-table thead th {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .study-table td,
+    .study-table th {
+      padding: 0.8rem;
+    }
+
+    .metric {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .class-bar-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .class-progress {
+      height: 0.85rem;
+      background: var(--bg-subtle);
+    }
+
+    .source-note {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .takeaway-card {
+      background: linear-gradient(
+        135deg,
+        rgba(13, 202, 240, 0.12),
+        rgba(13, 110, 253, 0.12)
+      );
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+    }
+
+    @media (max-width: 991.98px) {
+      .study-nav {
+        position: static;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+        <i class="bi bi-shield-check text-info fs-4" aria-hidden="true"></i>
+        <span>TECH 3498<span class="text-info">.sec</span></span>
+      </a>
+
+      <button
+        class="navbar-toggler border-0"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarContent"
+        aria-controls="navbarContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-lg-center">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About Me</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="technology.html">Technological Knowledge</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="cybersecurity.html">CyberSecurity</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="digital-user.html">Digital User</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active text-info" aria-current="page" href="ids_presentation.html">
+              IDS Study
+            </a>
+          </li>
+          <li class="nav-item nav-security-item d-none">
+            <a class="nav-link text-warning fw-semibold" href="security.html">
+              <i class="bi bi-shield-shaded me-1" aria-hidden="true"></i>Security Control
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-outline-info text-info px-3 ms-lg-2 py-1" href="#contact">
+              Contact
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-login-link" href="login.html">
+              <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>Login
+            </a>
+          </li>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <button
+              class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center"
+              type="button">
+              <i class="bi bi-sun-fill text-warning me-1" aria-hidden="true"></i>
+              <span class="theme-label">Light Theme</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-section text-center">
+    <div class="container hero-content">
+      <div class="avatar-wrapper mb-4">
+        <div class="avatar-inner">
+          <i class="bi bi-shield-exclamation" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <p class="text-info text-uppercase fw-bold small mb-2">
+        Network Security · Machine Learning · Evaluation
+      </p>
+      <h1 class="display-5 fw-bold mb-3">
+        Does an IDS Learn Attack Behavior—or Network Identity?
+      </h1>
+      <p class="lead text-light opacity-75 mx-auto mb-4" style="max-width: 800px;">
+        Testing whether intrusion-detection models generalize to source hosts
+        they did not encounter during training.
+      </p>
+
+      <div class="d-flex flex-wrap justify-content-center gap-2">
+        <span class="badge rounded-pill bg-info text-dark px-3 py-2">
+          <i class="bi bi-database me-1" aria-hidden="true"></i>NICA Dataset
+        </span>
+        <span class="badge rounded-pill bg-primary px-3 py-2">
+          <i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Three CV Strategies
+        </span>
+        <span class="badge rounded-pill bg-dark border border-secondary px-3 py-2">
+          <i class="bi bi-cpu me-1" aria-hidden="true"></i>Two Classifiers
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="study-nav" aria-label="IDS study sections">
+    <div class="container py-2">
+      <div class="nav nav-pills flex-nowrap overflow-x-auto gap-1">
+        <a class="nav-link" href="#overview">Overview</a>
+        <a class="nav-link" href="#dataset">Dataset</a>
+        <a class="nav-link" href="#findings">EDA findings</a>
+        <a class="nav-link" href="#method">Method</a>
+        <a class="nav-link" href="#results">Results</a>
+        <a class="nav-link" href="#interpretation">Interpretation</a>
+        <a class="nav-link" href="#resources">Resources</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section id="overview" class="study-section py-5 bg-white">
+      <div class="container py-3">
+        <div class="row g-4 align-items-start">
+          <div class="col-lg-8">
+            <span class="badge bg-info-subtle text-info fw-bold mb-2">Research question</span>
+            <h2 class="section-title">The security problem</h2>
+            <p class="study-lead text-secondary">
+              An intrusion-detection model may score highly when training and
+              validation records contain traffic from the same hosts. It may
+              have learned endpoint-specific clues rather than patterns that
+              transfer to unfamiliar systems.
+            </p>
+            <div class="study-callout">
+              <strong>Does the model recognize malicious traffic behavior, or
+              does it depend on IP addresses and other familiar data patterns?</strong>
+            </div>
+            <p class="text-secondary mt-3">
+              This project investigates a possible “accuracy illusion” by
+              comparing ordinary random cross-validation with validation folds
+              that keep duplicate records or source hosts together.
+            </p>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="study-card p-4">
+              <h3 class="h5 fw-bold">
+                <i class="bi bi-bullseye text-info me-2" aria-hidden="true"></i>
+                What the experiment tests
+              </h3>
+              <ul class="text-secondary ps-3 mb-0">
+                <li class="mb-2">Whether direct IP features affect model scores.</li>
+                <li class="mb-2">Whether duplicate records cross CV folds.</li>
+                <li>How models perform on source IPs held out from training.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-4">
+          <div class="col-6 col-lg-3">
+            <div class="study-card p-3 text-center">
+              <div class="study-stat">211,043</div>
+              <div class="study-stat-label">network-flow records</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="study-card p-3 text-center">
+              <div class="study-stat">44</div>
+              <div class="study-stat-label">dataset columns</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="study-card p-3 text-center">
+              <div class="study-stat">51</div>
+              <div class="study-stat-label">unique source IPs</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="study-card p-3 text-center">
+              <div class="study-stat">8</div>
+              <div class="study-stat-label">source networks</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dataset" class="study-section py-5 bg-light">
+      <div class="container py-3">
+        <div class="text-center mb-4">
+          <span class="badge bg-primary-subtle text-primary fw-bold mb-2">Data</span>
+          <h2 class="section-title">Dataset and prediction target</h2>
+          <p class="text-secondary mx-auto" style="max-width: 760px;">
+            The study uses the Network Intrusion and Cyberattack Dataset (NICA)
+            from Kaggle. Its flow records contain endpoint, protocol, connection,
+            byte, packet, DNS, HTTP, SSL, and other traffic fields.
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="study-card p-4">
+              <h3 class="h5 fw-bold">Prediction task</h3>
+              <p class="text-secondary">
+                The primary task is binary classification using
+                <code>label</code>:
+              </p>
+              <ul class="text-secondary mb-0">
+                <li><code>0</code> = normal traffic</li>
+                <li><code>1</code> = malicious traffic</li>
+              </ul>
+              <p class="text-secondary mt-3 mb-0">
+                The dataset also includes <code>type</code>, which identifies
+                the traffic category. It was excluded from model inputs to
+                prevent target leakage.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="study-card p-4">
+              <h3 class="h5 fw-bold">Label balance</h3>
+
+              <div class="mb-3">
+                <div class="class-bar-label">
+                  <span>Malicious</span>
+                  <strong class="metric">161,043 · 76.3%</strong>
+                </div>
+                <div
+                  class="progress class-progress"
+                  role="img"
+                  aria-label="Malicious flows: 161,043, or 76.3 percent">
+                  <div class="progress-bar bg-info" style="width: 76.3%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="class-bar-label">
+                  <span>Normal</span>
+                  <strong class="metric">50,000 · 23.7%</strong>
+                </div>
+                <div
+                  class="progress class-progress"
+                  role="img"
+                  aria-label="Normal flows: 50,000, or 23.7 percent">
+                  <div class="progress-bar bg-warning" style="width: 23.7%"></div>
+                </div>
+              </div>
+
+              <p class="source-note mt-3 mb-0">
+                Because the classes are imbalanced, accuracy alone would not
+                provide a complete picture of model performance.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="study-callout warning mt-4">
+          <strong>Category counts:</strong>
+          The <code>type</code> target has 50,000 normal records, 20,000 records
+          each for backdoor, DDoS, DoS, injection, password, ransomware,
+          scanning, and XSS, plus 1,043 MITM records.
+        </div>
+      </div>
+    </section>
+
+    <section id="findings" class="study-section py-5 bg-white">
+      <div class="container py-3">
+        <div class="text-center mb-4">
+          <span class="badge bg-info-subtle text-info fw-bold mb-2">
+            Exploratory data analysis
+          </span>
+          <h2 class="section-title">What the dataset reveals</h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">
+                <i class="bi bi-copy text-info me-2" aria-hidden="true"></i>
+                Repeated records
+              </h3>
+              <ul class="text-secondary">
+                <li><strong>20,569</strong> exact duplicate rows (9.75%).</li>
+                <li>
+                  <strong>27,739</strong> rows belong to groups with identical
+                  input features.
+                </li>
+                <li>
+                  No duplicate-feature group had conflicting binary labels.
+                </li>
+              </ul>
+              <p class="text-secondary">
+                Random splits can put identical feature records in both
+                training and validation data. The duplicate-group split keeps
+                those records together.
+              </p>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">
+                <i class="bi bi-database-exclamation text-warning me-2" aria-hidden="true"></i>
+                Missing-like values
+              </h3>
+              <ul class="text-secondary mb-0">
+                <li>The initial audit reported no blank or NaN values.</li>
+                <li>
+                  Text fields use <code>"-"</code> as a placeholder for
+                  absent or inapplicable information.
+                </li>
+                <li>
+                  For example, <code>ssl_subject</code> and
+                  <code>ssl_issuer</code> each contain 211,032 dash
+                  placeholders.
+                </li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="col-12">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">
+                <i class="bi bi-diagram-3 text-info me-2" aria-hidden="true"></i>
+                Source hosts and networks are associated with labels
+              </h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="p-3 rounded-3 bg-light h-100">
+                    <strong class="d-block">192.168.1.0/24</strong>
+                    <span class="text-secondary">
+                      204,550 flows; 78.7% malicious
+                    </span>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 rounded-3 bg-light h-100">
+                    <strong class="d-block">32 source IPs</strong>
+                    <span class="text-secondary">had only normal flows</span>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 rounded-3 bg-light h-100">
+                    <strong class="d-block">11 source IPs</strong>
+                    <span class="text-secondary">had only malicious flows</span>
+                  </div>
+                </div>
+              </div>
+              <p class="text-secondary mt-3 mb-0">
+                The remaining eight source IPs had both classes. Several busy
+                hosts had attack rates near 100%, while others had rates near
+                zero. This is evidence of a possible identity shortcut, but it
+                does not prove that every model uses one.
+              </p>
+              <p class="source-note mt-2 mb-0">
+                Rates from small groups are less reliable than rates supported
+                by many records. The dataset has only eight source networks,
+                and most records come from one network.
+              </p>
+            </article>
+          </div>
+
+          <div class="col-12">
+            <div class="study-callout">
+              <strong>Numeric correlations:</strong>
+              A numeric correlation analysis and heatmap are not included in
+              the notebook results provided. No specific numeric correlation
+              findings are claimed here.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="method" class="study-section py-5 bg-light">
+      <div class="container py-3">
+        <div class="text-center mb-4">
+          <span class="badge bg-primary-subtle text-primary fw-bold mb-2">
+            Methodology
+          </span>
+          <h2 class="section-title">How the models were tested</h2>
+          <p class="text-secondary mx-auto" style="max-width: 760px;">
+            The notebook compares two feature sets, two classifiers, and three
+            cross-validation strategies. Preprocessing is fitted within each
+            training fold.
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">Feature sets</h3>
+              <ul class="text-secondary mb-0">
+                <li>
+                  <strong>IP-included:</strong> retains source and destination
+                  IP address columns.
+                </li>
+                <li>
+                  <strong>IP-stripped:</strong> removes both direct IP address
+                  columns.
+                </li>
+                <li>
+                  Both exclude <code>label</code>, <code>type</code>, and
+                  derived source-network fields.
+                </li>
+              </ul>
+              <p class="source-note mt-3">
+                Removing direct IP fields does not remove every possible
+                indirect identifier from the remaining features.
+              </p>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">Preprocessing</h3>
+              <ul class="text-secondary mb-0">
+                <li>Replace text placeholders <code>"-"</code> with missing values.</li>
+                <li>Impute numeric values using the training-fold median.</li>
+                <li>Fill missing categorical values and one-hot encode them.</li>
+                <li>Group infrequent categories using a minimum frequency of 10.</li>
+                <li>Standardize numeric features within the pipeline.</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">Classifiers</h3>
+              <ul class="text-secondary mb-0">
+                <li>
+                  <strong>Logistic Regression:</strong> a comparatively simple
+                  baseline.
+                </li>
+                <li>
+                  <strong>LightGBM:</strong> a gradient-boosted tree model
+                  that can learn nonlinear patterns.
+                </li>
+                <li>
+                  Both use class weighting to account for the label imbalance.
+                </li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">Cross-validation strategies</h3>
+              <ul class="text-secondary mb-0">
+                <li>
+                  <strong>Random stratified:</strong> maintains class
+                  proportions; hosts and duplicate records may cross folds.
+                </li>
+                <li>
+                  <strong>Duplicate-group:</strong> keeps identical feature
+                  records in the same fold.
+                </li>
+                <li>
+                  <strong>Source-IP-group:</strong> holds out complete source
+                  IPs from training.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </div>
+
+        <div class="study-callout mt-4">
+          <strong>Why compare the splits?</strong>
+          Random cross-validation is a conventional benchmark. Duplicate-group
+          and source-IP-group evaluation are more demanding tests of whether
+          the model transfers beyond repeated records and familiar source
+          hosts.
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="study-section py-5 bg-white">
+      <div class="container py-3">
+        <div class="text-center mb-4">
+          <span class="badge bg-info-subtle text-info fw-bold mb-2">
+            Model evaluation
+          </span>
+          <h2 class="section-title">Results</h2>
+          <p class="text-secondary mx-auto" style="max-width: 780px;">
+            The main comparison below uses source-IP-grouped folds: validation
+            source IPs are not shared with training. These fold means are a
+            stress test on this dataset, not a guaranteed estimate of
+            performance on another network.
+          </p>
+        </div>
+
+        <h3 class="h5 fw-bold mb-3">Source-IP-grouped results</h3>
+        <div class="study-table-wrap">
+          <table class="table table-striped study-table">
+            <thead>
+              <tr>
+                <th scope="col">Features</th>
+                <th scope="col">Model</th>
+                <th scope="col">ROC-AUC</th>
+                <th scope="col">Avg. precision</th>
+                <th scope="col">Precision</th>
+                <th scope="col">Recall</th>
+                <th scope="col">F1</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">IP-included</th>
+                <td>LightGBM</td>
+                <td class="metric">0.9940 ± 0.0084</td>
+                <td class="metric">0.9957</td>
+                <td class="metric">0.9423</td>
+                <td class="metric">0.9744</td>
+                <td class="metric">0.9538</td>
+              </tr>
+              <tr>
+                <th scope="row">IP-included</th>
+                <td>Logistic Regression</td>
+                <td class="metric">0.9343 ± 0.0229</td>
+                <td class="metric">0.9666</td>
+                <td class="metric">0.9320</td>
+                <td class="metric">0.7138</td>
+                <td class="metric">0.7372</td>
+              </tr>
+              <tr>
+                <th scope="row">IP-stripped</th>
+                <td>LightGBM</td>
+                <td class="metric">0.9730 ± 0.0563</td>
+                <td class="metric">0.9789</td>
+                <td class="metric">0.9427</td>
+                <td class="metric">0.9469</td>
+                <td class="metric">0.9431</td>
+              </tr>
+              <tr>
+                <th scope="row">IP-stripped</th>
+                <td>Logistic Regression</td>
+                <td class="metric">0.9807 ± 0.0259</td>
+                <td class="metric">0.9849</td>
+                <td class="metric">0.9515</td>
+                <td class="metric">0.9373</td>
+                <td class="metric">0.9440</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="source-note mt-2">
+          ROC-AUC is shown as mean ± standard deviation across folds. Precision,
+          recall, and F1 use a 0.5 probability threshold. Metrics are reported
+          as fold averages in the notebook.
+        </p>
+
+        <details class="study-card p-4 mt-4">
+          <summary class="fw-bold">
+            View random-stratified and duplicate-group results
+          </summary>
+          <div class="mt-3">
+            <p class="text-secondary">
+              These strategies produced very high scores. In random
+              stratified CV, around 5,000 validation rows per fold had an
+              identical feature record in training. Duplicate-group CV had
+              zero duplicate groups shared between training and validation.
+            </p>
+
+            <div class="study-table-wrap">
+              <table class="table table-striped study-table">
+                <thead>
+                  <tr>
+                    <th scope="col">CV strategy</th>
+                    <th scope="col">Features</th>
+                    <th scope="col">Model</th>
+                    <th scope="col">ROC-AUC mean ± SD</th>
+                    <th scope="col">Avg. precision</th>
+                    <th scope="col">Precision</th>
+                    <th scope="col">Recall</th>
+                    <th scope="col">F1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Random</th>
+                    <td>IP-included</td>
+                    <td>LightGBM</td>
+                    <td class="metric">1.0000 ± 0.0000</td>
+                    <td class="metric">1.0000</td>
+                    <td class="metric">0.9999</td>
+                    <td class="metric">1.0000</td>
+                    <td class="metric">1.0000</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Random</th>
+                    <td>IP-included</td>
+                    <td>Logistic Regression</td>
+                    <td class="metric">1.0000 ± 0.0000</td>
+                    <td class="metric">1.0000</td>
+                    <td class="metric">0.9998</td>
+                    <td class="metric">0.9998</td>
+                    <td class="metric">0.9998</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Random</th>
+                    <td>IP-stripped</td>
+                    <td>LightGBM</td>
+                    <td class="metric">1.0000 ± 0.0000</td>
+                    <td class="metric">1.0000</td>
+                    <td class="metric">0.9995</td>
+                    <td class="metric">0.9995</td>
+                    <td class="metric">0.9995</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Random</th>
+                    <td>IP-stripped</td>
+                    <td>Logistic Regression</td>
+                    <td class="metric">0.9944 ± 0.0005</td>
+                    <td class="metric">0.9982</td>
+                    <td class="metric">0.9743</td>
+                    <td class="metric">0.9726</td>
+                    <td class="metric">0.9734</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Duplicate-group</th>
+                    <td>IP-included</td>
+                    <td>LightGBM</td>
+                    <td class="metric">1.0000 ± 0.0000</td>
+                    <td class="metric">1.0000</td>
+                    <td class="metric">0.9999</td>
+                    <td class="metric">0.9993</td>
+                    <td class="metric">0.9996</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Duplicate-group</th>
+                    <td>IP-included</td>
+                    <td>Logistic Regression</td>
+                    <td class="metric">1.0000 ± 0.0000</td>
+                    <td class="metric">1.0000</td>
+                    <td class="metric">0.9998</td>
+                    <td class="metric">0.9992</td>
+                    <td class="metric">0.9995</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Duplicate-group</th>
+                    <td>IP-stripped</td>
+                    <td>LightGBM</td>
+                    <td class="metric">1.0000 ± 0.0000</td>
+                    <td class="metric">1.0000</td>
+                    <td class="metric">0.9995</td>
+                    <td class="metric">0.9995</td>
+                    <td class="metric">0.9995</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Duplicate-group</th>
+                    <td>IP-stripped</td>
+                    <td>Logistic Regression</td>
+                    <td class="metric">0.9873 ± 0.0171</td>
+                    <td class="metric">0.9960</td>
+                    <td class="metric">0.9759</td>
+                    <td class="metric">0.9694</td>
+                    <td class="metric">0.9722</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <div class="study-callout warning mt-4">
+          <strong>Not yet reported:</strong>
+          The notebook summary provided does not include accuracy,
+          confusion-matrix counts, false-positive rate, or false-negative
+          rate. These values should be calculated from validation predictions,
+          not estimated from the other metrics.
+        </div>
+      </div>
+    </section>
+
+    <section id="interpretation" class="study-section py-5 bg-light">
+      <div class="container py-3">
+        <div class="text-center mb-4">
+          <span class="badge bg-primary-subtle text-primary fw-bold mb-2">
+            Security interpretation
+          </span>
+          <h2 class="section-title">What the results do—and don’t—show</h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold text-success">What the experiment supports</h3>
+              <ul class="text-secondary mb-0">
+                <li class="mb-2">
+                  Random-split scores were almost perfect, but random CV
+                  allowed duplicate feature records to appear across folds.
+                </li>
+                <li class="mb-2">
+                  Duplicate-group CV also produced very high scores, so
+                  duplicate overlap alone does not explain the results.
+                </li>
+                <li>
+                  Models remained strong in source-IP-grouped evaluation after
+                  direct IP columns were removed. This suggests the dataset
+                  contains predictive signal beyond those IP addresses.
+                </li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold text-warning">Important limitations</h3>
+              <ul class="text-secondary mb-0">
+                <li class="mb-2">
+                  Source-IP folds vary in size and class balance, and the
+                  dataset contains only 51 source IPs.
+                </li>
+                <li class="mb-2">
+                  Holding out source IPs within one dataset is not the same as
+                  testing on an independent network.
+                </li>
+                <li class="mb-2">
+                  Removing IP addresses does not rule out indirect identifiers
+                  in other features.
+                </li>
+                <li>
+                  The current models predict the binary label, not attack
+                  category; they do not show which attack types are hardest
+                  to detect.
+                </li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="col-12">
+            <div class="takeaway-card p-4 p-md-5">
+              <h3 class="h4 fw-bold">
+                <i class="bi bi-lightbulb text-info me-2" aria-hidden="true"></i>
+                Security takeaway
+              </h3>
+              <p class="text-secondary mb-0">
+                The dataset shows strong associations between source-host
+                identity and attack labels. IP-stripped models still performed
+                strongly when source IPs were held out, which is encouraging,
+                but does not prove that the models learned general attack
+                behavior. Evaluation on a genuinely independent network is
+                needed before making claims about real-world performance.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">False positives</h3>
+              <p class="text-secondary mb-0">
+                Benign flows flagged as attacks can consume analyst time,
+                create alert fatigue, and disrupt legitimate activity.
+              </p>
+            </article>
+          </div>
+
+          <div class="col-md-6">
+            <article class="study-card p-4">
+              <h3 class="h5 fw-bold">False negatives</h3>
+              <p class="text-secondary mb-0">
+                Missed attacks can allow harmful activity to continue
+                undetected. The appropriate balance depends on the threat,
+                operating threshold, and response process.
+              </p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resources" class="study-section py-5 bg-white">
+      <div class="container py-3">
+        <div class="text-center mb-4">
+          <span class="badge bg-info-subtle text-info fw-bold mb-2">Project resources</span>
+          <h2 class="section-title">Notebook and dataset</h2>
+        </div>
+
+        <div class="study-card p-4">
+          <ul class="text-secondary mb-0">
+            <li class="mb-2">
+              <strong>Notebook export:</strong>
+              <a href="T3498RDCA(1).html">T3498RDCA notebook results</a>
+            </li>
+            <li>
+              <strong>Kaggle dataset:</strong>
+              <a
+                href="https://www.kaggle.com/datasets/amineipad/ioittt/data"
+                target="_blank"
+                rel="noopener noreferrer">
+                Network Intrusion and Cyberattack Dataset (NICA)
+              </a>
+            </li>
+          </ul>
+          <p class="source-note mt-3 mb-0">
+            The notebook’s original data path is local to the computer where
+            the analysis was run. Running the notebook elsewhere requires
+            downloading the dataset and updating its <code>DATA_PATH</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="py-5 bg-light border-top">
+      <div class="container py-4 text-center">
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="text-muted mx-auto mb-4" style="max-width: 600px;">
+          Feel free to connect about this project, cybersecurity, or TECH 3498.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a href="mailto:student@example.com" class="btn btn-outline-primary px-4 py-2">
+            <i class="bi bi-envelope-fill me-2" aria-hidden="true"></i>Email Me
+          </a>
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline-dark px-4 py-2">
+            <i class="bi bi-github me-2" aria-hidden="true"></i>GitHub Profile
+          </a>
+          <a
+            href="https://linkedin.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline-info px-4 py-2">
+            <i class="bi bi-linkedin me-2" aria-hidden="true"></i>LinkedIn
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pt-5 pb-4">
+    <div class="container">
+      <div class="cyber-tip-box p-4 rounded-4 text-start mb-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="tip-icon">
+            <i class="bi bi-shield-fill-exclamation text-info fs-3" aria-hidden="true"></i>
+          </div>
+          <div>
+            <span class="badge bg-info text-dark fw-bold mb-1">PRO TIP</span>
+            <h2 class="h5 text-white mb-1 fw-bold">Responsible IDS evaluation</h2>
+            <p class="mb-0 text-light small">
+              Test on representative traffic, inspect false positives and
+              false negatives, and validate performance on networks not used
+              during model development.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center pt-3 border-top border-secondary border-opacity-25">
+        <div class="mb-2">
+          <i class="bi bi-shield-lock text-info fs-4" aria-hidden="true"></i>
+        </div>
+        <p class="mb-1 text-light small">
+          &copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio
+        </p>
+        <p class="small mb-0 text-secondary">
+          Built with Bootstrap 5 &bull; IDS Generalization Study
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <button id="chatbot-toggle" aria-label="Open AI Chatbot" title="Chat with CyberBot">
+    <div class="chatbot-pulse-ring"></div>
+    <i class="bi bi-robot" aria-hidden="true"></i>
+  </button>
+
+  <div
+    id="chatbot-window"
+    class="d-none"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="chatbot-title">
+    <div class="chat-header">
+      <div class="d-flex align-items-center gap-2">
+        <div
+          class="icon-box bg-info bg-opacity-20 text-info p-2 mb-0"
+          style="width: 36px; height: 36px; border-radius: 8px;">
+          <i class="bi bi-robot fs-5" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h2 id="chatbot-title" class="h6 fw-bold mb-0 text-white">CyberBot</h2>
+            <span class="chat-status-dot" title="Online"></span>
+          </div>
+          <span class="text-secondary" style="font-size: 0.72rem;">
+            TECH 3498 AI Assistant
+          </span>
+        </div>
+      </div>
+      <button
+        id="chatbot-close"
+        class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+        aria-label="Close Chat">
+        <i class="bi bi-x-lg fs-5" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div id="chatbot-messages"></div>
+
+    <form id="chatbot-form" class="chat-input-bar d-flex align-items-center gap-2">
+      <input
+        id="chatbot-input"
+        type="text"
+        class="form-control px-3 py-2"
+        placeholder="Ask about the portfolio..."
+        autocomplete="off">
+      <button
+        type="button"
+        id="chatbot-mic"
+        class="chat-mic-btn flex-shrink-0"
+        aria-label="Voice command"
+        title="Speak to CyberBot">
+        <i class="bi bi-mic" aria-hidden="true"></i>
+      </button>
+      <button type="submit" class="chat-send-btn flex-shrink-0" aria-label="Send message">
+        <i class="bi bi-arrow-up-short fs-4" aria-hidden="true"></i>
+      </button>
+    </form>
+  </div>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script src="chatbot.js"></script>
+</body>
+</html>
