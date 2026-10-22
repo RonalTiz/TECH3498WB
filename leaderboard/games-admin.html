@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game Records | TECH 3498</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="../theme.js"></script>
+
+  <style>
+    .games-main {
+      min-height: 65vh;
+      padding-top: 120px;
+    }
+
+    .games-card {
+      color: var(--text-main);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+    }
+
+    .participant-row {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="../index.html">
+        <i class="bi bi-shield-check text-info fs-4" aria-hidden="true"></i>
+        <span>TECH 3498<span class="text-info">.sec</span></span>
+      </a>
+
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a class="nav-link" href="../security.html">Admin Console</a>
+        <a class="nav-link" href="../index.html">Back to site</a>
+        <button
+          class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center"
+          type="button">
+          <i class="bi bi-sun-fill text-warning me-1" aria-hidden="true"></i>
+          <span class="theme-label">Light Theme</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container games-main pb-5">
+    <section id="access-message" class="text-center py-5" aria-live="polite">
+      <div class="card feature-card p-4 p-md-5 mx-auto" style="max-width: 620px;">
+        <i class="bi bi-shield-lock text-info display-4 mb-3" aria-hidden="true"></i>
+        <h1 class="h3">Checking administrator access…</h1>
+        <p id="access-message-text" class="text-secondary">
+          Verifying your Supabase session and administrator role.
+        </p>
+        <a id="login-link" href="../login.html" class="btn btn-info d-none">
+          Go to Login
+        </a>
+      </div>
+    </section>
+
+    <section id="dashboard" class="d-none" aria-labelledby="page-title">
+      <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+        <div>
+          <p class="text-info fw-semibold text-uppercase mb-1">Administration</p>
+          <h1 id="page-title" class="text-white fw-bold mb-2">Game Records</h1>
+          <p class="text-secondary mb-0">Signed in as <strong id="admin-email"></strong></p>
+        </div>
+        <div class="d-flex gap-2 align-items-start">
+          <button id="refresh-button" class="btn btn-outline-info" type="button">
+            <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>Refresh
+          </button>
+          <button id="sign-out-button" class="btn btn-outline-danger" type="button">
+            <i class="bi bi-box-arrow-left me-1" aria-hidden="true"></i>Sign out
+          </button>
+        </div>
+      </div>
+
+      <div id="status-message" class="alert d-none" role="status" aria-live="polite"></div>
+
+      <div class="alert alert-warning">
+        Players added here are game records, not Supabase accounts. Only
+        administrators can add or edit these records.
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <section class="games-card p-4 mb-4" aria-labelledby="player-heading">
+            <h2 id="player-heading" class="h4 fw-bold mb-3">
+              <i class="bi bi-person-plus text-info me-2" aria-hidden="true"></i>
+              Add a Player
+            </h2>
+
+            <form id="player-form">
+              <label for="player-name" class="form-label">Player name</label>
+              <input
+                id="player-name"
+                class="form-control mb-3"
+                type="text"
+                maxlength="100"
+                required>
+
+              <button id="add-player-button" class="btn btn-info text-dark fw-bold" type="submit">
+                Add Player
+              </button>
+            </form>
+          </section>
+
+          <section class="games-card p-4" aria-labelledby="deck-heading">
+            <h2 id="deck-heading" class="h4 fw-bold mb-3">
+              <i class="bi bi-collection text-info me-2" aria-hidden="true"></i>
+              Add a Deck
+            </h2>
+
+            <form id="deck-form">
+              <div class="mb-3">
+                <label for="deck-player" class="form-label">Player</label>
+                <select id="deck-player" class="form-select" required>
+                  <option value="">Select a player</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="deck-name" class="form-label">Deck name</label>
+                <input
+                  id="deck-name"
+                  class="form-control"
+                  type="text"
+                  maxlength="100"
+                  required>
+              </div>
+
+              <div class="mb-3">
+                <label for="decklist-url" class="form-label">Decklist URL (optional)</label>
+                <input
+                  id="decklist-url"
+                  class="form-control"
+                  type="url"
+                  placeholder="https://example.com/decklist">
+              </div>
+
+              <button id="add-deck-button" class="btn btn-info text-dark fw-bold" type="submit">
+                Add Deck
+              </button>
+            </form>
+          </section>
+        </div>
+
+        <div class="col-lg-7">
+          <section class="games-card p-4" aria-labelledby="game-heading">
+            <h2 id="game-heading" class="h4 fw-bold mb-3">
+              <i class="bi bi-trophy text-info me-2" aria-hidden="true"></i>
+              Record a Game
+            </h2>
+
+            <form id="game-form">
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="played-at" class="form-label">Date and time</label>
+                  <input id="played-at" class="form-control" type="datetime-local" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="game-result" class="form-label">Result</label>
+                  <select id="game-result" class="form-select" required>
+                    <option value="win">There was a winner</option>
+                    <option value="draw">Draw</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="winner-field" class="mb-3">
+                <label for="winner-player" class="form-label">Winner</label>
+                <select id="winner-player" class="form-select" required>
+                  <option value="">Add players first</option>
+                </select>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div>
+                  <h3 class="h6 fw-bold mb-0">Players and turn order</h3>
+                  <small class="text-secondary">Each player must have a deck.</small>
+                </div>
+                <button id="add-participant-button" class="btn btn-sm btn-outline-info" type="button">
+                  <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add player
+                </button>
+              </div>
+
+              <div id="participants-list" class="d-flex flex-column gap-2 mb-3"></div>
+
+              <div class="mb-3">
+                <label for="game-notes" class="form-label">Notes (optional)</label>
+                <textarea id="game-notes" class="form-control" rows="2" maxlength="1000"></textarea>
+              </div>
+
+              <button id="save-game-button" class="btn btn-info text-dark fw-bold" type="submit">
+                Save Game
+              </button>
+            </form>
+          </section>
+        </div>
+      </div>
+
+      <section class="games-card p-4 mt-4" aria-labelledby="records-heading">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+          <div>
+            <h2 id="records-heading" class="h4 fw-bold mb-1">Player Records by Deck</h2>
+            <p class="text-secondary small mb-0">Totals are calculated from completed games.</p>
+          </div>
+          <span id="record-count" class="badge bg-secondary">Loading…</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped align-middle mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Player</th>
+                <th scope="col">Deck</th>
+                <th scope="col">Wins</th>
+                <th scope="col">Losses</th>
+                <th scope="col">Draws</th>
+                <th scope="col">Decklist</th>
+              </tr>
+            </thead>
+            <tbody id="records-body">
+              <tr>
+                <td colspan="6" class="text-secondary text-center py-4">Loading records…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module">
+    import { supabase } from "./supabase-client.js";
+
+    const accessMessage = document.getElementById("access-message");
+    const accessText = document.getElementById("access-message-text");
+    const loginLink = document.getElementById("login-link");
+    const dashboard = document.getElementById("dashboard");
+    const adminEmail = document.getElementById("admin-email");
+    const statusBox = document.getElementById("status-message");
+
+    const playerForm = document.getElementById("player-form");
+    const playerNameInput = document.getElementById("player-name");
+    const playerButton = document.getElementById("add-player-button");
+
+    const deckForm = document.getElementById("deck-form");
+    const deckPlayerSelect = document.getElementById("deck-player");
+    const deckNameInput = document.getElementById("deck-name");
+    const deckUrlInput = document.getElementById("decklist-url");
+    const deckButton = document.getElementById("add-deck-button");
+
+    const gameForm = document.getElementById("game-form");
+    const playedAtInput = document.getElementById("played-at");
+    const gameResultSelect = document.getElementById("game-result");
+    const winnerField = document.getElementById("winner-field");
+    const winnerSelect = document.getElementById("winner-player");
+    const participantsList = document.getElementById("participants-list");
+    const addParticipantButton = document.getElementById("add-participant-button");
+    const gameNotesInput = document.getElementById("game-notes");
+    const saveGameButton = document.getElementById("save-game-button");
+
+    const refreshButton = document.getElementById("refresh-button");
+    const signOutButton = document.getElementById("sign-out-button");
+    const recordsBody = document.getElementById("records-body");
+    const recordCount = document.getElementById("record-count");
+
+    let currentUser = null;
+    let players = [];
+    let decks = [];
+
+    function showStatus(message, type = "info") {
+      statusBox.className = `alert alert-${type}`;
+      statusBox.textContent = message;
+    }
+
+    function clearStatus() {
+      statusBox.className = "alert d-none";
+      statusBox.textContent = "";
+    }
+
+    function showAccess(message, showLogin = false) {
+      accessMessage.classList.remove("d-none");
+      dashboard.classList.add("d-none");
+      accessText.textContent = message;
+      loginLink.classList.toggle("d-none", !showLogin);
+    }
+
+    function addOption(select, value, label) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      select.appendChild(option);
+    }
+
+    function populatePlayerSelects() {
+      const currentDeckPlayer = deckPlayerSelect.value;
+      const currentWinner = winnerSelect.value;
+
+      deckPlayerSelect.replaceChildren();
+      addOption(deckPlayerSelect, "", "Select a player");
+      players.forEach(player => addOption(deckPlayerSelect, player.id, player.display_name));
+      deckPlayerSelect.value = players.some(p => p.id === currentDeckPlayer)
+        ? currentDeckPlayer
+        : "";
+
+      winnerSelect.replaceChildren();
+      addOption(winnerSelect, "", "Select the winner");
+      players.forEach(player => addOption(winnerSelect, player.id, player.display_name));
+      winnerSelect.value = players.some(p => p.id === currentWinner)
+        ? currentWinner
+        : "";
+
+      renderParticipants();
+    }
+
+    function participantRow(index) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "participant-row p-3";
+      wrapper.dataset.row = String(index);
+
+      const row = document.createElement("div");
+      row.className = "row g-2 align-items-end";
+
+      const playerCol = document.createElement("div");
+      playerCol.className = "col-md-5";
+      const playerLabel = document.createElement("label");
+      playerLabel.className = "form-label small";
+      playerLabel.textContent = `Player ${index + 1}`;
+      const playerSelect = document.createElement("select");
+      playerSelect.className = "form-select participant-player";
+      playerSelect.required = true;
+      playerSelect.dataset.index = String(index);
+      addOption(playerSelect, "", "Select a player");
+      players.forEach(player => addOption(playerSelect, player.id, player.display_name));
+      playerCol.append(playerLabel, playerSelect);
+
+      const deckCol = document.createElement("div");
+      deckCol.className = "col-md-5";
+      const deckLabel = document.createElement("label");
+      deckLabel.className = "form-label small";
+      deckLabel.textContent = "Deck";
+      const deckSelect = document.createElement("select");
+      deckSelect.className = "form-select participant-deck";
+      deckSelect.required = true;
+      deckSelect.disabled = true;
+      addOption(deckSelect, "", "Choose a player first");
+      deckCol.append(deckLabel, deckSelect);
+
+      const removeCol = document.createElement("div");
+      removeCol.className = "col-md-2";
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "btn btn-outline-danger w-100 remove-participant";
+      removeButton.textContent = "Remove";
+      removeButton.setAttribute("aria-label", `Remove player ${index + 1}`);
+      removeCol.appendChild(removeButton);
+
+      playerSelect.addEventListener("change", () => {
+        populateDeckOptions(deckSelect, playerSelect.value);
+        populateWinnerOptions();
+      });
+
+      removeButton.addEventListener("click", () => {
+        wrapper.remove();
+        renumberParticipantRows();
+        populateWinnerOptions();
+      });
+
+      row.append(playerCol, deckCol, removeCol);
+      wrapper.appendChild(row);
+      return wrapper;
+    }
+
+    function populateDeckOptions(select, playerId) {
+      select.replaceChildren();
+
+      const playerDecks = decks.filter(deck => deck.player_id === playerId);
+      if (!playerId) {
+        addOption(select, "", "Choose a player first");
+        select.disabled = true;
+        return;
+      }
+
+      if (!playerDecks.length) {
+        addOption(select, "", "This player has no decks yet");
+        select.disabled = true;
+        return;
+      }
+
+      addOption(select, "", "Select a deck");
+      playerDecks.forEach(deck => addOption(select, deck.id, deck.name));
+      select.disabled = false;
+    }
+
+    function renderParticipants() {
+      const oldRows = Array.from(participantsList.querySelectorAll(".participant-row"))
+        .map(row => ({
+          playerId: row.querySelector(".participant-player")?.value || "",
+          deckId: row.querySelector(".participant-deck")?.value || ""
+        }));
+
+      participantsList.replaceChildren();
+
+      const rowsToRender = oldRows.length ? oldRows : [{ playerId: "", deckId: "" }];
+
+      rowsToRender.forEach((saved, index) => {
+        const row = participantRow(index);
+        const playerSelect = row.querySelector(".participant-player");
+        const deckSelect = row.querySelector(".participant-deck");
+
+        if (players.some(player => player.id === saved.playerId)) {
+          playerSelect.value = saved.playerId;
+          populateDeckOptions(deckSelect, saved.playerId);
+
+          if (decks.some(deck =>
+            deck.id === saved.deckId && deck.player_id === saved.playerId
+          )) {
+            deckSelect.value = saved.deckId;
+          }
+        }
+
+        participantsList.appendChild(row);
+      });
+
+      populateWinnerOptions();
+    }
+
+    function renumberParticipantRows() {
+      Array.from(participantsList.querySelectorAll(".participant-row")).forEach((row, index) => {
+        row.dataset.row = String(index);
+        const label = row.querySelector(".participant-player + *");
+        const playerLabel = row.querySelector("label");
+        if (playerLabel) playerLabel.textContent = `Player ${index + 1}`;
+        const removeButton = row.querySelector(".remove-participant");
+        if (removeButton) removeButton.setAttribute("aria-label", `Remove player ${index + 1}`);
+      });
+    }
+
+    function populateWinnerOptions() {
+      const selectedIds = Array.from(
+        participantsList.querySelectorAll(".participant-player")
+      )
+        .map(select => select.value)
+        .filter(Boolean);
+
+      const previousWinner = winnerSelect.value;
+      winnerSelect.replaceChildren();
+      addOption(winnerSelect, "", "Select the winner");
+
+      [...new Set(selectedIds)].forEach(playerId => {
+        const player = players.find(item => item.id === playerId);
+        if (player) addOption(winnerSelect, player.id, player.display_name);
+      });
+
+      winnerSelect.value = selectedIds.includes(previousWinner) ? previousWinner : "";
+    }
+
+    function updateResultControls() {
+      const isDraw = gameResultSelect.value === "draw";
+      winnerField.classList.toggle("d-none", isDraw);
+      winnerSelect.required = !isDraw;
+    }
+
+    function renderRecords(rows) {
+      recordsBody.replaceChildren();
+      recordCount.textContent = `${rows.length} ${rows.length === 1 ? "record" : "records"}`;
+
+      if (!rows.length) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 6;
+        td.className = "text-secondary text-center py-4";
+        td.textContent = "No completed game records yet.";
+        tr.appendChild(td);
+        recordsBody.appendChild(tr);
+        return;
+      }
+
+      rows.forEach(record => {
+        const tr = document.createElement("tr");
+
+        const player = document.createElement("td");
+        player.textContent = record.display_name || "—";
+
+        const deck = document.createElement("td");
+        deck.textContent = record.deck_name || "—";
+
+        const wins = document.createElement("td");
+        wins.textContent = String(record.wins ?? 0);
+
+        const losses = document.createElement("td");
+        losses.textContent = String(record.losses ?? 0);
+
+        const draws = document.createElement("td");
+        draws.textContent = String(record.draws ?? 0);
+
+        const linkCell = document.createElement("td");
+        if (record.decklist_url) {
+          const link = document.createElement("a");
+          link.href = record.decklist_url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "View decklist";
+          linkCell.appendChild(link);
+        } else {
+          linkCell.textContent = "—";
+        }
+
+        tr.append(player, deck, wins, losses, draws, linkCell);
+        recordsBody.appendChild(tr);
+      });
+    }
+
+    async function loadData() {
+      refreshButton.disabled = true;
+      clearStatus();
+
+      try {
+        const [playersResult, decksResult, recordsResult] = await Promise.all([
+          supabase.from("players").select("id, display_name").order("display_name"),
+          supabase.from("decks").select("id, player_id, name, decklist_url").order("name"),
+          supabase.from("deck_player_records")
+            .select("player_id, display_name, deck_id, deck_name, decklist_url, wins, losses, draws")
+            .order("display_name")
+        ]);
+
+        if (playersResult.error) throw playersResult.error;
+        if (decksResult.error) throw decksResult.error;
+        if (recordsResult.error) throw recordsResult.error;
+
+        players = playersResult.data || [];
+        decks = decksResult.data || [];
+
+        populatePlayerSelects();
+        renderRecords(recordsResult.data || []);
+      } catch (error) {
+        console.error("Could not load game dashboard data:", error);
+        showStatus(
+          error.message || "Could not load players, decks, or records.",
+          "danger"
+        );
+      } finally {
+        refreshButton.disabled = false;
+      }
+    }
+
+    playerForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      clearStatus();
+
+      const displayName = playerNameInput.value.trim();
+      if (!displayName) {
+        showStatus("Enter a player name.", "warning");
+        return;
+      }
+
+      playerButton.disabled = true;
+      playerButton.textContent = "Adding…";
+
+      try {
+        const { error } = await supabase.from("players").insert({
+          display_name: displayName,
+          created_by: currentUser.id
+        });
+
+        if (error) throw error;
+
+        playerForm.reset();
+        showStatus("Player added.", "success");
+        await loadData();
+      } catch (error) {
+        console.error("Could not add player:", error);
+        showStatus(error.message || "Could not add player.", "danger");
+      } finally {
+        playerButton.disabled = false;
+        playerButton.textContent = "Add Player";
+      }
+    });
+
+    deckForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      clearStatus();
+
+      const playerId = deckPlayerSelect.value;
+      const name = deckNameInput.value.trim();
+      const decklistUrl = deckUrlInput.value.trim();
+
+      if (!playerId || !name) {
+        showStatus("Select a player and enter a deck name.", "warning");
+        return;
+      }
+
+      deckButton.disabled = true;
+      deckButton.textContent = "Adding…";
+
+      try {
+        const { error } = await supabase.from("decks").insert({
+          player_id: playerId,
+          name,
+          decklist_url: decklistUrl || null,
+          created_by: currentUser.id
+        });
+
+        if (error) throw error;
+
+        deckForm.reset();
+        showStatus("Deck added.", "success");
+        await loadData();
+      } catch (error) {
+        console.error("Could not add deck:", error);
+        showStatus(error.message || "Could not add deck.", "danger");
+      } finally {
+        deckButton.disabled = false;
+        deckButton.textContent = "Add Deck";
+      }
+    });
+
+    addParticipantButton.addEventListener("click", () => {
+      const row = participantRow(participantsList.querySelectorAll(".participant-row").length);
+      participantsList.appendChild(row);
+      populateWinnerOptions();
+    });
+
+    gameResultSelect.addEventListener("change", updateResultControls);
+
+    gameForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      clearStatus();
+
+      const rows = Array.from(participantsList.querySelectorAll(".participant-row"));
+      const participants = rows.map((row, index) => ({
+        player_id: row.querySelector(".participant-player").value,
+        deck_id: row.querySelector(".participant-deck").value,
+        turn_order: index + 1
+      }));
+
+      if (participants.length < 2) {
+        showStatus("A game must have at least two players.", "warning");
+        return;
+      }
+
+      if (participants.some(item => !item.player_id || !item.deck_id)) {
+        showStatus("Select a player and deck for every participant.", "warning");
+        return;
+      }
+
+      const playerIds = participants.map(item => item.player_id);
+      if (new Set(playerIds).size !== playerIds.length) {
+        showStatus("A player can only appear once in a game.", "warning");
+        return;
+      }
+
+      const result = gameResultSelect.value;
+      const winnerId = result === "win" ? winnerSelect.value : null;
+
+      if (result === "win" && !playerIds.includes(winnerId)) {
+        showStatus("Choose a winner from the players in this game.", "warning");
+        return;
+      }
+
+      const playedAt = new Date(playedAtInput.value);
+      if (!playedAtInput.value || Number.isNaN(playedAt.getTime())) {
+        showStatus("Enter a valid date and time.", "warning");
+        return;
+      }
+
+      saveGameButton.disabled = true;
+      saveGameButton.textContent = "Saving…";
+
+      let createdGameId = null;
+
+      try {
+        // Create the game as pending first. Then add participants before
+        // finalizing the result, so the winner-participant constraint is met.
+        const { data: game, error: gameError } = await supabase
+          .from("games")
+          .insert({
+            recorded_by: currentUser.id,
+            played_at: playedAt.toISOString(),
+            result: "pending",
+            notes: gameNotesInput.value.trim() || null
+          })
+          .select("id")
+          .single();
+
+        if (gameError) throw gameError;
+        createdGameId = game.id;
+
+        const { error: participantsError } = await supabase
+          .from("game_players")
+          .insert(participants.map(participant => ({
+            ...participant,
+            game_id: createdGameId
+          })));
+
+        if (participantsError) throw participantsError;
+
+        const { error: finalizeError } = await supabase
+          .from("games")
+          .update({
+            result,
+            winner_player_id: winnerId
+          })
+          .eq("id", createdGameId);
+
+        if (finalizeError) throw finalizeError;
+
+        gameForm.reset();
+        participantsList.replaceChildren();
+        participantsList.appendChild(participantRow(0));
+        updateResultControls();
+
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        playedAtInput.value = now.toISOString().slice(0, 16);
+
+        showStatus("Game recorded successfully.", "success");
+        await loadData();
+      } catch (error) {
+        console.error("Could not record game:", error);
+
+        // Try to remove an unfinished game if a later insert/update failed.
+        if (createdGameId) {
+          const { error: cleanupError } = await supabase
+            .from("games")
+            .delete()
+            .eq("id", createdGameId);
+
+          if (cleanupError) {
+            console.error("Could not clean up incomplete game:", cleanupError);
+          }
+        }
+
+        showStatus(
+          error.message || "Could not record the game.",
+          "danger"
+        );
+      } finally {
+        saveGameButton.disabled = false;
+        saveGameButton.textContent = "Save Game";
+      }
+    });
+
+    refreshButton.addEventListener("click", loadData);
+
+    signOutButton.addEventListener("click", async () => {
+      signOutButton.disabled = true;
+
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        window.location.replace("login.html");
+      } catch (error) {
+        console.error("Sign-out failed:", error);
+        showStatus(error.message || "Could not sign out.", "danger");
+        signOutButton.disabled = false;
+      }
+    });
+
+    async function initialize() {
+      try {
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+
+        currentUser = userData.user;
+
+        if (!currentUser) {
+          showAccess("Sign in to use the game-record dashboard.", true);
+          return;
+        }
+
+        const { data: isAdmin, error: roleError } =
+          await supabase.rpc("is_current_user_admin");
+
+        if (roleError) throw roleError;
+
+        if (isAdmin !== true) {
+          showAccess("Your account is not authorized to use this dashboard.");
+          return;
+        }
+
+        adminEmail.textContent = currentUser.email || "Administrator";
+        accessMessage.classList.add("d-none");
+        dashboard.classList.remove("d-none");
+
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        playedAtInput.value = now.toISOString().slice(0, 16);
+
+        participantsList.appendChild(participantRow(0));
+        updateResultControls();
+        await loadData();
+      } catch (error) {
+        console.error("Could not initialize game dashboard:", error);
+        showAccess(
+          "Could not verify administrator access. Check Supabase configuration and permissions.",
+          true
+        );
+      }
+    }
+
+    initialize();
+  </script>
+</body>
+</html>
