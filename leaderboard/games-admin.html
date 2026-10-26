@@ -94,6 +94,41 @@
         Players added here are game records, not Supabase accounts. Only
         administrators can add or edit these records.
       </div>
+<ul class="nav nav-tabs mb-4" id="gamesAdminTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button
+      class="nav-link active"
+      id="games-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#games-pane"
+      type="button"
+      role="tab"
+      aria-controls="games-pane"
+      aria-selected="true">
+      Games &amp; Decks
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button
+      class="nav-link"
+      id="commanders-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#commanders-pane"
+      type="button"
+      role="tab"
+      aria-controls="commanders-pane"
+      aria-selected="false">
+      Commanders
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div
+    class="tab-pane fade show active"
+    id="games-pane"
+    role="tabpanel"
+    aria-labelledby="games-tab">
 
       <div class="row g-4">
         <div class="col-lg-5">
@@ -141,6 +176,12 @@
                   maxlength="100"
                   required>
               </div>
+<div class="mb-3">
+  <label for="deck-commander" class="form-label">Commander</label>
+  <select id="deck-commander" class="form-select" required>
+    <option value="">Select a commander</option>
+  </select>
+</div>
 
               <div class="mb-3">
                 <label for="decklist-url" class="form-label">Decklist URL (optional)</label>
@@ -242,7 +283,56 @@
         </div>
       </section>
     </section>
+      </div>
+    
+      <div
+        class="tab-pane fade"
+        id="commanders-pane"
+        role="tabpanel"
+        aria-labelledby="commanders-tab">
+        <section class="games-card p-4" aria-labelledby="commander-heading">
+          <h2 id="commander-heading" class="h4 fw-bold mb-3">
+            <i class="bi bi-person-badge text-info me-2" aria-hidden="true"></i>
+            Add a Commander
+          </h2>
+    
+          <p class="text-secondary">
+            Add a commander’s name and, optionally, an image. The image is uploaded
+            to the Supabase Storage bucket <code>commander-images</code>.
+          </p>
+    
+          <form id="commander-form" class="mt-4">
+            <div class="mb-3">
+              <label for="commander-name" class="form-label">Commander name</label>
+              <input
+                id="commander-name"
+                class="form-control"
+                type="text"
+                maxlength="100"
+                required>
+            </div>
+    
+            <div class="mb-3">
+              <label for="commander-image" class="form-label">Commander image (optional)</label>
+              <input
+                id="commander-image"
+                class="form-control"
+                type="file"
+                accept="image/png,image/jpeg,image/webp">
+              <div class="form-text">PNG, JPEG, or WebP; maximum 5 MB.</div>
+            </div>
+    
+            <button id="add-commander-button" class="btn btn-info text-dark fw-bold" type="submit">
+              <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
+              Add Commander
+            </button>
+          </form>
+        </section>
+      </div>
+    </div>
+    
   </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script type="module">
     import { supabase } from "../supabase-client.js";
@@ -253,7 +343,8 @@
     const dashboard = document.getElementById("dashboard");
     const adminEmail = document.getElementById("admin-email");
     const statusBox = document.getElementById("status-message");
-
+    
+    const commanderForm = document.getElementById("commander-form");
     const playerForm = document.getElementById("player-form");
     const playerNameInput = document.getElementById("player-name");
     const playerButton = document.getElementById("add-player-button");
@@ -282,7 +373,8 @@
     let currentUser = null;
     let players = [];
     let decks = [];
-
+    let commanders = [];
+    
     function showStatus(message, type = "info") {
       statusBox.className = `alert alert-${type}`;
       statusBox.textContent = message;
@@ -531,7 +623,11 @@
       clearStatus();
 
       try {
-        const [playersResult, decksResult, recordsResult] = await Promise.all([
+        const [playersResult, decksResult, recordsResult,commandersResult] = await Promise.all([
+            supabase
+              .from("commanders")
+              .select("id, name, image_path")
+              .order("name"),
           supabase.from("players").select("id, display_name").order("display_name"),
           supabase.from("decks").select("id, player_id, name, decklist_url").order("name"),
           supabase.from("deck_player_records")
@@ -542,7 +638,23 @@
         if (playersResult.error) throw playersResult.error;
         if (decksResult.error) throw decksResult.error;
         if (recordsResult.error) throw recordsResult.error;
-
+        if (commandersResult.error) throw commandersResult.error;
+        
+        commanders = commandersResult.data || [];
+        
+        commanderSelect.replaceChildren();
+        const commanderPlaceholder = document.createElement("option");
+        commanderPlaceholder.value = "";
+        commanderPlaceholder.textContent = "Select a commander";
+        commanderSelect.appendChild(commanderPlaceholder);
+        
+        commanders.forEach(commander => {
+          const option = document.createElement("option");
+          option.value = commander.id;
+          option.textContent = commander.name;
+          commanderSelect.appendChild(option);
+        });
+        
         players = playersResult.data || [];
         decks = decksResult.data || [];
 
@@ -611,6 +723,7 @@
       try {
         const { error } = await supabase.from("decks").insert({
           player_id: playerId,
+          commander_id: commanderSelect.value,
           name,
           decklist_url: decklistUrl || null,
           created_by: currentUser.id
@@ -637,6 +750,91 @@
     });
 
     gameResultSelect.addEventListener("change", updateResultControls);
+
+commanderForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  clearStatus();
+
+  const name = commanderNameInput.value.trim();
+  const imageFile = commanderImageInput.files?.[0] || null;
+
+  if (!name) {
+    showStatus("Enter a commander name.", "warning");
+    return;
+  }
+
+  const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+
+  if (imageFile && !allowedTypes.includes(imageFile.type)) {
+    showStatus("Choose a PNG, JPEG, or WebP image.", "warning");
+    return;
+  }
+
+  if (imageFile && imageFile.size > 5 * 1024 * 1024) {
+    showStatus("The image must be 5 MB or smaller.", "warning");
+    return;
+  }
+
+  addCommanderButton.disabled = true;
+  addCommanderButton.textContent = "Adding…";
+
+  let uploadedPath = null;
+
+  try {
+    if (imageFile) {
+      const extensionByType = {
+        "image/png": "png",
+        "image/jpeg": "jpg",
+        "image/webp": "webp"
+      };
+
+      const filename = `${crypto.randomUUID()}.${extensionByType[imageFile.type]}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("commander-images")
+        .upload(filename, imageFile, {
+          contentType: imageFile.type,
+          cacheControl: "3600",
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+      uploadedPath = filename;
+    }
+
+    const { error: insertError } = await supabase.from("commanders").insert({
+      name,
+      image_path: uploadedPath,
+      created_by: currentUser.id
+    });
+
+    if (insertError) throw insertError;
+
+    commanderForm.reset();
+    showStatus("Commander added.", "success");
+    await loadData();
+  } catch (error) {
+    console.error("Could not add commander:", error);
+
+    // Remove the uploaded image if saving the commander row failed.
+    if (uploadedPath) {
+      const { error: cleanupError } = await supabase.storage
+        .from("commander-images")
+        .remove([uploadedPath]);
+
+      if (cleanupError) {
+        console.error("Could not remove unused commander image:", cleanupError);
+      }
+    }
+
+    showStatus(error.message || "Could not add commander.", "danger");
+  } finally {
+    addCommanderButton.disabled = false;
+    addCommanderButton.innerHTML =
+      '<i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add Commander';
+  }
+});
+
 
     gameForm.addEventListener("submit", async event => {
       event.preventDefault();
@@ -707,7 +905,7 @@
             ...participant,
             game_id: createdGameId
           })));
-
+        
         if (participantsError) throw participantsError;
 
         const { error: finalizeError } = await supabase
