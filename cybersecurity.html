@@ -716,6 +716,331 @@
         </div>
       </div>
     </section>
+<section id="dos-ddos-study" class="py-5 bg-light border-top" aria-labelledby="dos-study-heading">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-2 mb-3">
+        Network Intrusion Detection · CIC-IDS2018
+      </span>
+      <h2 id="dos-study-heading" class="section-title">
+        Detecting DoS/DDoS Traffic with Flow Features
+      </h2>
+      <p class="text-muted mx-auto" style="max-width: 820px;">
+        This study compares normal and DoS/DDoS network flows using statistical
+        feature comparisons, a supervised Random Forest classifier, and an
+        Isolation Forest anomaly detector.
+      </p>
+    </div>
+
+    <article class="card feature-card shadow-sm p-4 p-md-5 mb-4">
+      <span class="badge bg-primary-subtle text-primary align-self-start mb-3">
+        Research Question
+      </span>
+      <h3 class="h4 fw-bold">
+        How effectively can flow-level network traffic features distinguish
+        normal traffic from DoS/DDoS attacks, and how do supervised
+        classification and anomaly detection compare?
+      </h3>
+      <p class="text-secondary mb-0">
+        In this notebook’s sampled data, the Random Forest distinguished the
+        two classes very well, while the Isolation Forest detected very few
+        attacks. These are preliminary results: the notebook uses a random
+        train/test split of a capped sample, so the scores do not establish
+        how well either model would perform on new days, networks, or attack
+        conditions.
+      </p>
+    </article>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6 col-xl-4">
+        <article class="card feature-card h-100 p-4">
+          <span class="badge bg-info-subtle text-info align-self-start mb-2">
+            1 · Normal Traffic
+          </span>
+          <h3 class="h5 fw-bold">What characterized normal flows?</h3>
+          <p class="text-secondary small mb-0">
+            In the sample, normal traffic had a median of 5 total forward
+            packets and 343 forward packet bytes. Its median forward packet
+            length mean was 50. These are observations from this dataset and
+            sample—not universal definitions of benign traffic.
+          </p>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <article class="card feature-card h-100 p-4">
+          <span class="badge bg-danger-subtle text-danger align-self-start mb-2">
+            2 · Attack Traffic
+          </span>
+          <h3 class="h5 fw-bold">What characterized DoS/DDoS flows?</h3>
+          <p class="text-secondary small mb-0">
+            In the combined attack sample, median forward packet bytes and
+            forward packet length mean were both 0. Median minimum forward
+            inter-arrival time was 20,957.5, compared with 34 for normal
+            traffic; median minimum flow inter-arrival time was 20,010,
+            compared with 29. The notebook also found a median ACK Flag Count
+            of 1 for attacks and 0 for normal flows.
+          </p>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <article class="card feature-card h-100 p-4">
+          <span class="badge bg-warning-subtle text-warning align-self-start mb-2">
+            3 · Traffic Volume
+          </span>
+          <h3 class="h5 fw-bold">How did traffic volume differ?</h3>
+          <p class="text-secondary small mb-0">
+            Related volume features showed lower attack medians in this sample:
+            forward packet bytes were 0 for attacks versus 343 for normal
+            flows, and Subflow Fwd Bytes showed the same medians. However,
+            the notebook’s intended traffic-volume feature lookup returned
+            <code>[]</code>, so its grouped volume table and histograms were
+            not produced. This comparison needs to be rerun with corrected
+            feature-name matching.
+          </p>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <article class="card feature-card h-100 p-4">
+          <span class="badge bg-primary-subtle text-primary align-self-start mb-2">
+            4 · Attack Patterns
+          </span>
+          <h3 class="h5 fw-bold">Which features may help identify attacks?</h3>
+          <p class="text-secondary small mb-0">
+            Useful candidate features in this analysis include forward and
+            backward packet counts, byte totals, packet lengths, inter-arrival
+            times, ACK flags, and flow rates. The Random Forest ranked
+            Subflow Fwd Bytes, Fwd Packets Length Total, and Fwd Packet Length
+            Max as its three most important features.
+          </p>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <article class="card feature-card h-100 p-4">
+          <span class="badge bg-secondary-subtle text-secondary align-self-start mb-2">
+            5 · Abnormal Behavior
+          </span>
+          <h3 class="h5 fw-bold">How can abnormal behavior be identified?</h3>
+          <p class="text-secondary small mb-0">
+            Establish a baseline from normal flows, then examine deviations in
+            packet volumes, rates, sizes, flags, and timing. Statistical
+            summaries can reveal group differences; an anomaly detector can
+            flag unusual flows. An unusual flow is not automatically malicious,
+            as the notebook’s Isolation Forest results demonstrate.
+          </p>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4">
+        <article class="card feature-card h-100 p-4">
+          <span class="badge bg-success-subtle text-success align-self-start mb-2">
+            6 · Detection Methods
+          </span>
+          <h3 class="h5 fw-bold">Can statistics and machine learning help?</h3>
+          <p class="text-secondary small mb-0">
+            Yes, in this experiment. Median comparisons highlighted differences,
+            and the Random Forest achieved strong test results on the sampled
+            split. The Isolation Forest performed poorly at identifying attacks.
+            Performance should be validated with data separated by source file
+            or time before drawing real-world conclusions.
+          </p>
+        </article>
+      </div>
+    </div>
+
+    <article class="card feature-card shadow-sm p-4 p-md-5 mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+        <div>
+          <span class="badge bg-info text-dark mb-2">Notebook Output</span>
+          <h3 class="h4 fw-bold mb-1">Dataset and sample</h3>
+          <p class="text-secondary mb-0">
+            The notebook read 10 Parquet files and created a 64,000-row,
+            81-column sample.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle mb-3">
+          <caption class="caption-top">
+            Sample rows used for the analysis
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Category</th>
+              <th scope="col">Sample rows</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Normal</th><td>48,000</td></tr>
+            <tr><th scope="row">DDoS</th><td>10,000</td></tr>
+            <tr><th scope="row">DoS</th><td>6,000</td></tr>
+            <tr class="fw-bold"><th scope="row">Total</th><td>64,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="h5 fw-bold mt-4">Normal versus attack medians</h4>
+      <p class="text-secondary small">
+        Attacks combine the notebook’s DoS and DDoS categories for this comparison.
+      </p>
+      <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              <th scope="col">Normal median</th>
+              <th scope="col">DoS/DDoS median</th>
+              <th scope="col">Scaled median difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">ACK Flag Count</th><td>0</td><td>1</td><td>1.000</td></tr>
+            <tr><th scope="row">Fwd IAT Min</th><td>34</td><td>20,957.5</td><td>0.879</td></tr>
+            <tr><th scope="row">Flow IAT Min</th><td>29</td><td>20,010</td><td>0.860</td></tr>
+            <tr><th scope="row">Fwd Packet Length Mean</th><td>50</td><td>0</td><td>0.823</td></tr>
+            <tr><th scope="row">Avg Packet Size</th><td>102.25</td><td>0</td><td>0.757</td></tr>
+            <tr><th scope="row">Fwd Packets Length Total</th><td>343</td><td>0</td><td>0.748</td></tr>
+            <tr><th scope="row">Total Fwd Packets</th><td>5</td><td>3</td><td>0.571</td></tr>
+            <tr><th scope="row">Total Backward Packets</th><td>2</td><td>0</td><td>0.400</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small text-muted mb-0">
+        The scaled difference is the notebook’s absolute median difference
+        divided by the average of the two groups’ interquartile ranges. It is
+        descriptive, not a significance test.
+      </p>
+    </article>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6">
+        <article class="card feature-card h-100 shadow-sm p-4">
+          <span class="badge bg-success-subtle text-success align-self-start mb-2">
+            Supervised · Random Forest
+          </span>
+          <h3 class="h5 fw-bold">Classification results</h3>
+          <p class="text-secondary small">
+            The model predicts Normal versus combined DoS/DDoS. The notebook
+            reports rounded metrics; the confusion matrix below is the exact
+            displayed output.
+          </p>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead>
+                <tr><th scope="col">Class</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th><th scope="col">Support</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Normal</th><td>1.00</td><td>1.00</td><td>1.00</td><td>12,000</td></tr>
+                <tr><th scope="row">DoS/DDoS</th><td>0.99</td><td>1.00</td><td>0.99</td><td>4,000</td></tr>
+                <tr><th scope="row">Accuracy</th><td colspan="3">1.00 (rounded)</td><td>16,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small fw-semibold mb-1">Confusion matrix (rows = actual, columns = predicted)</p>
+          <pre class="bg-dark text-light rounded p-3 small mb-0"><code>             Predicted
+             Normal  DoS/DDoS
+Actual Normal 11959       41
+       Attack    14     3986</code></pre>
+          <p class="small text-muted mt-3 mb-0">
+            From the displayed matrix, 15,945 of 16,000 test rows were classified
+            correctly (about 99.66%). This score is for the notebook’s random
+            split, not an independent external test.
+          </p>
+        </article>
+      </div>
+
+      <div class="col-lg-6">
+        <article class="card feature-card h-100 shadow-sm p-4">
+          <span class="badge bg-warning-subtle text-warning align-self-start mb-2">
+            Anomaly Detection · Isolation Forest
+          </span>
+          <h3 class="h5 fw-bold">Anomaly-detection results</h3>
+          <p class="text-secondary small">
+            The Isolation Forest was fit on normal training rows and its
+            outlier predictions were treated as attack predictions.
+          </p>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead>
+                <tr><th scope="col">Class</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th><th scope="col">Support</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Normal</th><td>0.74</td><td>0.92</td><td>0.82</td><td>12,000</td></tr>
+                <tr><th scope="row">DoS/DDoS</th><td>0.06</td><td>0.01</td><td>0.02</td><td>4,000</td></tr>
+                <tr><th scope="row">Accuracy</th><td colspan="3">0.69</td><td>16,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small fw-semibold mb-1">Confusion matrix (rows = actual, columns = predicted)</p>
+          <pre class="bg-dark text-light rounded p-3 small mb-0"><code>             Predicted
+             Normal  DoS/DDoS
+Actual Normal 10997     1003
+       Attack  3940       60</code></pre>
+          <p class="small text-muted mt-3 mb-0">
+            It detected only 60 of 4,000 attack rows in the test set. In this
+            experiment, treating “unusual” as “attack” was not an effective
+            substitute for the supervised classifier.
+          </p>
+        </article>
+      </div>
+    </div>
+
+    <article class="card feature-card shadow-sm p-4 p-md-5 mb-4">
+      <span class="badge bg-primary-subtle text-primary align-self-start mb-2">
+        Random Forest Feature Importance
+      </span>
+      <h3 class="h4 fw-bold">Top features reported by the notebook</h3>
+      <p class="text-secondary">
+        Importance indicates how much each feature contributed to the fitted
+        Random Forest’s decisions; it does not prove that a feature is a
+        universal attack indicator.
+      </p>
+      <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle mb-0">
+          <thead>
+            <tr><th scope="col">Feature</th><th scope="col">Importance</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Subflow Fwd Bytes</th><td>0.063393</td></tr>
+            <tr><th scope="row">Fwd Packets Length Total</th><td>0.057533</td></tr>
+            <tr><th scope="row">Fwd Packet Length Max</th><td>0.052860</td></tr>
+            <tr><th scope="row">Init Fwd Win Bytes</th><td>0.042088</td></tr>
+            <tr><th scope="row">Subflow Fwd Packets</th><td>0.040583</td></tr>
+            <tr><th scope="row">Total Fwd Packets</th><td>0.040044</td></tr>
+            <tr><th scope="row">Fwd IAT Min</th><td>0.034183</td></tr>
+            <tr><th scope="row">Fwd Packet Length Mean</th><td>0.032361</td></tr>
+            <tr><th scope="row">Avg Fwd Segment Size</th><td>0.032303</td></tr>
+            <tr><th scope="row">Avg Bwd Segment Size</th><td>0.028184</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <div class="alert alert-warning mb-3" role="note">
+      <strong>Interpretation and limitations:</strong>
+      The sample was capped at 5,000 rows per file and category, then randomly
+      split into training and test sets. Rows from the same source files can
+      therefore appear in both sets. The near-perfect Random Forest score may
+      not generalize to unseen days or networks. The notebook also found no
+      expected traffic-volume feature names, so its intended volume-specific
+      median table and histograms were skipped. Use a file- or time-separated
+      evaluation and correct the feature aliases before making stronger claims.
+    </div>
+
+    <div class="alert alert-info mb-0" role="note">
+      <strong>Research conclusion:</strong>
+      Flow-level features separated the sampled classes well with a supervised
+      Random Forest, while the tested Isolation Forest missed most attacks.
+      The results support further investigation—not a claim that the model is
+      ready for operational use.
+    </div>
+  </div>
+</section>
+`` 
 
     <section id="contact" class="py-5 bg-white border-top">
       <div class="container py-4 text-center">
