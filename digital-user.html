@@ -160,9 +160,12 @@
           </form>
 
           <div class="alert alert-warning small mt-3 mb-0">
-            Prototype notice: the chat uses scripted replies based on your description.
-            It is not connected to an AI service and does not identify people in images.
+            Prototype notice: chat replies are generated through the server-side
+            <code>/api/chat</code> service. The AI receives the persona name,
+            description, and conversation messages. Do not enter sensitive or personal
+            information. Uploaded images are displayed as avatars and are not analyzed.
           </div>
+          
         </section>
       </div>
 
@@ -209,7 +212,7 @@
           </form>
 
           <div class="d-flex justify-content-between align-items-center mt-3">
-            <small class="text-secondary">Replies are generated locally by this prototype.</small>
+            <small class="text-secondary">Replies use the server-side AI chat service.</small>
             <button id="speak-toggle" class="btn btn-sm btn-outline-info" type="button" aria-pressed="false">
               <i class="bi bi-volume-up me-1"></i>Voice off
             </button>

@@ -337,6 +337,11 @@
   <script type="module">
     import { supabase } from "../supabase-client.js";
 
+    const commanderSelect = document.getElementById("deck-commander");
+    const commanderNameInput = document.getElementById("commander-name");
+    const commanderImageInput = document.getElementById("commander-image");
+    const addCommanderButton = document.getElementById("add-commander-button");
+
     const accessMessage = document.getElementById("access-message");
     const accessText = document.getElementById("access-message-text");
     const loginLink = document.getElementById("login-link");
