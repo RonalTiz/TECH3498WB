@@ -17,11 +17,136 @@
     const sendBtn = chatForm
       ? chatForm.querySelector('button[type="submit"]')
       : null;
+    
 
+  
     if (!toggleBtn || !chatWindow || !messagesContainer || !chatForm || !chatInput) {
       return;
     }
-
+    // appearance Modifiers
+    const APPEARANCE_KEY = "siteAppearancePrefs";
+    const COLORS = {
+      blue: "#0b3d91",
+      navy: "#0b1120",
+      green: "#14532d",
+      purple: "#4c1d95",
+      red: "#7f1d1d"
+    };
+    
+    function readAppearance() {
+      try {
+        return JSON.parse(localStorage.getItem(APPEARANCE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+    
+    let appearance = readAppearance();
+    
+    function applyAppearance() {
+      const root = document.documentElement;
+      const styleId = "chatbot-appearance-overrides";
+      let style = document.getElementById(styleId);
+    
+      if (appearance.background) {
+        root.style.setProperty("--bg-main", appearance.background);
+        root.style.setProperty("--bg-section-alt", appearance.background);
+        root.style.setProperty("--bg-card", appearance.background);
+        root.style.setProperty("--bg-subtle", appearance.background);
+      } else {
+        ["--bg-main", "--bg-section-alt", "--bg-card", "--bg-subtle"]
+          .forEach(name => root.style.removeProperty(name));
+      }
+    
+      root.style.fontSize = appearance.largeText ? "120%" : "";
+    
+      if (appearance.securityImage) {
+        if (!style) {
+          style = document.createElement("style");
+          style.id = styleId;
+          document.head.appendChild(style);
+        }
+    
+        style.textContent = `
+          body {
+            background-image:
+              linear-gradient(rgba(11, 17, 32, .82), rgba(11, 17, 32, .88)),
+              url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=2000&q=80");
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+          }
+          section.bg-white, section.bg-light {
+            background-color: rgba(11, 17, 32, .72) !important;
+          }
+        `;
+      } else {
+        style?.remove();
+        document.body.style.backgroundImage = "";
+      }
+    
+      localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearance));
+    }
+    
+    function handleLocalCommand(text) {
+      const query = text.toLowerCase().trim();
+    
+      if (/restore the original appearance|reset the website|reset appearance/.test(query)) {
+        appearance = {};
+        localStorage.removeItem(APPEARANCE_KEY);
+        window.setSiteTheme?.("dark");
+    
+        localStorage.removeItem("siteCyberPalette");
+        window.applyColorPalette?.(null);
+    
+        applyAppearance();
+        return "Restored the original appearance: default colors, text size, and dark theme.";
+      }
+    
+      if (/switch to dark mode|dark mode/.test(query)) {
+        window.setSiteTheme?.("dark");
+        return "Switched to dark mode.";
+      }
+    
+      if (/switch to light mode|light mode/.test(query)) {
+        window.setSiteTheme?.("light");
+        return "Switched to light mode.";
+      }
+    
+      if (/text (larger|bigger)|make the text larger|increase text size/.test(query)) {
+        appearance.largeText = true;
+        applyAppearance();
+        return "Made the text larger.";
+      }
+    
+      if (/computer security image|security image/.test(query)) {
+        appearance.securityImage = true;
+        appearance.background = null;
+        applyAppearance();
+        return "Set a computer-security image as the background.";
+      }
+    
+      const colorMatch = query.match(/(?:background|background color)\s+(?:to\s+)?(blue|navy|green|purple|red)\b/);
+      if (colorMatch) {
+        appearance.background = COLORS[colorMatch[1]];
+        appearance.securityImage = false;
+        applyAppearance();
+        return `Changed the background to ${colorMatch[1]}.`;
+      }
+    
+      if (/open|go to|navigate to/.test(query) &&
+          /cybersecurity|security learning/.test(query)) {
+        setTimeout(() => {
+          window.location.href = "/cybersecurity.html#assessment-heading";
+        }, 500);
+        return "Opening the CyberSecurity learning section.";
+      }
+    
+      return null;
+    }
+    
+    applyAppearance();
+    
     // Keep recent turns locally so the API can use conversation context.
     const conversation = [];
     let isFirstOpen = true;
@@ -104,7 +229,15 @@
       const userText = chatInput.value.trim();
 
       if (!userText || isSending) return;
-
+      const localReply = handleLocalCommand(userText);
+      
+      if (localReply) {
+        appendMessage(userText, "user");
+        chatInput.value = "";
+        appendMessage(localReply, "bot");
+        return;
+      }
+      
       appendMessage(userText, "user");
       chatInput.value = "";
       conversation.push({ role: "user", content: userText });

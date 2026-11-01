@@ -36,6 +36,7 @@
       }
     }
   }
+window.setSiteTheme = theme => applyTheme(theme, true);
 
   function updateToggleButtons(theme) {
     document.querySelectorAll(".theme-toggle-btn").forEach(button => {
