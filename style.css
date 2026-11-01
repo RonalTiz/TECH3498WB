@@ -123,6 +123,10 @@ section.bg-light {
   padding: 4px 14px;
   transition: all 0.2s ease;
 }
+/* Restore Appearance Button */
+.restore-appearance-btn {
+  border-radius: 999px;
+}
 
 /* Navbar */
 .navbar {
