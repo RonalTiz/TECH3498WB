@@ -341,7 +341,12 @@
     // Voice recognition is optional and depends on browser support.
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
-
+    if (micBtn && "speechSynthesis" in window) {
+      micBtn.addEventListener("click", () => {
+        window.speechSynthesis.cancel();
+      });
+    }
+    
     if (SpeechRecognition && micBtn) {
       recognition = new SpeechRecognition();
       recognition.continuous = false;
