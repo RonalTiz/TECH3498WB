@@ -237,7 +237,7 @@
 
       links.forEach(link => {
         if (isAdmin) {
-          link.href = "security.html";
+          link.href = "Admin_section/security.html";
           setLinkContents(
             link,
             "bi bi-person-check-fill text-success",
@@ -258,7 +258,7 @@
           const item = ensureRoleLink(
             nav,
             "nav-security-item",
-            "security.html",
+            "Admin_section/security.html",
             "bi bi-shield-shaded text-warning",
             "Security Control"
           );
