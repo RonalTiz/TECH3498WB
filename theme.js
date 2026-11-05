@@ -36,6 +36,7 @@
       }
     }
   }
+window.setSiteTheme = theme => applyTheme(theme, true);
 
   function updateToggleButtons(theme) {
     document.querySelectorAll(".theme-toggle-btn").forEach(button => {
@@ -64,7 +65,27 @@
     updateToggleButtons(
       document.documentElement.getAttribute("data-theme") || "dark"
     );
-
+    document.querySelectorAll(".restore-appearance-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        try {
+          localStorage.removeItem("siteAppearancePrefs");
+          localStorage.removeItem("siteCyberPalette");
+        } catch (error) {
+          console.warn("Could not clear saved appearance settings.", error);
+        }
+    
+        // Restore the portfolio's default dark theme and clear appearance overrides.
+        applyTheme("dark", true);
+        ["--bg-main", "--bg-section-alt", "--bg-card", "--bg-subtle"]
+          .forEach(name => document.documentElement.style.removeProperty(name));
+    
+        document.documentElement.style.fontSize = "";
+        document.body.style.backgroundImage = "";
+        document.getElementById("chatbot-appearance-overrides")?.remove();
+        document.getElementById("cyber-palette-override")?.remove();
+      });
+    });
+    
     document.querySelectorAll(".theme-toggle-btn").forEach(button => {
       button.addEventListener("click", () => {
         const currentTheme =
