@@ -759,6 +759,36 @@
     });
 
     gameResultSelect.addEventListener("change", updateResultControls);
+async function findScryfallCard(name) {
+  const url =
+    `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(name)}`;
+
+  // Leave the browser's User-Agent intact; Scryfall requires an Accept header.
+  const response = await fetch(url, {
+    headers: { Accept: "application/json" }
+  });
+
+  const card = await response.json();
+
+  if (!response.ok) {
+    throw new Error(card.details || "Commander not found on Scryfall.");
+  }
+
+  const imageUrl =
+    card.image_uris?.normal ||
+    card.card_faces?.[0]?.image_uris?.normal;
+
+  if (!imageUrl) {
+    throw new Error("Scryfall did not provide a card image for this commander.");
+  }
+
+  return {
+    scryfall_id: card.id,
+    image_url: imageUrl,
+    artist: card.artist || card.card_faces?.[0]?.artist || null,
+    scryfall_uri: card.scryfall_uri
+  };
+}
 
 commanderForm.addEventListener("submit", async event => {
   event.preventDefault();
@@ -790,6 +820,7 @@ commanderForm.addEventListener("submit", async event => {
   let uploadedPath = null;
 
   try {
+    const scryfallCard = await findScryfallCard(name);
     if (imageFile) {
       const extensionByType = {
         "image/png": "png",
@@ -814,8 +845,11 @@ commanderForm.addEventListener("submit", async event => {
     const { error: insertError } = await supabase.from("commanders").insert({
       name,
       image_path: uploadedPath,
-      created_by: currentUser.id
+      created_by: currentUser.id,
+      ...scryfallCard
     });
+    
+    
 
     if (insertError) throw insertError;
 

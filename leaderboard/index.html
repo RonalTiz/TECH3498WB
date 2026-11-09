@@ -187,22 +187,66 @@
           const ids = deckIds.slice(i, i + 100);
           const batch = await fetchAll(() =>
             supabase.from("decks")
-              .select("id, name")
+              .select("id, name, commander_id")
               .in("id", ids)
               .order("id")
           );
           decks.push(...batch);
         }
 
-        const names = new Map(decks.map(deck => [deck.id, deck.name]));
+        const commanderIds = [...new Set(
+          decks.map(deck => deck.commander_id).filter(Boolean)
+        )];
+        
+        const commanders = [];
+        for (let i = 0; i < commanderIds.length; i += 100) {
+          const ids = commanderIds.slice(i, i + 100);
+          commanders.push(...await fetchAll(() =>
+            supabase.from("commanders")
+              .select("id, name, image_url, artist, scryfall_uri")
+              .in("id", ids)
+              .order("id")
+          ));
+        }
+        
+        const commandersById = new Map(
+          commanders.map(commander => [commander.id, commander])
+        );
+        const decksById = new Map(decks.map(deck => [deck.id, deck]));
+        
         deckStats = [...stats.values()]
-          .filter(deck => names.has(deck.deckId))
-          .map(deck => ({
-            ...deck,
-            name: names.get(deck.deckId),
-            winRate: deck.uses ? deck.wins / deck.uses : 0
-          }));
-
+          .filter(stat => decksById.has(stat.deckId))
+          .map(stat => {
+            const deck = decksById.get(stat.deckId);
+        
+            return {
+              ...stat,
+              name: deck.name,
+              winRate: stat.uses ? stat.wins / stat.uses : 0,
+              commander: commandersById.get(deck.commander_id) || null
+            };
+          });
+        
+        status.className = "alert d-none";
+        renderLeaderboard();
+        
+        
+        const commanders = [];
+        for (let i = 0; i < commanderIds.length; i += 100) {
+          const ids = commanderIds.slice(i, i + 100);
+          commanders.push(...await fetchAll(() =>
+            supabase.from("commanders")
+              .select("id, name, image_url, artist, scryfall_uri")
+              .in("id", ids)
+              .order("id")
+          ));
+        }
+        
+        const commandersById = new Map(
+          commanders.map(commander => [commander.id, commander])
+        );
+        const decksById = new Map(decks.map(deck => [deck.id, deck]));
+        
         status.className = "alert d-none";
         renderLeaderboard();
       } catch (error) {
@@ -265,7 +309,30 @@
         const rate = document.createElement("div");
         rate.className = "deck-rate text-nowrap";
         rate.textContent = `${(deck.winRate * 100).toFixed(1)}%`;
-
+        if (deck.commander?.image_url) {
+          const imageLink = document.createElement("a");
+          imageLink.href = deck.commander.scryfall_uri || deck.commander.image_url;
+          imageLink.target = "_blank";
+          imageLink.rel = "noopener noreferrer";
+        
+          const image = document.createElement("img");
+          image.src = deck.commander.image_url;
+          image.alt = `${deck.commander.name} Magic: The Gathering card`;
+          image.loading = "lazy";
+          image.style.cssText =
+            "width:100px;height:auto;object-fit:contain;border-radius:8px;";
+        
+          imageLink.appendChild(image);
+          row.appendChild(imageLink);
+        
+          const artist = document.createElement("small");
+          artist.className = "deck-stat d-block mt-2";
+          artist.textContent = deck.commander.artist
+            ? `Artist: ${deck.commander.artist}`
+            : "View card on Scryfall";
+          details.appendChild(artist);
+        }
+        
         details.append(name, usage);
         row.append(rank, details, rate);
         card.appendChild(row);
