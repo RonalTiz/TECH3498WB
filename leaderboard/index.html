@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top Decks Leaderboard | TECH 3498</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="../theme.js"></script>
+
+  <style>
+    .leaderboard-main { min-height: 70vh; padding-top: 120px; }
+    .leaderboard-card {
+      height: 100%;
+      color: var(--text-main);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+    }
+    .deck-rank {
+      width: 2.5rem;
+      height: 2.5rem;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--bg-subtle);
+      color: var(--cyber-cyan);
+      font-weight: 800;
+    }
+    .deck-stat { color: var(--text-muted); font-size: .9rem; }
+    .deck-rate { color: var(--cyber-cyan); font-size: 1.5rem; font-weight: 800; }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="../index.html">TECH 3498<span class="text-info">.sec</span></a>
+      <div class="d-flex align-items-center gap-3">
+        <a class="nav-link" href="../index.html">Back to site</a>
+        <button class="btn btn-outline-warning btn-sm theme-toggle-btn" type="button">
+          <span class="theme-label">Light Theme</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container leaderboard-main pb-5">
+    <header class="text-center mb-4">
+      <p class="text-info fw-semibold text-uppercase mb-1">Game Records</p>
+      <h1 class="text-white fw-bold">Top Decks</h1>
+      <p class="text-secondary">Compare deck win rates and how often each deck is played.</p>
+    </header>
+
+    <section class="leaderboard-card p-3 p-md-4 mb-4" aria-label="Leaderboard filters">
+      <div class="row g-3 align-items-end">
+        <div class="col-sm-4">
+          <label class="form-label" for="time-filter">Time period</label>
+          <select id="time-filter" class="form-select">
+            <option value="all">All time</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last year</option>
+          </select>
+        </div>
+        <div class="col-sm-4">
+          <label class="form-label" for="minimum-filter">Minimum games used</label>
+          <select id="minimum-filter" class="form-select">
+            <option value="1">1 or more</option>
+            <option value="3">3 or more</option>
+            <option value="5">5 or more</option>
+            <option value="10">10 or more</option>
+          </select>
+        </div>
+        <div class="col-sm-4">
+          <label class="form-label" for="sort-filter">Sort by</label>
+          <select id="sort-filter" class="form-select">
+            <option value="winrate">Win rate</option>
+            <option value="popularity">Popularity</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <div id="status" class="alert alert-info" role="status" aria-live="polite">
+      Loading leaderboard…
+    </div>
+    <p id="result-count" class="text-secondary small"></p>
+    <section id="leaderboard" class="row g-3" aria-label="Top decks leaderboard"></section>
+  </main>
+
+  <script type="module">
+    import { supabase } from "../supabase-client.js";
+
+    const timeFilter = document.getElementById("time-filter");
+    const minimumFilter = document.getElementById("minimum-filter");
+    const sortFilter = document.getElementById("sort-filter");
+    const leaderboard = document.getElementById("leaderboard");
+    const status = document.getElementById("status");
+    const resultCount = document.getElementById("result-count");
+
+    let deckStats = [];
+
+    // Fetch in pages to avoid Supabase's default response-size limit.
+    async function fetchAll(makeQuery) {
+      const rows = [];
+      const pageSize = 1000;
+
+      for (let offset = 0; ; offset += pageSize) {
+        const { data, error } = await makeQuery().range(offset, offset + pageSize - 1);
+        if (error) throw error;
+        rows.push(...(data || []));
+        if (!data || data.length < pageSize) break;
+      }
+
+      return rows;
+    }
+
+    async function loadLeaderboard() {
+      status.className = "alert alert-info";
+      status.textContent = "Loading leaderboard…";
+      leaderboard.replaceChildren();
+      resultCount.textContent = "";
+
+      try {
+        let gamesQuery = () =>
+          supabase.from("games")
+            .select("id, played_at, result, winner_player_id")
+            .in("result", ["win", "draw"])
+            .order("id");
+
+        const days = Number(timeFilter.value);
+        if (days) {
+          const startDate = new Date();
+          startDate.setDate(startDate.getDate() - days);
+          gamesQuery = () =>
+            supabase.from("games")
+              .select("id, played_at, result, winner_player_id")
+              .in("result", ["win", "draw"])
+              .gte("played_at", startDate.toISOString())
+              .order("id");
+        }
+
+        const games = await fetchAll(gamesQuery);
+        const gamesById = new Map(games.map(game => [game.id, game]));
+        const gameIds = games.map(game => game.id);
+        const participants = [];
+
+        // Keep each .in() query a manageable size.
+        for (let i = 0; i < gameIds.length; i += 100) {
+          const ids = gameIds.slice(i, i + 100);
+          const batch = await fetchAll(() =>
+            supabase.from("game_players")
+              .select("game_id, player_id, deck_id")
+              .in("game_id", ids)
+              .order("game_id")
+              .order("player_id")
+          );
+          participants.push(...batch);
+        }
+
+        const stats = new Map();
+        for (const participant of participants) {
+          const game = gamesById.get(participant.game_id);
+          if (!game || !participant.deck_id) continue;
+
+          const stat = stats.get(participant.deck_id) || {
+            deckId: participant.deck_id,
+            uses: 0,
+            wins: 0
+          };
+
+          stat.uses += 1;
+          if (game.result === "win" &&
+              game.winner_player_id === participant.player_id) {
+            stat.wins += 1;
+          }
+          stats.set(participant.deck_id, stat);
+        }
+
+        const deckIds = [...stats.keys()];
+        const decks = [];
+        for (let i = 0; i < deckIds.length; i += 100) {
+          const ids = deckIds.slice(i, i + 100);
+          const batch = await fetchAll(() =>
+            supabase.from("decks")
+              .select("id, name")
+              .in("id", ids)
+              .order("id")
+          );
+          decks.push(...batch);
+        }
+
+        const names = new Map(decks.map(deck => [deck.id, deck.name]));
+        deckStats = [...stats.values()]
+          .filter(deck => names.has(deck.deckId))
+          .map(deck => ({
+            ...deck,
+            name: names.get(deck.deckId),
+            winRate: deck.uses ? deck.wins / deck.uses : 0
+          }));
+
+        status.className = "alert d-none";
+        renderLeaderboard();
+      } catch (error) {
+        console.error("Could not load leaderboard:", error);
+        status.className = "alert alert-danger";
+        status.textContent =
+          "Could not load the leaderboard. Check Supabase read permissions for games, game_players, and decks.";
+      }
+    }
+
+    function renderLeaderboard() {
+      const minimum = Number(minimumFilter.value);
+      const sortBy = sortFilter.value;
+
+      const rows = deckStats
+        .filter(deck => deck.uses >= minimum)
+        .sort((a, b) => {
+          if (sortBy === "popularity") {
+            return b.uses - a.uses || b.winRate - a.winRate ||
+              a.name.localeCompare(b.name);
+          }
+          return b.winRate - a.winRate || b.uses - a.uses ||
+            a.name.localeCompare(b.name);
+        });
+
+      leaderboard.replaceChildren();
+      resultCount.textContent = `${rows.length} ${rows.length === 1 ? "deck" : "decks"} shown`;
+
+      if (!rows.length) {
+        status.className = "alert alert-secondary";
+        status.textContent = "No decks meet these filters yet.";
+        return;
+      }
+
+      rows.forEach((deck, index) => {
+        const column = document.createElement("div");
+        column.className = "col-12 col-md-6";
+
+        const card = document.createElement("article");
+        card.className = "leaderboard-card p-3 p-md-4";
+
+        const row = document.createElement("div");
+        row.className = "d-flex align-items-center gap-3";
+
+        const rank = document.createElement("div");
+        rank.className = "deck-rank";
+        rank.textContent = String(index + 1);
+
+        const details = document.createElement("div");
+        details.className = "flex-grow-1 min-w-0";
+
+        const name = document.createElement("h2");
+        name.className = "h5 fw-bold mb-1 text-break";
+        name.textContent = deck.name;
+
+        const usage = document.createElement("div");
+        usage.className = "deck-stat";
+        usage.textContent = `${deck.uses} ${deck.uses === 1 ? "game" : "games"} used`;
+
+        const rate = document.createElement("div");
+        rate.className = "deck-rate text-nowrap";
+        rate.textContent = `${(deck.winRate * 100).toFixed(1)}%`;
+
+        details.append(name, usage);
+        row.append(rank, details, rate);
+        card.appendChild(row);
+        column.appendChild(card);
+        leaderboard.appendChild(column);
+      });
+    }
+
+    timeFilter.addEventListener("change", loadLeaderboard);
+    minimumFilter.addEventListener("change", renderLeaderboard);
+    sortFilter.addEventListener("change", renderLeaderboard);
+
+    loadLeaderboard();
+  </script>
+</body>
+</html>
