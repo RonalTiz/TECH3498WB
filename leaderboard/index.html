@@ -333,10 +333,7 @@ rows.forEach((commander, index) => {
 
   const card = document.createElement("article");
   card.className = "leaderboard-card commander-card p-3 p-md-4";
-
-  const imageUrl =
-    commander.commander.art_crop_url ||
-    commander.commander.image_url;
+const imageUrl = commander.commander.art_crop_url;
 
   if (imageUrl) {
     const background = document.createElement("img");
