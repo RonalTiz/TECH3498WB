@@ -627,18 +627,22 @@
       refreshButton.disabled = true;
       clearStatus();
 
-      try {
-        const [playersResult, decksResult, recordsResult,commandersResult] = await Promise.all([
-            supabase
-              .from("commanders")
-              .select("id, name, image_path")
-              .order("name"),
-          supabase.from("players").select("id, display_name").order("display_name"),
-          supabase.from("decks").select("id, player_id, name, decklist_url").order("name"),
+      try {const [playersResult, decksResult, recordsResult, commandersResult] =
+        await Promise.all([
+          supabase.from("players")
+            .select("id, display_name")
+            .order("display_name"),
+          supabase.from("decks")
+            .select("id, player_id, name, decklist_url")
+            .order("name"),
           supabase.from("deck_player_records")
             .select("player_id, display_name, deck_id, deck_name, decklist_url, wins, losses, draws")
-            .order("display_name")
+            .order("display_name"),
+          supabase.from("commanders")
+            .select("id, name, image_path")
+            .order("name")
         ]);
+      
 
         if (playersResult.error) throw playersResult.error;
         if (decksResult.error) throw decksResult.error;
