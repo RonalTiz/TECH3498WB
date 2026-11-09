@@ -208,11 +208,7 @@
               .order("id")
           ));
         }
-        
-        const commandersById = new Map(
-          commanders.map(commander => [commander.id, commander])
-        );
-        const decksById = new Map(decks.map(deck => [deck.id, deck]));
+
         
         deckStats = [...stats.values()]
           .filter(stat => decksById.has(stat.deckId))
@@ -231,16 +227,7 @@
         renderLeaderboard();
         
         
-        const commanders = [];
-        for (let i = 0; i < commanderIds.length; i += 100) {
-          const ids = commanderIds.slice(i, i + 100);
-          commanders.push(...await fetchAll(() =>
-            supabase.from("commanders")
-              .select("id, name, image_url, artist, scryfall_uri")
-              .in("id", ids)
-              .order("id")
-          ));
-        }
+
         
         const commandersById = new Map(
           commanders.map(commander => [commander.id, commander])
