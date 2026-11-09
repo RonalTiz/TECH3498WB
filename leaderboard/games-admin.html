@@ -1070,13 +1070,19 @@ async function findScryfallCard(name) {
   if (!imageUrl) {
     throw new Error("Scryfall did not provide a card image for this commander.");
   }
+const artCropUrl =
+  card.image_uris?.art_crop ||
+  card.card_faces?.[0]?.image_uris?.art_crop ||
+  null;
 
-  return {
-    scryfall_id: card.id,
-    image_url: imageUrl,
-    artist: card.artist || card.card_faces?.[0]?.artist || null,
-    scryfall_uri: card.scryfall_uri
-  };
+return {
+  scryfall_id: card.id,
+  image_url: imageUrl,
+  art_crop_url: artCropUrl,
+  artist: card.artist || card.card_faces?.[0]?.artist || null,
+  scryfall_uri: card.scryfall_uri
+};
+
 }
 
 commanderForm.addEventListener("submit", async event => {

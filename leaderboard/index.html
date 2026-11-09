@@ -11,6 +11,21 @@
   <script src="../theme.js"></script>
 
   <style>
+    .commander-art {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      border-radius: 0.75rem;
+      background: var(--bg-subtle);
+    }
+    
+    .commander-art-link {
+      display: block;
+      overflow: hidden;
+      border-radius: 0.75rem;
+    }
+    
     .leaderboard-main { min-height: 70vh; padding-top: 120px; }
     .leaderboard-card {
       height: 100%;
@@ -203,7 +218,7 @@
           const ids = commanderIds.slice(i, i + 100);
           commanders.push(...await fetchAll(() =>
             supabase.from("commanders")
-              .select("id, name, image_url, artist, scryfall_uri")
+              .select("id, name, image_url, art_crop_url, artist, scryfall_uri")
               .in("id", ids)
               .order("id")
           ));
@@ -214,18 +229,37 @@
         );
         const decksById = new Map(decks.map(deck => [deck.id, deck]));
         
-        deckStats = [...stats.values()]
-          .filter(stat => decksById.has(stat.deckId))
-          .map(stat => {
-            const deck = decksById.get(stat.deckId);
+        const commanderStats = new Map();
+        
+        for (const stat of stats.values()) {
+          const deck = decksById.get(stat.deckId);
+          if (!deck?.commander_id) continue;
+        
+          const totals = commanderStats.get(deck.commander_id) || {
+            commanderId: deck.commander_id,
+            uses: 0,
+            wins: 0
+          };
+        
+          totals.uses += stat.uses;
+          totals.wins += stat.wins;
+          commanderStats.set(deck.commander_id, totals);
+        }
+        
+        deckStats = [...commanderStats.values()]
+          .map(totals => {
+            const commander = commandersById.get(totals.commanderId);
+            if (!commander) return null;
         
             return {
-              ...stat,
-              name: deck.name,
-              winRate: stat.uses ? stat.wins / stat.uses : 0,
-              commander: commandersById.get(deck.commander_id) || null
+              ...totals,
+              name: commander.name,
+              commander,
+              winRate: totals.uses ? totals.wins / totals.uses : 0
             };
-          });
+          })
+          .filter(Boolean);
+        
         status.className = "alert d-none";
         renderLeaderboard();
         
@@ -260,66 +294,72 @@
         status.textContent = "No decks meet these filters yet.";
         return;
       }
+rows.forEach((commander, index) => {
+  const column = document.createElement("div");
+  column.className = "col-12 col-md-6";
 
-      rows.forEach((deck, index) => {
-        const column = document.createElement("div");
-        column.className = "col-12 col-md-6";
+  const card = document.createElement("article");
+  card.className = "leaderboard-card p-3 p-md-4";
 
-        const card = document.createElement("article");
-        card.className = "leaderboard-card p-3 p-md-4";
+  const imageUrl =
+    commander.commander.art_crop_url ||
+    commander.commander.image_url;
 
-        const row = document.createElement("div");
-        row.className = "d-flex align-items-center gap-3";
+  if (imageUrl) {
+    const imageLink = document.createElement("a");
+    imageLink.className = "commander-art-link";
+    imageLink.href =
+      commander.commander.scryfall_uri || imageUrl;
+    imageLink.target = "_blank";
+    imageLink.rel = "noopener noreferrer";
 
-        const rank = document.createElement("div");
-        rank.className = "deck-rank";
-        rank.textContent = String(index + 1);
+    const image = document.createElement("img");
+    image.className = "commander-art";
+    image.src = imageUrl;
+    image.alt = `${commander.name} Magic: The Gathering card artwork`;
+    image.loading = "lazy";
 
-        const details = document.createElement("div");
-        details.className = "flex-grow-1 min-w-0";
+    imageLink.appendChild(image);
+    card.appendChild(imageLink);
+  }
 
-        const name = document.createElement("h2");
-        name.className = "h5 fw-bold mb-1 text-break";
-        name.textContent = deck.name;
+  const content = document.createElement("div");
+  content.className = "d-flex align-items-center gap-3 mt-3";
 
-        const usage = document.createElement("div");
-        usage.className = "deck-stat";
-        usage.textContent = `${deck.uses} ${deck.uses === 1 ? "game" : "games"} used`;
+  const rank = document.createElement("div");
+  rank.className = "deck-rank";
+  rank.textContent = String(index + 1);
 
-        const rate = document.createElement("div");
-        rate.className = "deck-rate text-nowrap";
-        rate.textContent = `${(deck.winRate * 100).toFixed(1)}%`;
-        if (deck.commander?.image_url) {
-          const imageLink = document.createElement("a");
-          imageLink.href = deck.commander.scryfall_uri || deck.commander.image_url;
-          imageLink.target = "_blank";
-          imageLink.rel = "noopener noreferrer";
-        
-          const image = document.createElement("img");
-          image.src = deck.commander.image_url;
-          image.alt = `${deck.commander.name} Magic: The Gathering card`;
-          image.loading = "lazy";
-          image.style.cssText =
-            "width:100px;height:auto;object-fit:contain;border-radius:8px;";
-        
-          imageLink.appendChild(image);
-          row.appendChild(imageLink);
-        
-          const artist = document.createElement("small");
-          artist.className = "deck-stat d-block mt-2";
-          artist.textContent = deck.commander.artist
-            ? `Artist: ${deck.commander.artist}`
-            : "View card on Scryfall";
-          details.appendChild(artist);
-        }
-        
-        details.append(name, usage);
-        row.append(rank, details, rate);
-        card.appendChild(row);
-        column.appendChild(card);
-        leaderboard.appendChild(column);
-      });
-    }
+  const details = document.createElement("div");
+  details.className = "flex-grow-1 min-w-0";
+
+  const name = document.createElement("h2");
+  name.className = "h5 fw-bold mb-1 text-break";
+  name.textContent = commander.name;
+
+  const usage = document.createElement("div");
+  usage.className = "deck-stat";
+  usage.textContent =
+    `${commander.uses} ${commander.uses === 1 ? "game" : "games"} used`;
+
+  const rate = document.createElement("div");
+  rate.className = "deck-rate text-nowrap";
+  rate.textContent = `${(commander.winRate * 100).toFixed(1)}%`;
+
+  details.append(name, usage);
+
+  if (commander.commander.artist) {
+    const artist = document.createElement("small");
+    artist.className = "deck-stat d-block mt-1";
+    artist.textContent = `Artist: ${commander.commander.artist}`;
+    details.appendChild(artist);
+  }
+
+  content.append(rank, details, rate);
+  card.appendChild(content);
+  column.appendChild(card);
+  leaderboard.appendChild(column);
+});
 
     timeFilter.addEventListener("change", loadLeaderboard);
     minimumFilter.addEventListener("change", renderLeaderboard);
