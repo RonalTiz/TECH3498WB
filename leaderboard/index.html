@@ -226,22 +226,9 @@
               commander: commandersById.get(deck.commander_id) || null
             };
           });
-        
         status.className = "alert d-none";
         renderLeaderboard();
         
-        renderLeaderboard();
-        
-        
-
-        
-        const commandersById = new Map(
-          commanders.map(commander => [commander.id, commander])
-        );
-        const decksById = new Map(decks.map(deck => [deck.id, deck]));
-        
-        status.className = "alert d-none";
-        renderLeaderboard();
       } catch (error) {
         console.error("Could not load leaderboard:", error);
         status.className = "alert alert-danger";
