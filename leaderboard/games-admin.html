@@ -94,6 +94,25 @@
         Players added here are game records, not Supabase accounts. Only
         administrators can add or edit these records.
       </div>
+      <section class="games-card p-4 mb-4" aria-labelledby="csv-import-heading">
+        <h2 id="csv-import-heading" class="h4 fw-bold mb-2">Import Lifetap CSV</h2>
+        <p class="text-secondary small">
+          Imports games, players, decks, and participant statistics. Existing game IDs
+          are skipped with an error to prevent duplicate imports.
+        </p>
+        <form id="csv-import-form" class="d-flex flex-column flex-sm-row gap-2">
+          <input
+            id="csv-file"
+            class="form-control"
+            type="file"
+            accept=".csv,text/csv"
+            required>
+          <button id="csv-import-button" class="btn btn-info text-dark fw-bold text-nowrap" type="submit">
+            Import CSV
+          </button>
+        </form>
+      </section>
+      
 <ul class="nav nav-tabs mb-4" id="gamesAdminTabs" role="tablist">
   <li class="nav-item" role="presentation">
     <button
@@ -337,6 +356,9 @@
   <script type="module">
     import { supabase } from "../supabase-client.js";
 
+    const csvImportForm = document.getElementById("csv-import-form");
+    const csvFileInput = document.getElementById("csv-file");
+    const csvImportButton = document.getElementById("csv-import-button");
     const commanderSelect = document.getElementById("deck-commander");
     const commanderNameInput = document.getElementById("commander-name");
     const commanderImageInput = document.getElementById("commander-image");
@@ -679,6 +701,273 @@
         refreshButton.disabled = false;
       }
     }
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+
+    if (quoted) {
+      if (char === '"' && text[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else if (char === '"') {
+        quoted = false;
+      } else {
+        field += char;
+      }
+    } else if (char === '"') {
+      quoted = true;
+    } else if (char === ",") {
+      row.push(field);
+      field = "";
+    } else if (char === "\n") {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+    } else if (char !== "\r") {
+      field += char;
+    }
+  }
+
+  if (quoted) throw new Error("The CSV has an unmatched quote.");
+
+  row.push(field);
+  rows.push(row);
+
+  const headers = rows.shift().map((header, index) =>
+    (index === 0 ? header.replace(/^\uFEFF/, "") : header).trim()
+  );
+
+  return rows
+    .filter(values => values.some(value => value.trim() !== ""))
+    .map(values =>
+      Object.fromEntries(headers.map((header, index) => [
+        header,
+        (values[index] || "").trim()
+      ]))
+    );
+}
+
+function csvNumber(value, label, required = false) {
+  if (!value) {
+    if (required) throw new Error(`${label} is required in the CSV.`);
+    return null;
+  }
+
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    throw new Error(`Invalid number for ${label}: ${value}`);
+  }
+  return number;
+}
+
+function csvYes(value) {
+  return ["yes", "true", "1"].includes((value || "").toLowerCase());
+}
+
+async function getOrCreateCsvPlayer(name) {
+  const key = name.trim().toLowerCase();
+  let player = players.find(item =>
+    item.display_name.trim().toLowerCase() === key
+  );
+
+  if (!player) {
+    const { data, error } = await supabase
+      .from("players")
+      .insert({ display_name: name.trim(), created_by: currentUser.id })
+      .select("id, display_name")
+      .single();
+
+    if (error) throw error;
+    player = data;
+    players.push(player);
+  }
+
+  return player;
+}
+
+async function getOrCreateCsvDeck(playerId, name) {
+  const key = name.trim().toLowerCase();
+  let deck = decks.find(item =>
+    item.player_id === playerId && item.name.trim().toLowerCase() === key
+  );
+
+  if (!deck) {
+    const { data, error } = await supabase
+      .from("decks")
+      .insert({
+        player_id: playerId,
+        name: name.trim(),
+        created_by: currentUser.id
+      })
+      .select("id, player_id, name, decklist_url")
+      .single();
+
+    if (error) throw error;
+    deck = data;
+    decks.push(deck);
+  }
+
+  return deck;
+}
+
+csvImportForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  clearStatus();
+
+  const file = csvFileInput.files?.[0];
+  if (!file) {
+    showStatus("Choose a CSV file first.", "warning");
+    return;
+  }
+
+  csvImportButton.disabled = true;
+  csvImportButton.textContent = "Importing…";
+
+  try {
+    const csvRows = parseCsv(await file.text());
+    const requiredHeaders = [
+      "Game ID", "Date", "Duration (min)", "Player Count",
+      "Starting Life", "Result", "Player Name", "Seat", "Deck",
+      "Winner", "Knocked Out", "Final Life", "Poison", "Energy",
+      "Experience", "Rad", "Treasure", "Commander Damage Received"
+    ];
+
+    const missingHeaders = requiredHeaders.filter(header =>
+      !Object.hasOwn(csvRows[0] || {}, header)
+    );
+    if (missingHeaders.length) {
+      throw new Error(`CSV is missing columns: ${missingHeaders.join(", ")}`);
+    }
+
+    const gamesById = new Map();
+    for (const row of csvRows) {
+      if (!row["Game ID"] || !row["Player Name"] || !row["Deck"]) {
+        throw new Error("Every row needs a Game ID, Player Name, and Deck.");
+      }
+
+      if (!gamesById.has(row["Game ID"])) gamesById.set(row["Game ID"], []);
+      gamesById.get(row["Game ID"]).push(row);
+    }
+
+    let imported = 0;
+
+    for (const [gameId, rows] of gamesById) {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(gameId)) {
+        throw new Error(`Invalid UUID for Game ID: ${gameId}`);
+      }
+
+      const { data: existingGame, error: checkError } = await supabase
+        .from("games")
+        .select("id")
+        .eq("id", gameId)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+      if (existingGame) throw new Error(`Game ${gameId} is already in the database.`);
+
+      const first = rows[0];
+      const resultText = first["Result"].toLowerCase();
+      const result = resultText === "draw" ? "draw"
+        : resultText === "win" ? "win"
+        : null;
+
+      if (!result) {
+        throw new Error(`Game ${gameId}: Result must be Win or Draw.`);
+      }
+
+      const date = new Date(first["Date"]);
+      if (Number.isNaN(date.getTime())) {
+        throw new Error(`Game ${gameId} has an invalid Date.`);
+      }
+
+      const participants = [];
+      let winnerId = null;
+
+      for (const row of rows) {
+        const player = await getOrCreateCsvPlayer(row["Player Name"]);
+        const deck = await getOrCreateCsvDeck(player.id, row["Deck"]);
+
+        if (participants.some(item => item.player_id === player.id)) {
+          throw new Error(`Game ${gameId} lists ${row["Player Name"]} more than once.`);
+        }
+
+        const participant = {
+          game_id: gameId,
+          player_id: player.id,
+          deck_id: deck.id,
+          turn_order: csvNumber(row["Seat"], "Seat", true),
+          final_life: csvNumber(row["Final Life"], "Final Life"),
+          poison: csvNumber(row["Poison"], "Poison"),
+          energy: csvNumber(row["Energy"], "Energy"),
+          experience: csvNumber(row["Experience"], "Experience"),
+          rad: csvNumber(row["Rad"], "Rad"),
+          treasure: csvNumber(row["Treasure"], "Treasure"),
+          knocked_out: row["Knocked Out"] ? csvYes(row["Knocked Out"]) : null,
+          commander_damage_received: row["Commander Damage Received"] || null
+        };
+
+        participants.push(participant);
+        if (csvYes(row["Winner"])) {
+          if (winnerId) throw new Error(`Game ${gameId} has multiple winners.`);
+          winnerId = player.id;
+        }
+      }
+
+      if (result === "win" && !winnerId) {
+        throw new Error(`Game ${gameId} is marked Win but has no Winner.`);
+      }
+      if (result === "draw" && winnerId) {
+        throw new Error(`Game ${gameId} is marked Draw but has a Winner.`);
+      }
+
+      // Insert as pending so participants exist before saving the winner.
+      const { error: gameError } = await supabase.from("games").insert({
+        id: gameId,
+        recorded_by: currentUser.id,
+        played_at: date.toISOString(),
+        duration_minutes: csvNumber(first["Duration (min)"], "Duration"),
+        player_count: csvNumber(first["Player Count"], "Player Count"),
+        starting_life: csvNumber(first["Starting Life"], "Starting Life"),
+        result: "pending"
+      });
+
+      if (gameError) throw gameError;
+
+      const { error: participantsError } = await supabase
+        .from("game_players")
+        .insert(participants);
+
+      if (participantsError) {
+        await supabase.from("games").delete().eq("id", gameId);
+        throw participantsError;
+      }
+
+      const { error: finalizeError } = await supabase
+        .from("games")
+        .update({ result, winner_player_id: winnerId })
+        .eq("id", gameId);
+
+      if (finalizeError) throw finalizeError;
+      imported++;
+    }
+
+    csvImportForm.reset();
+    await loadData();
+    showStatus(`Imported ${imported} game${imported === 1 ? "" : "s"} successfully.`, "success");
+  } catch (error) {
+    console.error("CSV import failed:", error);
+    showStatus(error.message || "Could not import the CSV.", "danger");
+  } finally {
+    csvImportButton.disabled = false;
+    csvImportButton.textContent = "Import CSV";
+  }
+});
 
     playerForm.addEventListener("submit", async event => {
       event.preventDefault();
