@@ -7,10 +7,34 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style.css">
 
-  <script src="theme.js"></script>
-  <script src="auth.js"></script>
+  <script src="../theme.js"></script>
+  <script src="../auth.js"></script>
+
+  <style>
+    .profile-panel {
+      color: var(--text-main);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+    }
+
+    .profile-avatar {
+      width: 128px;
+      height: 128px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid var(--cyber-cyan);
+      background: var(--bg-subtle);
+    }
+
+    .decklist-row {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: .75rem;
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
@@ -19,77 +43,84 @@
         <i class="bi bi-shield-check text-info me-2"></i>TECH 3498<span class="text-info">.sec</span>
       </a>
       <div class="ms-auto d-flex align-items-center gap-3">
-        <a class="nav-link" href="index.html">Back to site</a>
+        <a class="nav-link" href="index.html">Leaderboard</a>
         <button class="btn btn-outline-warning btn-sm theme-toggle-btn" type="button">
-          <i class="bi bi-sun-fill me-1"></i>
           <span class="theme-label">Light Theme</span>
         </button>
-        <button class="btn btn-outline-warning btn-sm restore-appearance-btn d-flex align-items-center"
-                type="button">
-          <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i>
-          Restore appearance
-        </button>
-        
       </div>
     </div>
   </nav>
 
   <main class="container py-5" style="padding-top: 130px !important;">
     <section id="access-denied" class="d-none text-center py-5">
-      <div class="card feature-card p-5 mx-auto" style="max-width: 600px;">
+      <div class="profile-panel p-5 mx-auto" style="max-width: 600px;">
         <i class="bi bi-person-lock text-warning display-4 mb-3"></i>
-        <h1 class="h3 text-white">User account required</h1>
-        <p class="text-secondary">Sign in with the regular user account to view this page.</p>
+        <h1 class="h3">Sign in required</h1>
+        <p class="text-secondary">Sign in to view and manage your profile.</p>
         <a href="login.html" class="btn btn-info">Go to Login</a>
       </div>
     </section>
 
     <section id="profile-page" class="d-none">
       <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
-          <div class="sec-console-card p-4 p-md-5">
-            <div class="alert alert-warning small" role="note">
-              Demo only: your profile name is saved in this browser. This page does not
-              use server-verified authentication or protect private account data.
-            </div>
-            
+        <div class="col-12 col-lg-8">
+          <div class="profile-panel p-4 p-md-5">
+            <div id="status-message" class="alert d-none" role="status" aria-live="polite"></div>
+
             <div class="text-center mb-4">
-              <div class="icon-box bg-info bg-opacity-10 text-info mx-auto mb-3"
-                   style="width: 64px; height: 64px; font-size: 1.8rem;">
-                <i class="bi bi-person-circle"></i>
-              </div>
-              <h1 class="h3 text-white fw-bold">Your Profile</h1>
+              <img id="avatar-preview" class="profile-avatar mb-3" alt="Your profile picture">
+              <h1 class="h3 fw-bold">Your Profile</h1>
               <p class="text-secondary mb-0">
                 Signed in as <strong id="account-username" class="text-info"></strong>
               </p>
             </div>
 
-            <div class="mb-4">
-              <span class="text-secondary small">Your name</span>
-              <p id="display-name" class="text-white fs-4 fw-semibold mb-0"></p>
-            </div>
+            <form id="avatar-form" class="mb-4">
+              <label for="avatar-file" class="form-label">Profile picture</label>
+              <input
+                id="avatar-file"
+                class="form-control mb-2"
+                type="file"
+                accept="image/png,image/jpeg,image/webp">
+              <div class="form-text mb-3">PNG, JPEG, or WebP; maximum 5 MB.</div>
+              <button class="btn btn-outline-info" type="submit">Upload picture</button>
+            </form>
 
-            <form id="name-form">
-              <label for="name-input" class="form-label text-light">Change your name</label>
+            <hr class="border-secondary">
+
+            <form id="name-form" class="mb-4">
+              <label for="name-input" class="form-label">Display name</label>
               <input
                 id="name-input"
                 class="form-control mb-3"
                 type="text"
-                maxlength="60"
+                maxlength="80"
                 required
                 autocomplete="name"
                 placeholder="Enter your name">
-
-              <button class="btn btn-info text-dark fw-bold w-100" type="submit">
-                <i class="bi bi-check2 me-1"></i>Save name
-              </button>
-              <p id="save-message" class="text-success small mt-3 mb-0 d-none" role="status">
-                Your name has been saved.
-              </p>
+              <button class="btn btn-info text-dark fw-bold" type="submit">Save name</button>
             </form>
 
-            <hr class="border-secondary my-4">
+            <hr class="border-secondary">
 
+            <h2 class="h4 fw-bold mb-3">My Decklists</h2>
+            <form id="decklist-form" class="row g-2 mb-4">
+              <div class="col-md-4">
+                <label for="decklist-title" class="form-label">Decklist name</label>
+                <input id="decklist-title" class="form-control" type="text" maxlength="100" required>
+              </div>
+              <div class="col-md-6">
+                <label for="decklist-url" class="form-label">Decklist URL</label>
+                <input id="decklist-url" class="form-control" type="url" placeholder="https://…" required>
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-info text-dark fw-bold w-100" type="submit">Add</button>
+              </div>
+            </form>
+
+            <div id="decklist-items" class="d-flex flex-column gap-2"></div>
+
+            <hr class="border-secondary my-4">
             <button id="logout-button" class="btn btn-outline-danger w-100" type="button">
               <i class="bi bi-box-arrow-left me-1"></i>Log out
             </button>
@@ -98,124 +129,229 @@
       </div>
     </section>
   </main>
+
   <script type="module">
-    import { supabase } from "./supabase-client.js";
-  
-    document.addEventListener("DOMContentLoaded", async () => {
-      const denied = document.getElementById("access-denied");
-      const profile = document.getElementById("profile-page");
-      const usernameDisplay = document.getElementById("account-username");
-      const displayName = document.getElementById("display-name");
-      const nameInput = document.getElementById("name-input");
-      const nameForm = document.getElementById("name-form");
-      const saveMessage = document.getElementById("save-message");
-      const logoutButton = document.getElementById("logout-button");
-  
-      function showMessage(message, isError = false) {
-        saveMessage.textContent = message;
-        saveMessage.classList.toggle("text-danger", isError);
-        saveMessage.classList.toggle("text-success", !isError);
-        saveMessage.classList.remove("d-none");
+    import { supabase } from "../supabase-client.js";
+
+    const denied = document.getElementById("access-denied");
+    const profile = document.getElementById("profile-page");
+    const statusBox = document.getElementById("status-message");
+    const avatarPreview = document.getElementById("avatar-preview");
+    const avatarForm = document.getElementById("avatar-form");
+    const avatarFile = document.getElementById("avatar-file");
+    const nameForm = document.getElementById("name-form");
+    const nameInput = document.getElementById("name-input");
+    const usernameDisplay = document.getElementById("account-username");
+    const decklistForm = document.getElementById("decklist-form");
+    const decklistItems = document.getElementById("decklist-items");
+    const logoutButton = document.getElementById("logout-button");
+
+    const defaultAvatar =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' fill='%23162032'/%3E%3Ctext x='64' y='82' text-anchor='middle' font-size='64' fill='%230dcaf0'%3E%3F%3C/text%3E%3C/svg%3E";
+
+    let user = null;
+
+    function showStatus(message, isError = false) {
+      statusBox.className = `alert alert-${isError ? "danger" : "success"}`;
+      statusBox.textContent = message;
+    }
+
+    function getAvatarUrl(path) {
+      if (!path) return defaultAvatar;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function loadDecklists() {
+      const { data, error } = await supabase
+        .from("profile_decklists")
+        .select("id, title, url, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      decklistItems.replaceChildren();
+
+      if (!data?.length) {
+        const empty = document.createElement("p");
+        empty.className = "text-secondary";
+        empty.textContent = "You haven't added any decklists yet.";
+        decklistItems.appendChild(empty);
+        return;
       }
-  
+
+      for (const item of data) {
+        const row = document.createElement("div");
+        row.className = "decklist-row p-3 d-flex justify-content-between align-items-center gap-3";
+
+        const link = document.createElement("a");
+        link.href = item.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = item.title;
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "btn btn-sm btn-outline-danger";
+        removeButton.textContent = "Remove";
+        removeButton.addEventListener("click", async () => {
+          removeButton.disabled = true;
+          const { error: deleteError } = await supabase
+            .from("profile_decklists")
+            .delete()
+            .eq("id", item.id)
+            .eq("user_id", user.id);
+
+          if (deleteError) {
+            showStatus("Could not remove that decklist.", true);
+            removeButton.disabled = false;
+            return;
+          }
+
+          await loadDecklists();
+          showStatus("Decklist removed.");
+        });
+
+        row.append(link, removeButton);
+        decklistItems.appendChild(row);
+      }
+    }
+
+    async function initialize() {
       try {
         const { data, error } = await supabase.auth.getUser();
-  
         if (error) throw error;
-  
-        const user = data.user;
+
+        user = data.user;
         if (!user) {
           denied.classList.remove("d-none");
           return;
         }
-  
+
         profile.classList.remove("d-none");
         usernameDisplay.textContent = user.email || "Signed-in user";
-  
-        // Load this user's profile. RLS should restrict access to their own row.
+
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
-          .select("display_name")
+          .select("display_name, avatar_path")
           .eq("id", user.id)
           .maybeSingle();
-  
-        if (profileError) throw profileError;
-  
-        const initialName = profileData?.display_name || user.email || "";
-        displayName.textContent = initialName;
-        nameInput.value = initialName;
-  
-        nameForm.addEventListener("submit", async event => {
-          event.preventDefault();
-  
-          const newName = nameInput.value.trim();
-          if (!newName) {
-            nameInput.focus();
-            return;
-          }
-  
-          const saveButton = nameForm.querySelector('button[type="submit"]');
-          saveButton.disabled = true;
-          saveMessage.classList.add("d-none");
-  
-          try {
-            const { error: saveError } = await supabase
-              .from("profiles")
-              .upsert(
-                {
-                  id: user.id,
-                  display_name: newName,
-                  updated_at: new Date().toISOString()
-                },
-                { onConflict: "id" }
-              );
-  
-            if (saveError) throw saveError;
-  
-            displayName.textContent = newName;
-            showMessage("Your profile name has been saved.");
-          } catch (error) {
-            console.error("Could not save profile:", error);
-            showMessage(
-              "Could not save your name. Check the database table and RLS policies.",
-              true
-            );
-          } finally {
-            saveButton.disabled = false;
-          }
-        });
-  
-        nameInput.addEventListener("input", () => {
-          saveMessage.classList.add("d-none");
-        });
-  
-        logoutButton.addEventListener("click", async () => {
-          logoutButton.disabled = true;
-  
-          try {
-            const { error: signOutError } = await supabase.auth.signOut();
-            if (signOutError) throw signOutError;
-  
-            window.location.replace("login.html");
-          } catch (error) {
-            console.error("Could not sign out:", error);
-            showMessage("Could not sign out. Please try again.", true);
-            logoutButton.disabled = false;
-          }
-        });
-      } catch (error) {
-        console.error("Could not load the Supabase profile:", error);
-        denied.classList.remove("d-none");
-  
-        const deniedMessage = denied.querySelector("p");
-        if (deniedMessage) {
-          deniedMessage.textContent =
-            "Could not verify your account or load your profile. Please sign in again and try once more.";
-        }
-      }
-    });
-  </script>
-  
 
+        if (profileError) throw profileError;
+
+        nameInput.value = profileData?.display_name || "";
+        avatarPreview.src = getAvatarUrl(profileData?.avatar_path);
+
+        await loadDecklists();
+      } catch (error) {
+        console.error("Could not load profile:", error);
+        denied.classList.remove("d-none");
+        denied.querySelector("p").textContent =
+          "Could not load your profile. Check your Supabase configuration and RLS policies.";
+      }
+    }
+
+    nameForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const displayName = nameInput.value.trim();
+      if (!displayName) return;
+
+      const { error } = await supabase.from("profiles").upsert({
+        id: user.id,
+        display_name: displayName,
+        updated_at: new Date().toISOString()
+      });
+
+      if (error) {
+        showStatus("Could not save your name.", true);
+        return;
+      }
+
+      showStatus("Profile name saved.");
+    });
+
+    avatarForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const file = avatarFile.files?.[0];
+
+      if (!file) {
+        showStatus("Choose an image first.", true);
+        return;
+      }
+
+      const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+      if (!allowedTypes.includes(file.type) || file.size > 5 * 1024 * 1024) {
+        showStatus("Choose a PNG, JPEG, or WebP image no larger than 5 MB.", true);
+        return;
+      }
+
+      const extension = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" }[file.type];
+      const path = `${user.id}/${crypto.randomUUID()}.${extension}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { contentType: file.type, upsert: false });
+
+      if (uploadError) {
+        showStatus("Could not upload the picture. Check Storage policies.", true);
+        return;
+      }
+
+      const { error: saveError } = await supabase.from("profiles").upsert({
+        id: user.id,
+        avatar_path: path,
+        updated_at: new Date().toISOString()
+      });
+
+      if (saveError) {
+        await supabase.storage.from("avatars").remove([path]);
+        showStatus("Picture uploaded, but could not save it to your profile.", true);
+        return;
+      }
+
+      avatarPreview.src = getAvatarUrl(path);
+      avatarFile.value = "";
+      showStatus("Profile picture updated.");
+    });
+
+    decklistForm.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const title = document.getElementById("decklist-title").value.trim();
+      const url = document.getElementById("decklist-url").value.trim();
+
+      if (!title || !/^https?:\/\//i.test(url)) {
+        showStatus("Enter a decklist name and a valid HTTP or HTTPS URL.", true);
+        return;
+      }
+
+      const { error } = await supabase.from("profile_decklists").insert({
+        user_id: user.id,
+        title,
+        url
+      });
+
+      if (error) {
+        showStatus("Could not add the decklist. Check the table and RLS policies.", true);
+        return;
+      }
+
+      decklistForm.reset();
+      await loadDecklists();
+      showStatus("Decklist added.");
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        showStatus("Could not sign out. Please try again.", true);
+        return;
+      }
+      window.location.replace("login.html");
+    });
+
+    initialize();
+  </script>
 </body>
 </html>
