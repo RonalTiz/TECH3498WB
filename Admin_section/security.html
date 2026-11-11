@@ -93,7 +93,7 @@
           Verifying your Supabase session and administrator role.
         </p>
         <div class="d-flex justify-content-center gap-2 flex-wrap">
-          <a id="login-link" href="../login.html" class="btn btn-info d-none">
+          <a id="login-link" href="../leaderboard/login.html" class="btn btn-info d-none">
             <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>
             Go to Login
           </a>
@@ -488,7 +488,7 @@
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
 
-        window.location.replace("login.html");
+        window.location.replace("../login.html");
       } catch (error) {
         console.error("Sign-out failed:", error);
         setStatus(error.message || "Could not sign out. Please try again.", "danger");

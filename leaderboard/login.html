@@ -11,9 +11,9 @@
         crossorigin="anonymous">
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style.css">
 
-  <script src="theme.js"></script>
+  <script src="../theme.js"></script>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
@@ -151,7 +151,7 @@
   </footer>
 
   <script type="module">
-    import { supabase } from "./supabase-client.js";
+    import { supabase } from "../supabase-client.js";
 
     const displayNameGroup = document.getElementById("display-name-group");
     const displayNameInput = document.getElementById("display-name");
@@ -240,7 +240,7 @@
             password,
             options: {
               data: { display_name: displayName },
-              emailRedirectTo: window.location.origin + "/login.html"
+              emailRedirectTo: new URL("login.html", window.location.href).href
             }
           });
           

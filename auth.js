@@ -186,100 +186,16 @@
     nav.querySelector(".nav-security-item")?.classList.add("d-none");
     nav.querySelector(".nav-user-item")?.classList.add("d-none");
   }
+async function syncNavbarAuthState() {
+  document.querySelectorAll(".nav-login-link").forEach(link => {
+    link.href = "/leaderboard/index.html";
+    setLinkContents(link, "bi bi-trophy", "Leaderboard");
+    link.title = "Open the leaderboard";
+  });
 
-  async function syncNavbarAuthState() {
-    const links = document.querySelectorAll(".nav-login-link");
-    if (!links.length) return;
+  document.querySelectorAll(".navbar-nav").forEach(hideRoleLinks);
+}
 
-    // Fail closed in the navbar if Supabase is unavailable.
-    if (!supabaseClient) {
-      links.forEach(link => {
-        link.href = "login.html";
-        setLinkContents(link, "bi bi-box-arrow-in-right", "Login");
-        link.classList.remove("text-info");
-        link.title = "Sign in";
-      });
-
-      document.querySelectorAll(".navbar-nav").forEach(hideRoleLinks);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabaseClient.auth.getUser();
-      if (error) throw error;
-
-      const user = data.user;
-
-      if (!user) {
-        links.forEach(link => {
-          link.href = "login.html";
-          setLinkContents(link, "bi bi-box-arrow-in-right", "Login");
-          link.classList.remove("text-info");
-          link.title = "Sign in";
-        });
-
-        document.querySelectorAll(".navbar-nav").forEach(hideRoleLinks);
-        return;
-      }
-
-      let isAdmin = false;
-
-      try {
-        const { data: adminResult, error: roleError } =
-          await supabaseClient.rpc("is_current_user_admin");
-
-        if (roleError) throw roleError;
-        isAdmin = adminResult === true;
-      } catch (error) {
-        // Treat role lookup failures as non-admin for display purposes.
-        console.warn("Could not verify administrator role.", error);
-      }
-
-      links.forEach(link => {
-        if (isAdmin) {
-          link.href = "Admin_section/security.html";
-          setLinkContents(
-            link,
-            "bi bi-person-check-fill text-success",
-            "Admin Console"
-          );
-          link.title = "Open the admin console";
-        } else {
-          link.href = "user.html";
-          setLinkContents(link, "bi bi-person-circle", "My Profile");
-          link.title = "Open your profile";
-        }
-
-        link.classList.add("text-info");
-      });
-
-      document.querySelectorAll(".navbar-nav").forEach(nav => {
-        if (isAdmin) {
-          const item = ensureRoleLink(
-            nav,
-            "nav-security-item",
-            "Admin_section/security.html",
-            "bi bi-shield-shaded text-warning",
-            "Security Control"
-          );
-          item.querySelector("a").classList.add("text-warning", "fw-semibold");
-          nav.querySelector(".nav-user-item")?.classList.add("d-none");
-        } else {
-          nav.querySelector(".nav-security-item")?.classList.add("d-none");
-          ensureRoleLink(
-            nav,
-            "nav-user-item",
-            "user.html",
-            "bi bi-person-circle",
-            "My Profile"
-          );
-        }
-      });
-    } catch (error) {
-      console.error("Could not sync Supabase navbar state.", error);
-      document.querySelectorAll(".navbar-nav").forEach(hideRoleLinks);
-    }
-  }
 
   // Apply saved palette early.
   applyColorPalette();
