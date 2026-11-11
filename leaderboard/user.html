@@ -305,10 +305,12 @@
       });
 
       if (saveError) {
+        console.error("Could not save avatar path:", saveError);
         await supabase.storage.from("avatars").remove([path]);
-        showStatus("Picture uploaded, but could not save it to your profile.", true);
+        showStatus(`Could not save picture path: ${saveError.message}`, true);
         return;
       }
+      
 
       avatarPreview.src = getAvatarUrl(path);
       avatarFile.value = "";
