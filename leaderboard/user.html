@@ -108,13 +108,33 @@
           <section class="profile-panel p-4" aria-labelledby="my-games-heading">
             <h2 id="my-games-heading" class="h4 fw-bold mb-2">My Games &amp; Decklists</h2>
             <p class="text-secondary">
-              Games are associated with the player linked to your account. Saving a decklist
-              updates that deck’s URL wherever the deck is used.
+              Games are associated with the player linked to your account. Decklist changes
+              update the deck’s URL wherever that deck is used.
             </p>
+          
+            <label for="my-games-search" class="visually-hidden">Search your games</label>
+            <input
+              id="my-games-search"
+              class="form-control mb-3"
+              type="search"
+              placeholder="Search by player, deck, commander, date, or game result"
+              autocomplete="off">
+          
+            <p id="my-games-page-info" class="text-secondary small" aria-live="polite"></p>
             <div id="my-games-list" class="d-flex flex-column gap-3">
               <p class="text-secondary">Loading your games…</p>
             </div>
+          
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <button id="games-prev" class="btn btn-outline-info btn-sm" type="button">
+                Previous
+              </button>
+              <button id="games-next" class="btn btn-outline-info btn-sm" type="button">
+                Next
+              </button>
+            </div>
           </section>
+          
         </div>
     
         <!-- Commander performance -->
@@ -160,7 +180,15 @@
     const commanderStats = document.getElementById("commander-stats");
     const turnOrderStats = document.getElementById("turn-order-stats");
     const logoutButton = document.getElementById("logout-button");
-
+    const myGamesSearch = document.getElementById("my-games-search");
+    const myGamesPageInfo = document.getElementById("my-games-page-info");
+    const gamesPrevButton = document.getElementById("games-prev");
+    const gamesNextButton = document.getElementById("games-next");
+    
+    let myGameCards = [];
+    let myGamesPage = 0;
+    const GAMES_PER_PAGE = 5;
+    
     const defaultAvatar =
       "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' fill='%23162032'/%3E%3Ctext x='64' y='82' text-anchor='middle' font-size='64' fill='%230dcaf0'%3E%3F%3C/text%3E%3C/svg%3E";
 
@@ -225,13 +253,187 @@
       table.append(thead, tbody);
       container.appendChild(table);
     }
+    function renderMyGames() {
+      const query = myGamesSearch.value.trim().toLowerCase();
+    
+      const filteredGames = myGameCards.filter(game => {
+        const searchable = [
+          game.id,
+          game.playedAt,
+          game.result,
+          ...game.participants.flatMap(participant => [
+            participant.playerName,
+            participant.deckName,
+            participant.commanderName,
+            `seat ${participant.turnOrder}`
+          ])
+        ].join(" ").toLowerCase();
+    
+        return searchable.includes(query);
+      });
+    
+      const pageCount = Math.ceil(filteredGames.length / GAMES_PER_PAGE);
+      myGamesPage = Math.min(myGamesPage, Math.max(pageCount - 1, 0));
+    
+      const start = myGamesPage * GAMES_PER_PAGE;
+      const pageGames = filteredGames.slice(start, start + GAMES_PER_PAGE);
+    
+      myGamesList.replaceChildren();
+      myGamesPageInfo.textContent = filteredGames.length
+        ? `Showing ${start + 1}–${start + pageGames.length} of ${filteredGames.length} games`
+        : "No matching games.";
+    
+      gamesPrevButton.disabled = myGamesPage === 0;
+      gamesNextButton.disabled = myGamesPage >= pageCount - 1;
+    
+      if (!pageGames.length) {
+        const empty = document.createElement("p");
+        empty.className = "text-secondary";
+        empty.textContent = myGameCards.length
+          ? "No games match your search."
+          : "No games found for your linked player.";
+        myGamesList.appendChild(empty);
+        return;
+      }
+    
+      for (const game of pageGames) {
+        const card = document.createElement("article");
+        card.className = "decklist-row p-3";
+    
+        const date = new Date(game.playedAt);
+        const heading = document.createElement("h3");
+        heading.className = "h6 fw-bold mb-1";
+        heading.textContent = Number.isNaN(date.getTime())
+          ? "Game date unavailable"
+          : new Intl.DateTimeFormat(undefined, {
+              dateStyle: "medium",
+              timeStyle: "short"
+            }).format(date);
+    
+        const gameSummary = document.createElement("p");
+        gameSummary.className = "text-secondary small mb-3";
+        gameSummary.textContent =
+          `${game.result} · ${game.participants.length} players`;
+    
+        card.append(heading, gameSummary);
+    
+        const participantList = document.createElement("div");
+        participantList.className = "d-flex flex-column gap-2";
+    
+        for (const participant of game.participants) {
+          const row = document.createElement("div");
+          row.className =
+            "d-flex flex-column flex-sm-row align-items-sm-center gap-2 p-2 rounded border border-secondary";
+    
+          const identity = document.createElement("div");
+          identity.className = "d-flex align-items-center gap-2 flex-grow-1";
+    
+          const avatar = document.createElement("img");
+          avatar.className = "profile-avatar";
+          avatar.style.width = "44px";
+          avatar.style.height = "44px";
+          avatar.alt = `${participant.playerName}'s profile picture`;
+          avatar.src = participant.avatarPath
+            ? getAvatarUrl(participant.avatarPath)
+            : defaultAvatar;
+    
+          const details = document.createElement("div");
+          const playerName = document.createElement("strong");
+          playerName.className = "d-block";
+          playerName.textContent = participant.playerName;
+    
+          const deckDetails = document.createElement("small");
+          deckDetails.className = "text-secondary";
+          deckDetails.textContent =
+            `${participant.deckName}` +
+            (participant.commanderName
+              ? ` · ${participant.commanderName}`
+              : "");
+    
+          details.append(playerName, deckDetails);
+          identity.append(avatar, details);
+    
+          const seat = document.createElement("span");
+          seat.className = "badge text-bg-secondary";
+          seat.textContent = `Seat ${participant.turnOrder}`;
+    
+          row.append(identity, seat);
+    
+          if (participant.isCurrentUser) {
+            const disclosure = document.createElement("details");
+            disclosure.className = "mt-2";
+    
+            const summary = document.createElement("summary");
+            summary.className = "btn btn-sm btn-outline-info";
+            summary.textContent = participant.decklistUrl
+              ? "Edit decklist"
+              : "Add decklist";
+    
+            const form = document.createElement("form");
+            form.className = "d-flex flex-column flex-sm-row gap-2 mt-2";
+    
+            const input = document.createElement("input");
+            input.className = "form-control";
+            input.type = "url";
+            input.maxLength = 2048;
+            input.placeholder = "Decklist URL (https://…)";
+            input.setAttribute(
+              "aria-label",
+              `Decklist URL for ${participant.deckName}`
+            );
+            input.value = participant.decklistUrl || "";
+    
+            const saveButton = document.createElement("button");
+            saveButton.className = "btn btn-info text-dark fw-bold text-nowrap";
+            saveButton.type = "submit";
+            saveButton.textContent = "Save";
+    
+            form.addEventListener("submit", async event => {
+              event.preventDefault();
+    
+              const url = input.value.trim();
+              if (url && !/^https?:\/\//i.test(url)) {
+                showStatus("Enter a valid HTTP or HTTPS URL.", true);
+                return;
+              }
+    
+              saveButton.disabled = true;
+    
+              try {
+                const { error } = await supabase.rpc("save_my_decklist", {
+                  p_deck_id: participant.deckId,
+                  p_url: url || null
+                });
+    
+                if (error) throw error;
+    
+                showStatus("Decklist saved.");
+                await loadMyGamesAndStats();
+              } catch (error) {
+                console.error("Could not save decklist:", error);
+                showStatus(error.message || "Could not save the decklist.", true);
+                saveButton.disabled = false;
+              }
+            });
+    
+            form.append(input, saveButton);
+            disclosure.append(summary, form);
+            row.appendChild(disclosure);
+          }
+    
+          participantList.appendChild(row);
+        }
+    
+        card.appendChild(participantList);
+        myGamesList.appendChild(card);
+      }
+    }
     
     async function loadMyGamesAndStats() {
       myGamesList.replaceChildren();
-      commanderStats.replaceChildren();
-      turnOrderStats.replaceChildren();
+      myGamesPageInfo.textContent = "Loading games…";
     
-      const { data: player, error: playerError } = await supabase
+      const { data: myPlayer, error: playerError } = await supabase
         .from("players")
         .select("id")
         .eq("user_id", user.id)
@@ -239,40 +441,33 @@
     
       if (playerError) throw playerError;
     
-      if (!player) {
-        const message = document.createElement("p");
-        message.className = "text-secondary mb-0";
-        message.textContent =
-          "No player is linked to your account yet. Contact an administrator.";
-        myGamesList.appendChild(message);
-    
+      if (!myPlayer) {
+        myGameCards = [];
+        renderMyGames();
         renderStatsTable(commanderStats, [], "No commander statistics available.");
-        renderStatsTable(turnOrderStats, [], "No turn-order statistics available.");
+        renderStatsTable(turnOrderStats, [], "No seat-order statistics available.");
         return;
       }
     
-      const { data: participations, error: participationError } = await supabase
-        .from("game_players")
-        .select("game_id, player_id, deck_id, turn_order")
-        .eq("player_id", player.id);
+      const { data: myParticipations, error: myParticipationError } =
+        await supabase
+          .from("game_players")
+          .select("game_id")
+          .eq("player_id", myPlayer.id);
     
-      if (participationError) throw participationError;
+      if (myParticipationError) throw myParticipationError;
     
-      if (!participations?.length) {
-        const message = document.createElement("p");
-        message.className = "text-secondary mb-0";
-        message.textContent = "No games found for your linked player.";
-        myGamesList.appendChild(message);
+      const gameIds = [...new Set((myParticipations || []).map(row => row.game_id))];
     
+      if (!gameIds.length) {
+        myGameCards = [];
+        renderMyGames();
         renderStatsTable(commanderStats, [], "No commander statistics available.");
-        renderStatsTable(turnOrderStats, [], "No turn-order statistics available.");
+        renderStatsTable(turnOrderStats, [], "No seat-order statistics available.");
         return;
       }
     
-      const gameIds = [...new Set(participations.map(item => item.game_id))];
-      const deckIds = [...new Set(participations.map(item => item.deck_id))];
-    
-      const [gamesResult, decksResult] = await Promise.all([
+      const [gamesResult, participantsResult] = await Promise.all([
         supabase
           .from("games")
           .select("id, played_at, result, winner_player_id")
@@ -280,19 +475,58 @@
           .order("played_at", { ascending: false }),
     
         supabase
+          .from("game_players")
+          .select("game_id, player_id, deck_id, turn_order")
+          .in("game_id", gameIds)
+          .order("turn_order")
+      ]);
+    
+      if (gamesResult.error) throw gamesResult.error;
+      if (participantsResult.error) throw participantsResult.error;
+    
+      const games = gamesResult.data || [];
+      const participants = participantsResult.data || [];
+      const playerIds = [...new Set(participants.map(row => row.player_id))];
+      const deckIds = [...new Set(participants.map(row => row.deck_id))];
+    
+      const [playersResult, decksResult] = await Promise.all([
+        supabase
+          .from("players")
+          .select("id, display_name, user_id")
+          .in("id", playerIds),
+    
+        supabase
           .from("decks")
           .select("id, name, decklist_url, commander_id")
           .in("id", deckIds)
       ]);
     
-      if (gamesResult.error) throw gamesResult.error;
+      if (playersResult.error) throw playersResult.error;
       if (decksResult.error) throw decksResult.error;
     
-      const games = gamesResult.data || [];
+      const players = playersResult.data || [];
       const decks = decksResult.data || [];
+      const accountIds = [...new Set(
+        players.map(player => player.user_id).filter(Boolean)
+      )];
       const commanderIds = [...new Set(
         decks.map(deck => deck.commander_id).filter(Boolean)
       )];
+    
+      let profiles = [];
+      if (accountIds.length) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, avatar_path")
+          .in("id", accountIds);
+    
+        // Profile RLS may prevent reading other players' avatars.
+        if (error) {
+          console.warn("Could not load other players' avatars:", error);
+        } else {
+          profiles = data || [];
+        }
+      }
     
       let commanders = [];
       if (commanderIds.length) {
@@ -306,154 +540,107 @@
       }
     
       const gamesById = new Map(games.map(game => [game.id, game]));
+      const playersById = new Map(players.map(player => [player.id, player]));
+      const profilesById = new Map(profiles.map(profile => [profile.id, profile]));
       const decksById = new Map(decks.map(deck => [deck.id, deck]));
       const commandersById = new Map(commanders.map(item => [item.id, item]));
     
-      // Only completed wins and draws are used in performance statistics.
-      const commanderTotals = new Map();
-      const turnTotals = new Map();
+      const participantsByGame = new Map();
+      for (const participant of participants) {
+        if (!participantsByGame.has(participant.game_id)) {
+          participantsByGame.set(participant.game_id, []);
+        }
     
-      for (const participation of participations) {
-        const game = gamesById.get(participation.game_id);
+        const player = playersById.get(participant.player_id);
+        const deck = decksById.get(participant.deck_id);
+        const commander = deck?.commander_id
+          ? commandersById.get(deck.commander_id)
+          : null;
+        const game = gamesById.get(participant.game_id);
+    
+        participantsByGame.get(participant.game_id).push({
+          ...participant,
+          playerName: player?.display_name || "Unknown player",
+          avatarPath: player?.user_id
+            ? profilesById.get(player.user_id)?.avatar_path
+            : null,
+          deckName: deck?.name || "Unknown deck",
+          deckId: deck?.id,
+          decklistUrl: deck?.decklist_url || "",
+          commanderName: commander?.name || "",
+          isCurrentUser: participant.player_id === myPlayer.id,
+          won: game?.result === "win" && game.winner_player_id === myPlayer.id
+        });
+      }
+    
+      myGameCards = games.map(game => ({
+        id: game.id,
+        playedAt: game.played_at,
+        result: game.result,
+        participants: participantsByGame.get(game.id) || []
+      }));
+    
+      renderMyGames();
+    
+      // Performance stats are for the current user, counting completed wins/draws.
+      const ownRows = participants.filter(row => row.player_id === myPlayer.id);
+      const commanderTotals = new Map();
+      const seatTotals = new Map();
+    
+      for (const row of ownRows) {
+        const game = gamesById.get(row.game_id);
         if (!game || !["win", "draw"].includes(game.result)) continue;
     
-        const won =
-          game.result === "win" &&
-          game.winner_player_id === player.id;
-    
-        const deck = decksById.get(participation.deck_id);
+        const won = game.result === "win" && game.winner_player_id === myPlayer.id;
+        const deck = decksById.get(row.deck_id);
         const commander = deck?.commander_id
           ? commandersById.get(deck.commander_id)
           : null;
     
-        const commanderKey = commander?.id || "unknown";
-        const commanderTotal = commanderTotals.get(commanderKey) || {
+        const key = commander?.id || "unknown";
+        const commanderTotal = commanderTotals.get(key) || {
           name: commander?.name || "Unknown commander",
           games: 0,
           wins: 0
         };
         commanderTotal.games += 1;
         if (won) commanderTotal.wins += 1;
-        commanderTotals.set(commanderKey, commanderTotal);
+        commanderTotals.set(key, commanderTotal);
     
-        const turnKey = String(participation.turn_order);
-        const turnTotal = turnTotals.get(turnKey) || {
-          name: `Turn ${turnKey}`,
+        const seatKey = String(row.turn_order);
+        const seatTotal = seatTotals.get(seatKey) || {
+          name: `Seat ${seatKey}`,
           games: 0,
           wins: 0
         };
-        turnTotal.games += 1;
-        if (won) turnTotal.wins += 1;
-        turnTotals.set(turnKey, turnTotal);
+        seatTotal.games += 1;
+        if (won) seatTotal.wins += 1;
+        seatTotals.set(seatKey, seatTotal);
       }
     
-      const byWinRate = (a, b) =>
+      const rateSort = (a, b) =>
         (b.wins / b.games) - (a.wins / a.games) ||
         b.games - a.games ||
         a.name.localeCompare(b.name);
     
       renderStatsTable(
         commanderStats,
-        [...commanderTotals.values()].sort(byWinRate),
+        [...commanderTotals.values()].sort(rateSort),
         "No completed games with commander data yet."
       );
     
       renderStatsTable(
         turnOrderStats,
-        [...turnTotals.values()].sort(
-          (a, b) => Number(a.name.replace("Turn ", "")) -
-                    Number(b.name.replace("Turn ", ""))
+        [...seatTotals.values()].sort(
+          (a, b) =>
+            Number(a.name.replace("Seat ", "")) -
+            Number(b.name.replace("Seat ", ""))
         ),
-        "No completed games with turn-order data yet."
+        "No completed games with seat-order data yet."
       );
-    
-      myGamesList.replaceChildren();
-    
-      for (const participation of [...participations].sort((a, b) => {
-        const gameA = gamesById.get(a.game_id);
-        const gameB = gamesById.get(b.game_id);
-        return new Date(gameB?.played_at || 0) - new Date(gameA?.played_at || 0);
-      })) {
-        const game = gamesById.get(participation.game_id);
-        const deck = decksById.get(participation.deck_id);
-        if (!game || !deck) continue;
-    
-        const card = document.createElement("article");
-        card.className = "decklist-row p-3";
-    
-        const heading = document.createElement("h3");
-        heading.className = "h6 fw-bold mb-1";
-    
-        const date = new Date(game.played_at);
-        heading.textContent = Number.isNaN(date.getTime())
-          ? "Game date unavailable"
-          : new Intl.DateTimeFormat(undefined, {
-              dateStyle: "medium",
-              timeStyle: "short"
-            }).format(date);
-    
-        const commander = commandersById.get(deck.commander_id);
-        const resultText =
-          game.result === "win" && game.winner_player_id === player.id
-            ? "You won"
-            : game.result;
-    
-        const details = document.createElement("p");
-        details.className = "text-secondary small mb-3";
-        details.textContent =
-          `${resultText} · Turn ${participation.turn_order} · ${deck.name}` +
-          (commander ? ` · ${commander.name}` : "");
-    
-        const form = document.createElement("form");
-        form.className = "d-flex flex-column flex-sm-row gap-2";
-    
-        const input = document.createElement("input");
-        input.className = "form-control";
-        input.type = "url";
-        input.maxLength = 2048;
-        input.placeholder = "Decklist URL (https://…)";
-        input.setAttribute("aria-label", `Decklist URL for ${deck.name}`);
-        input.value = deck.decklist_url || "";
-    
-        const saveButton = document.createElement("button");
-        saveButton.className = "btn btn-info text-dark fw-bold text-nowrap";
-        saveButton.type = "submit";
-        saveButton.textContent = "Save decklist";
-    
-        form.addEventListener("submit", async event => {
-          event.preventDefault();
-    
-          const url = input.value.trim();
-          if (url && !/^https?:\/\//i.test(url)) {
-            showStatus("Enter a valid HTTP or HTTPS URL.", true);
-            return;
-          }
-    
-          saveButton.disabled = true;
-    
-          try {
-            const { error } = await supabase.rpc("save_my_decklist", {
-              p_deck_id: deck.id,
-              p_url: url || null
-            });
-    
-            if (error) throw error;
-    
-            showStatus("Decklist saved.");
-            await loadMyGamesAndStats();
-          } catch (error) {
-            console.error("Could not save decklist:", error);
-            showStatus(error.message || "Could not save the decklist.", true);
-            saveButton.disabled = false;
-          }
-        });
-    
-        form.append(input, saveButton);
-        card.append(heading, details, form);
-        myGamesList.appendChild(card);
-      }
     }
     
+
     async function initialize() {
       try {
         const { data, error } = await supabase.auth.getUser();
@@ -487,7 +674,21 @@
           "Could not load your profile. Check your Supabase configuration and RLS policies.";
       }
     }
-
+    myGamesSearch.addEventListener("input", () => {
+      myGamesPage = 0;
+      renderMyGames();
+    });
+    
+    gamesPrevButton.addEventListener("click", () => {
+      myGamesPage = Math.max(0, myGamesPage - 1);
+      renderMyGames();
+    });
+    
+    gamesNextButton.addEventListener("click", () => {
+      myGamesPage += 1;
+      renderMyGames();
+    });
+    
     nameForm.addEventListener("submit", async event => {
       event.preventDefault();
       const displayName = nameInput.value.trim();
