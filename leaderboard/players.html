@@ -252,8 +252,13 @@ playerStats.set(participant.player_id, stats);
               .slice(0, 3)
           };
         })
-          .filter(player => player.games > 0)
-          .sort((a, b) => b.score - a.score || b.winRate - a.winRate || b.games - a.games);
+          .filter(player => player.score > 0)
+          .sort((a, b) =>
+            Number(b.player_score) - Number(a.player_score) ||
+            b.winRate - a.winRate ||
+            b.games - a.games
+          );
+          
 
         status.className = "alert d-none";
         resultCount.textContent = `${rows.length} ${rows.length === 1 ? "player" : "players"} ranked`;
