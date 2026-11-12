@@ -187,7 +187,7 @@
     
     let myGameCards = [];
     let myGamesPage = 0;
-    const GAMES_PER_PAGE = 5;
+    const GAMES_PER_PAGE = 2;
     
     const defaultAvatar =
       "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' fill='%23162032'/%3E%3Ctext x='64' y='82' text-anchor='middle' font-size='64' fill='%230dcaf0'%3E%3F%3C/text%3E%3C/svg%3E";
@@ -560,6 +560,7 @@
     
         participantsByGame.get(participant.game_id).push({
           ...participant,
+          turnOrder: participant.turn_order,
           playerName: player?.display_name || "Unknown player",
           avatarPath: player?.user_id
             ? profilesById.get(player.user_id)?.avatar_path
