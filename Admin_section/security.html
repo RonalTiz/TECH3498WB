@@ -168,13 +168,14 @@
                 <th scope="col">Account</th>
                 <th scope="col">Display name</th>
                 <th scope="col">Role</th>
+                <th scope="col">Linked player</th>
                 <th scope="col">Created</th>
                 <th scope="col">Manage role</th>
               </tr>
             </thead>
             <tbody id="accounts-body">
               <tr>
-                <td colspan="5" class="text-secondary text-center py-4">
+                <td colspan="6" class="text-secondary text-center py-4">
                   Loading accounts…
                 </td>
               </tr>
@@ -209,6 +210,7 @@
     const refreshButton = document.getElementById("refresh-button");
     const signOutButton = document.getElementById("sign-out-button");
 
+    let players = [];
     let accounts = [];
     let loadingAccounts = false;
     const changingRoles = new Set();
@@ -270,7 +272,7 @@
       if (loadingAccounts) {
         const row = document.createElement("tr");
         const cell = makeCell("Loading accounts…", "text-center text-secondary py-4");
-        cell.colSpan = 5;
+        cell.colSpan = 6;
         row.appendChild(cell);
         accountsBody.appendChild(row);
         return;
@@ -282,7 +284,7 @@
           accounts.length ? "No accounts match your search." : "No accounts found.",
           "text-center text-secondary py-4"
         );
-        cell.colSpan = 5;
+        cell.colSpan = 6;
         row.appendChild(cell);
         accountsBody.appendChild(row);
         return;
@@ -299,6 +301,62 @@
 
         const nameCell = makeCell(account.display_name || "—");
         const roleCell = document.createElement("td");
+        const playerCell = document.createElement("td");
+        const playerControls = document.createElement("div");
+        playerControls.className = "d-flex gap-2 align-items-center";
+        
+        const linkedPlayer = players.find(
+          player => player.user_id === account.account_id
+        );
+        
+        const playerSelect = document.createElement("select");
+        playerSelect.className = "form-select form-select-sm";
+        playerSelect.setAttribute(
+          "aria-label",
+          `Linked player for ${account.account_email || "account"}`
+        );
+        
+        const unlinkedOption = document.createElement("option");
+        unlinkedOption.value = "";
+        unlinkedOption.textContent = "No player linked";
+        playerSelect.appendChild(unlinkedOption);
+        
+        // Only offer unlinked players, plus this account's currently linked player.
+        players
+          .filter(player =>
+            !player.user_id || player.user_id === account.account_id
+          )
+          .forEach(player => {
+            const option = document.createElement("option");
+            option.value = player.id;
+            option.textContent = player.display_name;
+            playerSelect.appendChild(option);
+          });
+        
+        playerSelect.value = linkedPlayer?.id || "";
+        
+        const linkButton = document.createElement("button");
+        linkButton.type = "button";
+        linkButton.className = "btn btn-sm btn-outline-info";
+        linkButton.textContent = "Save";
+        linkButton.disabled = (linkedPlayer?.id || "");
+        
+        playerSelect.addEventListener("change", () => {
+          linkButton.disabled =
+            isCurrentAdmin &&
+            playerSelect.value === (linkedPlayer?.id || "");
+          if (!isCurrentAdmin) {
+            linkButton.disabled =
+              playerSelect.value === (linkedPlayer?.id || "");
+          }
+        });
+        
+        linkButton.addEventListener("click", async () => {
+          await setAccountPlayer(account.account_id, playerSelect.value);
+        });
+        
+        playerControls.append(playerSelect, linkButton);
+        playerCell.appendChild(playerControls);
         const roleBadge = document.createElement("span");
         roleBadge.className =
           account.account_role === "admin"
@@ -371,11 +429,11 @@
         }
 
         controlsCell.appendChild(controls);
-        row.append(emailCell, nameCell, roleCell, dateCell, controlsCell);
+        row.append(emailCell, nameCell, roleCell, playerCell, dateCell, controlsCell);
         accountsBody.appendChild(row);
       }
     }
-
+    
     async function loadAccounts() {
       if (loadingAccounts) return;
 
@@ -384,16 +442,25 @@
       renderAccounts();
       refreshButton.disabled = true;
 
-      try {
-        const { data, error } = await supabase.rpc("admin_list_users");
-        if (error) throw error;
-
-        if (!Array.isArray(data)) {
-          throw new Error("The server returned an unexpected account list.");
-        }
-
-        accounts = data;
-        renderAccounts();
+      try {const [accountsResult, playersResult] = await Promise.all([
+        supabase.rpc("admin_list_users"),
+        supabase
+          .from("players")
+          .select("id, display_name, user_id")
+          .order("display_name")
+      ]);
+      
+      if (accountsResult.error) throw accountsResult.error;
+      if (playersResult.error) throw playersResult.error;
+      
+      if (!Array.isArray(accountsResult.data)) {
+        throw new Error("The server returned an unexpected account list.");
+      }
+      
+      accounts = accountsResult.data;
+      players = playersResult.data || [];
+      renderAccounts();
+      
       } catch (error) {
         console.error("Could not load admin account list:", error);
         accounts = [];
@@ -408,7 +475,42 @@
         renderAccounts();
       }
     }
-
+    async function setAccountPlayer(userId, playerId) {
+      clearStatus();
+    
+      try {
+        if (!playerId) {
+          // Unlink the player's account.
+          const { error } = await supabase
+            .from("players")
+            .update({ user_id: null })
+            .eq("user_id", userId);
+    
+          if (error) throw error;
+        } else {
+          // A player can be linked only if currently unassigned.
+          const { data, error } = await supabase
+            .from("players")
+            .update({ user_id: userId })
+            .eq("id", playerId)
+            .is("user_id", null)
+            .select("id");
+    
+          if (error) throw error;
+          if (!data?.length) {
+            throw new Error("That player is already linked to another account.");
+          }
+        }
+    
+        await loadAccounts();
+        setStatus("Player-account link updated.", "success");
+        
+      } catch (error) {
+        console.error("Could not update player-account link:", error);
+        setStatus(error.message || "Could not update the player link.", "danger");
+      }
+    }
+    
     async function changeRole(userId, role) {
       changingRoles.add(userId);
       renderAccounts();
