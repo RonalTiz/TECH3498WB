@@ -299,35 +299,32 @@
         </div>
       </div>
 
-      <section class="games-card p-4 mt-4" aria-labelledby="records-heading">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <section class="games-card p-4 mt-4" aria-labelledby="games-list-heading">
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
           <div>
-            <h2 id="records-heading" class="h4 fw-bold mb-1">Player Records by Deck</h2>
-            <p class="text-secondary small mb-0">Totals are calculated from completed games.</p>
+            <h2 id="games-list-heading" class="h4 fw-bold mb-1">Games</h2>
+            <p class="text-secondary small mb-0">
+              Search games, change a participant’s deck/commander, or delete a game.
+            </p>
           </div>
-          <span id="record-count" class="badge bg-secondary">Loading…</span>
+      
+          <div>
+            <label for="game-search" class="visually-hidden">Search games</label>
+            <input
+              id="game-search"
+              class="form-control"
+              type="search"
+              placeholder="Search date, player, deck, or game ID"
+              autocomplete="off">
+          </div>
         </div>
-
-        <div class="table-responsive">
-          <table class="table table-striped align-middle mb-0">
-            <thead>
-              <tr>
-                <th scope="col">Player</th>
-                <th scope="col">Deck</th>
-                <th scope="col">Wins</th>
-                <th scope="col">Losses</th>
-                <th scope="col">Draws</th>
-                <th scope="col">Decklist</th>
-              </tr>
-            </thead>
-            <tbody id="records-body">
-              <tr>
-                <td colspan="6" class="text-secondary text-center py-4">Loading records…</td>
-              </tr>
-            </tbody>
-          </table>
+      
+        <p id="game-count" class="text-secondary small"></p>
+        <div id="games-list" class="d-flex flex-column gap-3">
+          <p class="text-secondary text-center py-4">Loading games…</p>
         </div>
       </section>
+      
     </section>
       </div>
     
@@ -421,13 +418,17 @@
 
     const refreshButton = document.getElementById("refresh-button");
     const signOutButton = document.getElementById("sign-out-button");
-    const recordsBody = document.getElementById("records-body");
-    const recordCount = document.getElementById("record-count");
+    const gameSearchInput = document.getElementById("game-search");
+    const gameCount = document.getElementById("game-count");
+    const gamesList = document.getElementById("games-list");
+    
 
     let currentUser = null;
     let players = [];
     let decks = [];
     let commanders = [];
+    let games = [];
+    let gameParticipants = [];
     
     function showStatus(message, type = "info") {
       statusBox.className = `alert alert-${type}`;
@@ -621,83 +622,280 @@
       winnerField.classList.toggle("d-none", isDraw);
       winnerSelect.required = !isDraw;
     }
-
-    function renderRecords(rows) {
-      recordsBody.replaceChildren();
-      recordCount.textContent = `${rows.length} ${rows.length === 1 ? "record" : "records"}`;
-
-      if (!rows.length) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 6;
-        td.className = "text-secondary text-center py-4";
-        td.textContent = "No completed game records yet.";
-        tr.appendChild(td);
-        recordsBody.appendChild(tr);
+    function renderGames() {
+      const query = gameSearchInput.value.trim().toLowerCase();
+    
+      const filteredGames = games.filter(game => {
+        const participants = gameParticipants.filter(
+          participant => participant.game_id === game.id
+        );
+    
+        const searchableParts = [
+          game.id,
+          game.played_at,
+          game.result,
+          ...participants.flatMap(participant => {
+            const player = players.find(item => item.id === participant.player_id);
+            const deck = decks.find(item => item.id === participant.deck_id);
+            const commander = commanders.find(
+              item => item.id === deck?.commander_id
+            );
+    
+            return [
+              player?.display_name,
+              deck?.name,
+              commander?.name
+            ];
+          })
+        ];
+    
+        return searchableParts
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      });
+    
+      gamesList.replaceChildren();
+      gameCount.textContent =
+        `${filteredGames.length} ${filteredGames.length === 1 ? "game" : "games"}`;
+    
+      if (!filteredGames.length) {
+        const empty = document.createElement("p");
+        empty.className = "text-secondary text-center py-4";
+        empty.textContent = games.length
+          ? "No games match your search."
+          : "No games recorded yet.";
+        gamesList.appendChild(empty);
         return;
       }
-
-      rows.forEach(record => {
-        const tr = document.createElement("tr");
-
-        const player = document.createElement("td");
-        player.textContent = record.display_name || "—";
-
-        const deck = document.createElement("td");
-        deck.textContent = record.deck_name || "—";
-
-        const wins = document.createElement("td");
-        wins.textContent = String(record.wins ?? 0);
-
-        const losses = document.createElement("td");
-        losses.textContent = String(record.losses ?? 0);
-
-        const draws = document.createElement("td");
-        draws.textContent = String(record.draws ?? 0);
-
-        const linkCell = document.createElement("td");
-        if (record.decklist_url) {
-          const link = document.createElement("a");
-          link.href = record.decklist_url;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.textContent = "View decklist";
-          linkCell.appendChild(link);
-        } else {
-          linkCell.textContent = "—";
+    
+      for (const game of filteredGames) {
+        const participants = gameParticipants.filter(
+          participant => participant.game_id === game.id
+        );
+    
+        const card = document.createElement("article");
+        card.className = "participant-row p-3";
+    
+        const header = document.createElement("div");
+        header.className =
+          "d-flex flex-column flex-md-row justify-content-between gap-2 mb-3";
+    
+        const summary = document.createElement("div");
+        const title = document.createElement("h3");
+        title.className = "h6 fw-bold mb-1";
+        title.textContent = new Intl.DateTimeFormat(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short"
+        }).format(new Date(game.played_at));
+    
+        const gameInfo = document.createElement("small");
+        gameInfo.className = "text-secondary";
+        gameInfo.textContent =
+          `${game.result} · ${participants.length} players · ID ${game.id}`;
+    
+        summary.append(title, gameInfo);
+    
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "btn btn-sm btn-outline-danger align-self-start";
+        deleteButton.textContent = "Delete game";
+        deleteButton.addEventListener("click", () => deleteGame(game));
+    
+        header.append(summary, deleteButton);
+        card.appendChild(header);
+    
+        if (!participants.length) {
+          const empty = document.createElement("p");
+          empty.className = "text-secondary mb-0";
+          empty.textContent = "This game has no participant records.";
+          card.appendChild(empty);
+          gamesList.appendChild(card);
+          continue;
         }
-
-        tr.append(player, deck, wins, losses, draws, linkCell);
-        recordsBody.appendChild(tr);
-      });
+    
+        const tableWrap = document.createElement("div");
+        tableWrap.className = "table-responsive";
+    
+        const table = document.createElement("table");
+        table.className = "table table-sm align-middle mb-0";
+    
+        const thead = document.createElement("thead");
+        const headingRow = document.createElement("tr");
+    
+        for (const label of ["Player", "Deck / commander", "Turn order", "Action"]) {
+          const th = document.createElement("th");
+          th.scope = "col";
+          th.textContent = label;
+          headingRow.appendChild(th);
+        }
+    
+        thead.appendChild(headingRow);
+    
+        const tbody = document.createElement("tbody");
+    
+        for (const participant of participants) {
+          const row = document.createElement("tr");
+          const player = players.find(item => item.id === participant.player_id);
+    
+          const playerCell = document.createElement("td");
+          playerCell.textContent = player?.display_name || "Unknown player";
+    
+          const deckCell = document.createElement("td");
+          const deckSelect = document.createElement("select");
+          deckSelect.className = "form-select form-select-sm";
+    
+          const playerDecks = decks.filter(
+            deck => deck.player_id === participant.player_id
+          );
+    
+          for (const deck of playerDecks) {
+            const commander = commanders.find(
+              item => item.id === deck.commander_id
+            );
+            const option = document.createElement("option");
+            option.value = deck.id;
+            option.textContent = commander
+              ? `${deck.name} — ${commander.name}`
+              : deck.name;
+            deckSelect.appendChild(option);
+          }
+    
+          deckSelect.value = participant.deck_id;
+    
+          if (!playerDecks.length) {
+            deckSelect.disabled = true;
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "No decks available";
+            deckSelect.appendChild(option);
+          }
+    
+          deckCell.appendChild(deckSelect);
+    
+          const turnCell = document.createElement("td");
+          turnCell.textContent = String(participant.turn_order);
+    
+          const actionCell = document.createElement("td");
+          const saveButton = document.createElement("button");
+          saveButton.type = "button";
+          saveButton.className = "btn btn-sm btn-outline-info";
+          saveButton.textContent = "Save";
+          saveButton.disabled =
+            deckSelect.disabled || deckSelect.value === participant.deck_id;
+    
+          deckSelect.addEventListener("change", () => {
+            saveButton.disabled = deckSelect.value === participant.deck_id;
+          });
+    
+          saveButton.addEventListener("click", async () => {
+            saveButton.disabled = true;
+    
+            try {
+              const { error } = await supabase
+                .from("game_players")
+                .update({ deck_id: deckSelect.value })
+                .eq("game_id", participant.game_id)
+                .eq("player_id", participant.player_id);
+    
+              if (error) throw error;
+    
+              await loadData();
+              showStatus("Participant deck/commander updated.", "success");
+            } catch (error) {
+              console.error("Could not update participant deck:", error);
+              showStatus(error.message || "Could not update the participant.", "danger");
+              saveButton.disabled = false;
+            }
+          });
+    
+          actionCell.appendChild(saveButton);
+          row.append(playerCell, deckCell, turnCell, actionCell);
+          tbody.appendChild(row);
+        }
+    
+        table.append(thead, tbody);
+        tableWrap.appendChild(table);
+        card.appendChild(tableWrap);
+        gamesList.appendChild(card);
+      }
     }
-
+    
+    async function deleteGame(game) {
+      if (!window.confirm(
+        "Delete this game and all of its participant records? This cannot be undone."
+      )) {
+        return;
+      }
+    
+      try {
+        const { error } = await supabase.rpc("admin_delete_game", {
+          p_game_id: game.id
+        });
+    
+        if (error) throw error;
+    
+        await loadData();
+        showStatus("Game deleted.", "success");
+      } catch (error) {
+        console.error("Could not delete game:", error);
+        showStatus(
+          error.message || "Could not delete the game. Check the admin RPC and database permissions.",
+          "danger"
+        );
+      }
+    }
+    
     async function loadData() {
       refreshButton.disabled = true;
       clearStatus();
 
-      try {const [playersResult, decksResult, recordsResult, commandersResult] =
-        await Promise.all([
-          supabase.from("players")
-            .select("id, display_name")
-            .order("display_name"),
-          supabase.from("decks")
-            .select("id, player_id, name, decklist_url")
-            .order("name"),
-          supabase.from("deck_player_records")
-            .select("player_id, display_name, deck_id, deck_name, decklist_url, wins, losses, draws")
-            .order("display_name"),
-          supabase.from("commanders")
-            .select("id, name, image_path")
-            .order("name")
-        ]);
+      try {const [
+        playersResult,
+        decksResult,
+        commandersResult,
+        gamesResult,
+        participantsResult
+      ] = await Promise.all([
+        supabase.from("players")
+          .select("id, display_name")
+          .order("display_name"),
       
-
-        if (playersResult.error) throw playersResult.error;
-        if (decksResult.error) throw decksResult.error;
-        if (recordsResult.error) throw recordsResult.error;
-        if (commandersResult.error) throw commandersResult.error;
-        
+        supabase.from("decks")
+          .select("id, player_id, name, decklist_url, commander_id")
+          .order("name"),
+      
+        supabase.from("commanders")
+          .select("id, name, image_path")
+          .order("name"),
+      
+        supabase.from("games")
+          .select("id, played_at, result, winner_player_id")
+          .order("played_at", { ascending: false }),
+      
+        supabase.from("game_players")
+          .select("game_id, player_id, deck_id, turn_order")
+          .order("game_id")
+          .order("turn_order")
+      ]);
+      
+      for (const result of [
+        playersResult,
+        decksResult,
+        commandersResult,
+        gamesResult,
+        participantsResult
+      ]) {
+        if (result.error) throw result.error;
+      }
+      
+      players = playersResult.data || [];
+      decks = decksResult.data || [];
+      commanders = commandersResult.data || [];
+      games = gamesResult.data || [];
+      gameParticipants = participantsResult.data || [];
+      
         commanders = commandersResult.data || [];
         
         commanderSelect.replaceChildren();
@@ -717,7 +915,7 @@
         decks = decksResult.data || [];
 
         populatePlayerSelects();
-        renderRecords(recordsResult.data || []);
+        renderGames();
       } catch (error) {
         console.error("Could not load game dashboard data:", error);
         showStatus(
@@ -1075,6 +1273,8 @@ csvImportForm.addEventListener("submit", async event => {
     });
 
     gameResultSelect.addEventListener("change", updateResultControls);
+    gameSearchInput.addEventListener("input", renderGames);
+    
 async function findScryfallCard(name) {
   const url =
     `https://api.scryfall.com/cards/named?exact=${encodeURIComponent(name)}`;
