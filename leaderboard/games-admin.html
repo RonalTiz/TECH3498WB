@@ -152,69 +152,96 @@
       <div class="row g-4">
         <div class="col-lg-5">
           <section class="games-card p-4 mb-4" aria-labelledby="player-heading">
-            <h2 id="player-heading" class="h4 fw-bold mb-3">
-              <i class="bi bi-person-plus text-info me-2" aria-hidden="true"></i>
-              Add a Player
-            </h2>
-
-            <form id="player-form">
-              <label for="player-name" class="form-label">Player name</label>
-              <input
-                id="player-name"
-                class="form-control mb-3"
-                type="text"
-                maxlength="100"
-                required>
-
-              <button id="add-player-button" class="btn btn-info text-dark fw-bold" type="submit">
-                Add Player
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+              <h2 id="player-heading" class="h4 fw-bold mb-0">
+                <i class="bi bi-person-plus text-info me-2" aria-hidden="true"></i>
+                Add a Player
+              </h2>
+              <button
+                class="btn btn-sm btn-outline-info"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#add-player-collapse"
+                aria-expanded="false"
+                aria-controls="add-player-collapse">
+                Show form
               </button>
-            </form>
-          </section>
-
-          <section class="games-card p-4" aria-labelledby="deck-heading">
-            <h2 id="deck-heading" class="h4 fw-bold mb-3">
-              <i class="bi bi-collection text-info me-2" aria-hidden="true"></i>
-              Add a Deck
-            </h2>
-
-            <form id="deck-form">
-              <div class="mb-3">
-                <label for="deck-player" class="form-label">Player</label>
-                <select id="deck-player" class="form-select" required>
-                  <option value="">Select a player</option>
-                </select>
-              </div>
-
-              <div class="mb-3">
-                <label for="deck-name" class="form-label">Deck name</label>
+            </div>
+          
+            <div class="collapse" id="add-player-collapse">
+              <form id="player-form">
+                <label for="player-name" class="form-label">Player name</label>
                 <input
-                  id="deck-name"
-                  class="form-control"
+                  id="player-name"
+                  class="form-control mb-3"
                   type="text"
                   maxlength="100"
                   required>
-              </div>
-<div class="mb-3">
-  <label for="deck-commander" class="form-label">Commander</label>
-  <select id="deck-commander" class="form-select" required>
-    <option value="">Select a commander</option>
-  </select>
-</div>
-
-              <div class="mb-3">
-                <label for="decklist-url" class="form-label">Decklist URL (optional)</label>
-                <input
-                  id="decklist-url"
-                  class="form-control"
-                  type="url"
-                  placeholder="https://example.com/decklist">
-              </div>
-
-              <button id="add-deck-button" class="btn btn-info text-dark fw-bold" type="submit">
-                Add Deck
+          
+                <button id="add-player-button" class="btn btn-info text-dark fw-bold" type="submit">
+                  Add Player
+                </button>
+              </form>
+            </div>
+          </section>
+          
+          <section class="games-card p-4" aria-labelledby="deck-heading">
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+              <h2 id="deck-heading" class="h4 fw-bold mb-0">
+                <i class="bi bi-collection text-info me-2" aria-hidden="true"></i>
+                Add a Deck
+              </h2>
+              <button
+                class="btn btn-sm btn-outline-info"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#add-deck-collapse"
+                aria-expanded="false"
+                aria-controls="add-deck-collapse">
+                Show form
               </button>
-            </form>
+            </div>
+          
+            <div class="collapse" id="add-deck-collapse">
+              <form id="deck-form">
+                <div class="mb-3">
+                  <label for="deck-player" class="form-label">Player</label>
+                  <select id="deck-player" class="form-select" required>
+                    <option value="">Select a player</option>
+                  </select>
+                </div>
+          
+                <div class="mb-3">
+                  <label for="deck-name" class="form-label">Deck name</label>
+                  <input
+                    id="deck-name"
+                    class="form-control"
+                    type="text"
+                    maxlength="100"
+                    required>
+                </div>
+          
+                <div class="mb-3">
+                  <label for="deck-commander" class="form-label">Commander</label>
+                  <select id="deck-commander" class="form-select" required>
+                    <option value="">Select a commander</option>
+                  </select>
+                </div>
+          
+                <div class="mb-3">
+                  <label for="decklist-url" class="form-label">Decklist URL (optional)</label>
+                  <input
+                    id="decklist-url"
+                    class="form-control"
+                    type="url"
+                    placeholder="https://example.com/decklist">
+                </div>
+          
+                <button id="add-deck-button" class="btn btn-info text-dark fw-bold" type="submit">
+                  Add Deck
+                </button>
+              </form>
+            </div>
           </section>
         </div>
 
