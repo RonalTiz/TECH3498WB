@@ -89,10 +89,11 @@
       <a class="navbar-brand fw-bold" href="index.html">ECCCommander</a>
   
       <div class="ms-auto d-flex align-items-center gap-3">
-        <a class="nav-link" href="login.html">Login</a>
-        <a class="nav-link" href="user.html">My Profile</a>
         <a class="nav-link" href="players.html">Player Leaderboard</a>
-        <a class="nav-link" href="../Admin_section/security.html">Admin Console</a>
+        <a id="auth-nav-link" class="nav-link" href="login.html">Login</a>
+        <a class="nav-link" href="user.html">My Profile</a>
+        <a id="admin-console-link" class="nav-link d-none"
+           href="../Admin_section/security.html">Admin Console</a>
       </div>
     </div>
   </nav>
@@ -151,7 +152,50 @@
     const leaderboard = document.getElementById("leaderboard");
     const status = document.getElementById("status");
     const resultCount = document.getElementById("result-count");
+    const authNavLink = document.getElementById("auth-nav-link");
+    const adminConsoleLink = document.getElementById("admin-console-link");
 
+    async function updateAdminLink(session) {
+      adminConsoleLink.classList.add("d-none");
+      if (!session?.user) return;
+
+      const { data: isAdmin, error } =
+        await supabase.rpc("is_current_user_admin");
+
+      if (!error && isAdmin === true) {
+        adminConsoleLink.classList.remove("d-none");
+      }
+    }
+    
+    let isSignedIn = false;
+    
+    function updateAuthLink(session) {
+      isSignedIn = Boolean(session?.user);
+      authNavLink.textContent = isSignedIn ? "Sign out" : "Login";
+      authNavLink.href = "login.html";
+    }
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    updateAuthLink(session);
+    await updateAdminLink(session);
+    
+    supabase.auth.onAuthStateChange((_event, session) => {
+      updateAuthLink(session);
+      setTimeout(() => updateAdminLink(session), 0);
+    });
+    
+    authNavLink.addEventListener("click", async event => {
+      if (!isSignedIn) return; // Keep the normal link to Login.
+    
+      event.preventDefault();
+      const { error } = await supabase.auth.signOut();
+    
+      if (error) {
+        console.error("Sign-out failed:", error);
+        window.alert("Could not sign out. Please try again.");
+      }
+    });
+    
     let deckStats = [];
 
     // Fetch in pages to avoid Supabase's default response-size limit.
