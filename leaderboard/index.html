@@ -11,6 +11,25 @@
   <script src="../theme.js"></script>
 
   <style>
+    .commander-art-pair {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .commander-art-pair img {
+      width: 50%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    .commander-art-pair.single img {
+      width: 100%;
+    }
+    
     .commander-card {
       position: relative;
       isolation: isolate;
@@ -281,7 +300,7 @@
           const ids = deckIds.slice(i, i + 100);
           const batch = await fetchAll(() =>
             supabase.from("decks")
-              .select("id, name, commander_id")
+              .select("id, name, commander_id, partner_commander_id")
               .in("id", ids)
               .order("id")
           );
@@ -289,7 +308,10 @@
         }
 
         const commanderIds = [...new Set(
-          decks.map(deck => deck.commander_id).filter(Boolean)
+          decks.flatMap(deck => [
+            deck.commander_id,
+            deck.partner_commander_id
+          ]).filter(Boolean)
         )];
         
         const commanders = [];
@@ -314,30 +336,38 @@
           const deck = decksById.get(stat.deckId);
           if (!deck?.commander_id) continue;
         
-          const totals = commanderStats.get(deck.commander_id) || {
-            commanderId: deck.commander_id,
+          const ids = [deck.commander_id, deck.partner_commander_id].filter(Boolean);
+          const key = ids.join(":");
+        
+          const totals = commanderStats.get(key) || {
+            commanderIds: ids,
             uses: 0,
             wins: 0
           };
         
           totals.uses += stat.uses;
           totals.wins += stat.wins;
-          commanderStats.set(deck.commander_id, totals);
+          commanderStats.set(key, totals);
         }
         
         deckStats = [...commanderStats.values()]
           .map(totals => {
-            const commander = commandersById.get(totals.commanderId);
-            if (!commander) return null;
+            const pair = totals.commanderIds
+              .map(id => commandersById.get(id))
+              .filter(Boolean);
+        
+            if (!pair.length) return null;
         
             return {
               ...totals,
-              name: commander.name,
-              commander,
+              name: pair.map(item => item.name).join(" / "),
+              commanders: pair,
+              commander: pair[0],
               winRate: totals.uses ? totals.wins / totals.uses : 0
             };
           })
           .filter(Boolean);
+        
         
         status.className = "alert d-none";
         renderLeaderboard();
@@ -379,16 +409,28 @@ rows.forEach((commander, index) => {
 
   const card = document.createElement("article");
   card.className = "leaderboard-card commander-card p-3 p-md-4";
-const imageUrl = commander.commander.art_crop_url;
-
-  if (imageUrl) {
-    const background = document.createElement("img");
-    background.className = "commander-background";
-    background.src = imageUrl;
-    background.alt = `${commander.name} card artwork`;
-    background.loading = "lazy";
-    card.appendChild(background);
+  const artPair = document.createElement("div");
+  artPair.className = "commander-art-pair";
+  
+  if (commander.commanders.length === 1) {
+    artPair.classList.add("single");
   }
+  
+  for (const cardCommander of commander.commanders) {
+    const imageUrl = cardCommander.art_crop_url || cardCommander.image_url;
+    if (!imageUrl) continue;
+  
+    const image = document.createElement("img");
+    image.src = imageUrl;
+    image.alt = `${cardCommander.name} card art`;
+    image.loading = "lazy";
+    artPair.appendChild(image);
+  }
+  
+  if (artPair.childElementCount) {
+    card.appendChild(artPair);
+  }
+  
 
   const content = document.createElement("div");
   content.className =

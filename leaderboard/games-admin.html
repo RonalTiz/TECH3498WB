@@ -175,7 +175,7 @@
                   id="player-name"
                   class="form-control mb-3"
                   type="text"
-                  maxlength="100"
+                  maxlength="203"
                   required>
           
                 <button id="add-player-button" class="btn btn-info text-dark fw-bold" type="submit">
@@ -227,6 +227,16 @@
                     <option value="">Select a commander</option>
                   </select>
                 </div>
+                
+                <div class="mb-3">
+                  <label for="deck-partner-commander" class="form-label">
+                    Partner commander (optional)
+                  </label>
+                  <select id="deck-partner-commander" class="form-select">
+                    <option value="">No partner commander</option>
+                  </select>
+                </div>
+                
           
                 <div class="mb-3">
                   <label for="decklist-url" class="form-label">Decklist URL (optional)</label>
@@ -336,13 +346,14 @@
         <section class="games-card p-4" aria-labelledby="commander-heading">
           <h2 id="commander-heading" class="h4 fw-bold mb-3">
             <i class="bi bi-person-badge text-info me-2" aria-hidden="true"></i>
-            Add a Commander
+            Add Commander(s)
           </h2>
-    
+          
           <p class="text-secondary">
-            Add a commander’s name and, optionally, an image. The image is uploaded
-            to the Supabase Storage bucket <code>commander-images</code>.
+            Enter one card name or a partner pair separated by <code>/</code>,
+            for example: <code>Leonardo, the Balance / Michelangelo, the Heart</code>.
           </p>
+          
     
           <form id="commander-form" class="mt-4">
             <div class="mb-3">
@@ -351,10 +362,12 @@
                 id="commander-name"
                 class="form-control"
                 type="text"
-                maxlength="100"
+                maxlength="201"
+                placeholder="Leonardo, the Balance / Michelangelo, the Heart"
                 required>
             </div>
-    
+            
+            
             <div class="mb-3">
               <label for="commander-image" class="form-label">Commander image (optional)</label>
               <input
@@ -387,7 +400,8 @@
     const commanderNameInput = document.getElementById("commander-name");
     const commanderImageInput = document.getElementById("commander-image");
     const addCommanderButton = document.getElementById("add-commander-button");
-
+    const partnerCommanderSelect = document.getElementById("deck-partner-commander");
+    
     const accessMessage = document.getElementById("access-message");
     const accessText = document.getElementById("access-message-text");
     const loginLink = document.getElementById("login-link");
@@ -892,7 +906,7 @@
           .order("display_name"),
       
         supabase.from("decks")
-          .select("id, player_id, name, decklist_url, commander_id")
+          .select("id, player_id, name, decklist_url, commander_id, partner_commander_id")
           .order("name"),
       
         supabase.from("commanders")
@@ -918,6 +932,14 @@
       ]) {
         if (result.error) throw result.error;
       }
+      function populateCommanderSelect(select, placeholderText) {
+        select.replaceChildren();
+        addOption(select, "", placeholderText);
+      
+        commanders.forEach(commander => {
+          addOption(select, commander.id, commander.name);
+        });
+      }
       
       players = playersResult.data || [];
       decks = decksResult.data || [];
@@ -927,18 +949,11 @@
       
         commanders = commandersResult.data || [];
         
-        commanderSelect.replaceChildren();
-        const commanderPlaceholder = document.createElement("option");
-        commanderPlaceholder.value = "";
-        commanderPlaceholder.textContent = "Select a commander";
-        commanderSelect.appendChild(commanderPlaceholder);
         
-        commanders.forEach(commander => {
-          const option = document.createElement("option");
-          option.value = commander.id;
-          option.textContent = commander.name;
-          commanderSelect.appendChild(option);
-        });
+        
+        populateCommanderSelect(commanderSelect, "Select a commander");
+        populateCommanderSelect(partnerCommanderSelect, "No partner commander");
+        
         
         players = playersResult.data || [];
         decks = decksResult.data || [];
@@ -1059,7 +1074,8 @@ async function getOrCreateCsvDeck(playerId, name) {
         name: name.trim(),
         created_by: currentUser.id
       })
-      .select("id, player_id, name, decklist_url")
+      .select("id, player_id, name, decklist_url, commander_id, partner_commander_id")
+      
       .single();
 
     if (error) throw error;
@@ -1269,13 +1285,21 @@ csvImportForm.addEventListener("submit", async event => {
         return;
       }
 
+      
+      const partnerCommanderId = partnerCommanderSelect.value || null;
+      
+      if (partnerCommanderId === commanderSelect.value) {
+        showStatus("A commander cannot also be its own partner.", "warning");
+        return;
+      }
       deckButton.disabled = true;
       deckButton.textContent = "Adding…";
-
+      
       try {
         const { error } = await supabase.from("decks").insert({
           player_id: playerId,
           commander_id: commanderSelect.value,
+          partner_commander_id: partnerCommanderId,
           name,
           decklist_url: decklistUrl || null,
           created_by: currentUser.id
@@ -1347,11 +1371,26 @@ commanderForm.addEventListener("submit", async event => {
   event.preventDefault();
   clearStatus();
 
-  const name = commanderNameInput.value.trim();
+  const names = commanderNameInput.value
+    .split("/")
+    .map(name => name.trim())
+    .filter(Boolean);
+
   const imageFile = commanderImageInput.files?.[0] || null;
 
-  if (!name) {
-    showStatus("Enter a commander name.", "warning");
+  if (names.length < 1 || names.length > 2) {
+    showStatus("Enter one commander name or two names separated by /.", "warning");
+    return;
+  }
+
+  if (names.some(name => name.length > 100)) {
+    showStatus("Each commander name must be 100 characters or fewer.", "warning");
+    return;
+  }
+
+  if (names.length === 2 &&
+      names[0].toLowerCase() === names[1].toLowerCase()) {
+    showStatus("Enter two different commander names.", "warning");
     return;
   }
 
@@ -1368,69 +1407,61 @@ commanderForm.addEventListener("submit", async event => {
   }
 
   addCommanderButton.disabled = true;
-  addCommanderButton.textContent = "Adding…";
-
   let uploadedPath = null;
 
   try {
-    const scryfallCard = await findScryfallCard(name);
+    const cards = await Promise.all(names.map(findScryfallCard));
+
     if (imageFile) {
       const extensionByType = {
         "image/png": "png",
         "image/jpeg": "jpg",
         "image/webp": "webp"
       };
+      uploadedPath =
+        `${crypto.randomUUID()}.${extensionByType[imageFile.type]}`;
 
-      const filename = `${crypto.randomUUID()}.${extensionByType[imageFile.type]}`;
-
-      const { error: uploadError } = await supabase.storage
+      const { error } = await supabase.storage
         .from("commander-images")
-        .upload(filename, imageFile, {
+        .upload(uploadedPath, imageFile, {
           contentType: imageFile.type,
           cacheControl: "3600",
           upsert: false
         });
 
-      if (uploadError) throw uploadError;
-      uploadedPath = filename;
+      if (error) throw error;
     }
 
-    const { error: insertError } = await supabase.from("commanders").insert({
+    const records = names.map((name, index) => ({
       name,
       image_path: uploadedPath,
       created_by: currentUser.id,
-      ...scryfallCard
-    });
-    
-    
+      ...cards[index]
+    }));
 
-    if (insertError) throw insertError;
+    const { error } = await supabase.from("commanders").insert(records);
+    if (error) throw error;
 
     commanderForm.reset();
-    showStatus("Commander added.", "success");
+    showStatus(
+      names.length === 2 ? "Partner commanders added." : "Commander added.",
+      "success"
+    );
     await loadData();
   } catch (error) {
-    console.error("Could not add commander:", error);
+    console.error("Could not add commander(s):", error);
 
-    // Remove the uploaded image if saving the commander row failed.
     if (uploadedPath) {
-      const { error: cleanupError } = await supabase.storage
-        .from("commander-images")
-        .remove([uploadedPath]);
-
-      if (cleanupError) {
-        console.error("Could not remove unused commander image:", cleanupError);
-      }
+      await supabase.storage.from("commander-images").remove([uploadedPath]);
     }
 
-    showStatus(error.message || "Could not add commander.", "danger");
+    showStatus(error.message || "Could not add commander(s).", "danger");
   } finally {
     addCommanderButton.disabled = false;
     addCommanderButton.innerHTML =
       '<i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add Commander';
   }
 });
-
 
     gameForm.addEventListener("submit", async event => {
       event.preventDefault();
