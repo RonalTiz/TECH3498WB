@@ -1410,8 +1410,26 @@ commanderForm.addEventListener("submit", async event => {
   let uploadedPath = null;
 
   try {
-    const cards = await Promise.all(names.map(findScryfallCard));
-
+    const cards = await Promise.all(names.map(async name => {
+      try {
+        return await findScryfallCard(name);
+      } catch (error) {
+        const addCustom = window.confirm(
+          `Scryfall lookup failed for "${name}". Add it as a custom commander instead?`
+        );
+    
+        if (!addCustom) throw error;
+    
+        return {
+          scryfall_id: null,
+          image_url: null,
+          art_crop_url: null,
+          artist: null,
+          scryfall_uri: null
+        };
+      }
+    }));
+    
     if (imageFile) {
       const extensionByType = {
         "image/png": "png",
@@ -1431,10 +1449,14 @@ commanderForm.addEventListener("submit", async event => {
 
       if (error) throw error;
     }
-
+    const uploadedImageUrl = uploadedPath
+      ? supabase.storage.from("commander-images").getPublicUrl(uploadedPath).data.publicUrl
+      : null;
+    
     const records = names.map((name, index) => ({
       name,
       image_path: uploadedPath,
+      image_url: uploadedImageUrl,
       created_by: currentUser.id,
       ...cards[index]
     }));
