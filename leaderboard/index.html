@@ -336,8 +336,12 @@
           const deck = decksById.get(stat.deckId);
           if (!deck?.commander_id) continue;
         
-          const ids = [deck.commander_id, deck.partner_commander_id].filter(Boolean);
+          const ids = [deck.commander_id, deck.partner_commander_id]
+            .filter(Boolean)
+            .sort();
+          
           const key = ids.join(":");
+          
         
           const totals = commanderStats.get(key) || {
             commanderIds: ids,
