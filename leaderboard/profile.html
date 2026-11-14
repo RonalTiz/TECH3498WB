@@ -302,7 +302,7 @@
       wld.textContent = `${wins}–${losses}–${draws}`;
   
       const rankedDecks = [...deckStats.entries()].map(([deckId, stat]) => {
-        const deck = decksById.get(bestDeck.id);
+        const deck = decksById.get(deckId);
         const commanderNames = [
           deck?.commander_id && commandersById.get(deck.commander_id)?.name,
           deck?.partner_commander_id &&
@@ -328,9 +328,8 @@
         topPointsDeck.innerHTML =
           '<div class="top-deck-content">No deck stats available.</div>';
       } else {
-        const deck = decksById.get(
-          [...deckStats.entries()].find(([, stat]) => stat === bestDeck)?.[0]
-        );
+        const deck = decksById.get(bestDeck.id);
+        
       
         const artPair = document.createElement("div");
         artPair.className = "commander-art-pair";
