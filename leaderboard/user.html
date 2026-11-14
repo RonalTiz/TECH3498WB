@@ -103,6 +103,22 @@
                 placeholder="Enter your name">
               <button class="btn btn-info text-dark fw-bold" type="submit">Save name</button>
             </form>
+            <hr class="border-secondary">
+
+<form id="description-form">
+  <label for="description-input" class="form-label">Profile description</label>
+  <textarea
+    id="description-input"
+    class="form-control mb-3"
+    maxlength="500"
+    rows="4"
+    placeholder="Write a short description about yourself"></textarea>
+  <div class="form-text mb-3">Maximum 500 characters.</div>
+  <button class="btn btn-info text-dark fw-bold" type="submit">
+    Save description
+  </button>
+</form>
+
           </section>
         </div>
     
@@ -169,7 +185,8 @@
 
   <script type="module">
     import { supabase } from "../supabase-client.js";
-
+    const descriptionForm = document.getElementById("description-form");
+    const descriptionInput = document.getElementById("description-input");
     const denied = document.getElementById("access-denied");
     const profile = document.getElementById("profile-page");
     const statusBox = document.getElementById("status-message");
@@ -661,13 +678,14 @@
 
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
-          .select("display_name, avatar_path")
+          .select("display_name, avatar_path, description")
           .eq("id", user.id)
           .maybeSingle();
 
         if (profileError) throw profileError;
 
         nameInput.value = profileData?.display_name || "";
+        descriptionInput.value = profileData?.description || "";
         avatarPreview.src = getAvatarUrl(profileData?.avatar_path);
 
         await loadMyGamesAndStats();
@@ -712,6 +730,24 @@
       showStatus("Profile name saved.");
     });
 
+    descriptionForm.addEventListener("submit", async event => {
+      event.preventDefault();
+    
+      const { error } = await supabase.from("profiles").upsert({
+        id: user.id,
+        description: descriptionInput.value.trim(),
+        updated_at: new Date().toISOString()
+      });
+    
+      if (error) {
+        console.error("Could not save profile description:", error);
+        showStatus("Could not save your description.", true);
+        return;
+      }
+    
+      showStatus("Profile description saved.");
+    });
+    
     avatarForm.addEventListener("submit", async event => {
       event.preventDefault();
       const file = avatarFile.files?.[0];
