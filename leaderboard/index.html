@@ -148,6 +148,7 @@
         <div class="col-sm-4">
           <label class="form-label" for="sort-filter">Sort by</label>
           <select id="sort-filter" class="form-select">
+            <option value="score">Commander score</option>
             <option value="winrate">Win rate</option>
             <option value="popularity">Popularity</option>
           </select>
@@ -274,105 +275,101 @@
           );
           participants.push(...batch);
         }
+const stats = new Map();
 
-        const stats = new Map();
-        for (const participant of participants) {
-          const game = gamesById.get(participant.game_id);
-          if (!game || !participant.deck_id) continue;
+for (const participant of participants) {
+  const game = gamesById.get(participant.game_id);
+  if (!game || !participant.deck_id) continue;
 
-          const stat = stats.get(participant.deck_id) || {
-            deckId: participant.deck_id,
-            uses: 0,
-            wins: 0
-          };
+  const stat = stats.get(participant.deck_id) || {
+    deckId: participant.deck_id,
+    uses: 0,
+    wins: 0
+  };
 
-          stat.uses += 1;
-          if (game.result === "win" &&
-              game.winner_player_id === participant.player_id) {
-            stat.wins += 1;
-          }
-          stats.set(participant.deck_id, stat);
-        }
+  stat.uses++;
+  if (game.result === "win" &&
+      game.winner_player_id === participant.player_id) {
+    stat.wins++;
+  }
 
-        const deckIds = [...stats.keys()];
-        const decks = [];
-        for (let i = 0; i < deckIds.length; i += 100) {
-          const ids = deckIds.slice(i, i + 100);
-          const batch = await fetchAll(() =>
-            supabase.from("decks")
-              .select("id, name, commander_id, partner_commander_id")
-              .in("id", ids)
-              .order("id")
-          );
-          decks.push(...batch);
-        }
+  stats.set(participant.deck_id, stat);
+}
 
-        const commanderIds = [...new Set(
-          decks.flatMap(deck => [
-            deck.commander_id,
-            deck.partner_commander_id
-          ]).filter(Boolean)
-        )];
-        
-        const commanders = [];
-        for (let i = 0; i < commanderIds.length; i += 100) {
-          const ids = commanderIds.slice(i, i + 100);
-          commanders.push(...await fetchAll(() =>
-            supabase.from("commanders")
-              .select("id, name, image_url, art_crop_url, artist, scryfall_uri")
-              .in("id", ids)
-              .order("id")
-          ));
-        }
-        
-        const commandersById = new Map(
-          commanders.map(commander => [commander.id, commander])
-        );
-        const decksById = new Map(decks.map(deck => [deck.id, deck]));
-        
-        const commanderStats = new Map();
-        
-        for (const stat of stats.values()) {
-          const deck = decksById.get(stat.deckId);
-          if (!deck?.commander_id) continue;
-        
-          const ids = [deck.commander_id, deck.partner_commander_id]
-            .filter(Boolean)
-            .sort();
-          
-          const key = ids.join(":");
-          
-        
-          const totals = commanderStats.get(key) || {
-            commanderIds: ids,
-            uses: 0,
-            wins: 0
-          };
-        
-          totals.uses += stat.uses;
-          totals.wins += stat.wins;
-          commanderStats.set(key, totals);
-        }
-        
-        deckStats = [...commanderStats.values()]
-          .map(totals => {
-            const pair = totals.commanderIds
-              .map(id => commandersById.get(id))
-              .filter(Boolean);
-        
-            if (!pair.length) return null;
-        
-            return {
-              ...totals,
-              name: pair.map(item => item.name).join(" / "),
-              commanders: pair,
-              commander: pair[0],
-              winRate: totals.uses ? totals.wins / totals.uses : 0
-            };
-          })
-          .filter(Boolean);
-        
-        
+const deckIds = [...stats.keys()];
+const decks = [];
+
+for (let i = 0; i < deckIds.length; i += 100) {
+  const ids = deckIds.slice(i, i + 100);
+  decks.push(...await fetchAll(() =>
+    supabase.from("decks")
+      .select("id, commander_id, partner_commander_id")
+      .in("id", ids)
+      .order("id")
+  ));
+}
+
+const commanderIds = [...new Set(
+  decks.flatMap(deck => [deck.commander_id, deck.partner_commander_id])
+    .filter(Boolean)
+)];
+const commanders = [];
+
+for (let i = 0; i < commanderIds.length; i += 100) {
+  const ids = commanderIds.slice(i, i + 100);
+  commanders.push(...await fetchAll(() =>
+    supabase.from("commanders")
+      .select("id, name, image_url, art_crop_url, artist, scryfall_uri, commander_score")
+      .in("id", ids)
+      .order("id")
+  ));
+}
+
+const decksById = new Map(decks.map(deck => [deck.id, deck]));
+const commandersById = new Map(commanders.map(item => [item.id, item]));
+const commanderStats = new Map();
+
+for (const stat of stats.values()) {
+  const deck = decksById.get(stat.deckId);
+  if (!deck?.commander_id) continue;
+
+  const ids = [deck.commander_id, deck.partner_commander_id]
+    .filter(Boolean)
+    .sort();
+  const key = ids.join(":");
+
+  const totals = commanderStats.get(key) || {
+    commanderIds: ids,
+    uses: 0,
+    wins: 0
+  };
+
+  totals.uses += stat.uses;
+  totals.wins += stat.wins;
+  commanderStats.set(key, totals);
+}
+
+deckStats = [...commanderStats.values()]
+  .map(totals => {
+    const pair = totals.commanderIds
+      .map(id => commandersById.get(id))
+      .filter(Boolean);
+
+    if (!pair.length) return null;
+
+    return {
+      ...totals,
+      name: pair.map(item => item.name).join(" / "),
+      commanders: pair,
+      commander: pair[0],
+      winRate: totals.uses ? totals.wins / totals.uses : 0,
+      score: pair.reduce(
+        (sum, item) => sum + Number(item.commander_score || 0),
+        0
+      ) / pair.length
+    };
+  })
+  .filter(Boolean);
         status.className = "alert d-none";
         renderLeaderboard();
         
@@ -392,12 +389,17 @@
         .filter(deck => deck.uses >= minimum)
         .sort((a, b) => {
           if (sortBy === "popularity") {
-            return b.uses - a.uses || b.winRate - a.winRate ||
+            return b.uses - a.uses || b.score - a.score ||
               a.name.localeCompare(b.name);
           }
-          return b.winRate - a.winRate || b.uses - a.uses ||
+          if (sortBy === "winrate") {
+            return b.winRate - a.winRate || b.uses - a.uses ||
+              a.name.localeCompare(b.name);
+          }
+          return b.score - a.score || b.uses - a.uses ||
             a.name.localeCompare(b.name);
         });
+        
 
       leaderboard.replaceChildren();
       resultCount.textContent = `${rows.length} ${rows.length === 1 ? "deck" : "decks"} shown`;
@@ -467,7 +469,8 @@ rows.forEach((commander, index) => {
 
   const rate = document.createElement("div");
   rate.className = "deck-rate text-nowrap";
-  rate.textContent = `${(commander.winRate * 100).toFixed(1)}%`;
+  rate.textContent = `${commander.score.toFixed(2)} pts/game`;
+
 
   content.append(rank, details, rate);
   card.appendChild(content);
