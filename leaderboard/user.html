@@ -536,14 +536,7 @@
       const commanderIds = [...new Set(
         decks.map(deck => deck.commander_id).filter(Boolean)
       )];
-      if (player.user_id) {
-        const profileLink = document.createElement("a");
-        profileLink.className = "btn btn-sm btn-outline-info m-3";
-        profileLink.href =
-          `profile.html?id=${encodeURIComponent(player.user_id)}`;
-        profileLink.textContent = "View profile";
-        card.appendChild(profileLink);
-      }
+      
       
       let profiles = [];
       if (accountIds.length) {
@@ -570,8 +563,6 @@
         if (error) throw error;
         commanders = data || [];
       }
-      document.getElementById("public-profile-link").href =
-        `profile.html?id=${encodeURIComponent(user.id)}`;
       
       const gamesById = new Map(games.map(game => [game.id, game]));
       const playersById = new Map(players.map(player => [player.id, player]));
@@ -686,7 +677,9 @@
           denied.classList.remove("d-none");
           return;
         }
-
+        document.getElementById("public-profile-link").href =
+          `profile.html?id=${encodeURIComponent(user.id)}`;
+        
         profile.classList.remove("d-none");
         usernameDisplay.textContent = user.email || "Signed-in user";
 
