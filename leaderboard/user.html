@@ -118,6 +118,10 @@
     Save description
   </button>
 </form>
+<a id="public-profile-link" class="btn btn-outline-info mt-3"
+   target="_blank" rel="noopener">
+  View public profile
+</a>
 
           </section>
         </div>
@@ -468,7 +472,7 @@
         renderStatsTable(turnOrderStats, [], "No seat-order statistics available.");
         return;
       }
-    
+      
       const { data: myParticipations, error: myParticipationError } =
         await supabase
           .from("game_players")
@@ -532,7 +536,15 @@
       const commanderIds = [...new Set(
         decks.map(deck => deck.commander_id).filter(Boolean)
       )];
-    
+      if (player.user_id) {
+        const profileLink = document.createElement("a");
+        profileLink.className = "btn btn-sm btn-outline-info m-3";
+        profileLink.href =
+          `profile.html?id=${encodeURIComponent(player.user_id)}`;
+        profileLink.textContent = "View profile";
+        card.appendChild(profileLink);
+      }
+      
       let profiles = [];
       if (accountIds.length) {
         const { data, error } = await supabase
@@ -558,7 +570,9 @@
         if (error) throw error;
         commanders = data || [];
       }
-    
+      document.getElementById("public-profile-link").href =
+        `profile.html?id=${encodeURIComponent(user.id)}`;
+      
       const gamesById = new Map(games.map(game => [game.id, game]));
       const playersById = new Map(players.map(player => [player.id, player]));
       const profilesById = new Map(profiles.map(profile => [profile.id, profile]));
