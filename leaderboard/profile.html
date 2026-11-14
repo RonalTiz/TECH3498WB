@@ -147,7 +147,9 @@
     const totalPoints = document.getElementById("profile-total-points");
     const playerRank = document.getElementById("profile-player-rank");
     const wld = document.getElementById("profile-wld");
-  
+    const defaultAvatar =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' fill='%23162032'/%3E%3Ctext x='64' y='82' text-anchor='middle' font-size='64' fill='%230dcaf0'%3E%3F%3C/text%3E%3C/svg%3E";
+    
     async function fetchAll(makeQuery) {
       const rows = [];
       const pageSize = 1000;
@@ -421,7 +423,8 @@
         avatar.alt = `${name.textContent}'s profile picture`;
         avatar.src = data.avatar_path
           ? supabase.storage.from("avatars").getPublicUrl(data.avatar_path).data.publicUrl
-          : "";
+          : defaultAvatar;
+        
   
         status.classList.add("d-none");
         content.classList.remove("d-none");
