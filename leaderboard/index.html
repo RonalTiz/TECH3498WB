@@ -384,7 +384,8 @@ deckStats = [...commanderStats.values()]
     function renderLeaderboard() {
       const minimum = Number(minimumFilter.value);
       const sortBy = sortFilter.value;
-
+      const totalUses = deckStats.reduce((sum, item) => sum + item.uses, 0);
+      
       const rows = deckStats
         .filter(deck => deck.uses >= minimum)
         .sort((a, b) => {
@@ -469,8 +470,17 @@ rows.forEach((commander, index) => {
 
   const rate = document.createElement("div");
   rate.className = "deck-rate text-nowrap";
-  rate.textContent = `${commander.score.toFixed(2)} pts/game`;
-
+  if (sortBy === "popularity") {
+    const metaShare = totalUses
+      ? (commander.uses / totalUses) * 100
+      : 0;
+    rate.textContent = `Meta share: ${metaShare.toFixed(1)}%`;
+  } else if (sortBy === "winrate") {
+    rate.textContent = `Win rate: ${(commander.winRate * 100).toFixed(1)}%`;
+  } else {
+    rate.textContent = `Average Pts: ${commander.score.toFixed(2)}`;
+  }
+  
 
   content.append(rank, details, rate);
   card.appendChild(content);
