@@ -9,6 +9,58 @@
   <link rel="stylesheet" href="../style.css">
   <script src="../theme.js"></script>
   <style>
+    .profile-stat-card {
+      height: 100%;
+      padding: 1rem;
+      color: var(--text-main);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+    }
+    
+    .commander-card {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 200px;
+      color: white;
+      background: linear-gradient(135deg, #164e63, #0f172a);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+    }
+    
+    .commander-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(90deg, rgba(5, 10, 20, .92), rgba(5, 10, 20, .42));
+    }
+    
+    .commander-art-pair {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .commander-art-pair img {
+      width: 50%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .commander-art-pair.single img {
+      width: 100%;
+    }
+    
+    .top-deck-content {
+      position: relative;
+      min-height: 200px;
+      padding: 1.25rem;
+    }
+    
     .public-profile {
       margin-top: 130px;
       color: var(--text-main);
@@ -47,30 +99,31 @@
     </section>
     <div class="row g-3 mt-4 text-start">
       <div class="col-12">
-        <section class="profile-panel p-3">
-          <h2 class="h5">Top deck by points</h2>
-          <div id="top-points-deck" class="text-secondary">Loading…</div>
+        <section class="profile-stat-card" aria-labelledby="top-points-heading">
+          <h2 id="top-points-heading" class="h5 mb-3">Top deck by points</h2>
+          <article id="top-points-deck" class="commander-card">
+            <div class="top-deck-content">Loading…</div>
+          </article>
         </section>
       </div>
     
-      <div class="col-12">
-        <section class="profile-panel p-3">
-          <h2 class="h5">Most played decks</h2>
-          <ol id="top-played-decks" class="mb-0 text-secondary">
-            <li>Loading…</li>
-          </ol>
+      <div class="col-12 col-lg-6">
+        <section class="profile-stat-card" aria-labelledby="top-played-heading">
+          <h2 id="top-played-heading" class="h5 mb-3">Most played decks</h2>
+          <ol id="top-played-decks" class="list-group list-group-numbered"></ol>
         </section>
       </div>
     
-      <div class="col-12">
-        <section class="profile-panel p-3">
-          <h2 class="h5">Player stats</h2>
+      <div class="col-12 col-lg-6">
+        <section class="profile-stat-card" aria-labelledby="player-stats-heading">
+          <h2 id="player-stats-heading" class="h5 mb-3">Player stats</h2>
           <div>Total points: <strong id="profile-total-points">—</strong></div>
           <div>Player rank: <strong id="profile-player-rank">—</strong></div>
           <div>Wins–Losses–Draws: <strong id="profile-wld">—</strong></div>
         </section>
       </div>
     </div>
+    
     
   </main>
 
@@ -200,7 +253,12 @@
         decks.flatMap(deck => [deck.commander_id, deck.partner_commander_id])
           .filter(Boolean)
       )];
-      const commanders = await fetchByIds("commanders", "id, name", commanderIds);
+      const commanders = await fetchByIds(
+        "commanders",
+        "id, name, image_url, art_crop_url",
+        commanderIds
+      );
+      
       const commandersById = new Map(commanders.map(item => [item.id, item]));
       const decksById = new Map(decks.map(deck => [deck.id, deck]));
   
@@ -246,37 +304,70 @@
         ].filter(Boolean);
   
         return {
+          id: deckId,
           name: deck?.name || "Unknown deck",
           commanders: commanderNames.join(" / "),
           ...stat
         };
+        
       });
   
       const bestDeck = [...rankedDecks].sort(
         (a, b) => b.points - a.points || b.uses - a.uses
       )[0];
   
-      topPointsDeck.textContent = bestDeck
-        ? `${bestDeck.name}${bestDeck.commanders ? ` — ${bestDeck.commanders}` : ""}: ${bestDeck.points.toFixed(2)} points`
-        : "No deck stats available.";
-  
-      topPlayedDecks.replaceChildren();
-      rankedDecks
-        .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name))
-        .slice(0, 3)
-        .forEach(deck => {
-          const item = document.createElement("li");
-          item.textContent =
-            `${deck.name}${deck.commanders ? ` — ${deck.commanders}` : ""}: ` +
-            `${deck.uses} games, ${deck.points.toFixed(2)} points`;
-          topPlayedDecks.appendChild(item);
-        });
-  
-      if (!topPlayedDecks.children.length) {
-        const item = document.createElement("li");
-        item.textContent = "No deck usage recorded.";
-        topPlayedDecks.appendChild(item);
+      topPointsDeck.replaceChildren();
+      
+      if (!bestDeck) {
+        topPointsDeck.innerHTML =
+          '<div class="top-deck-content">No deck stats available.</div>';
+      } else {
+        const deck = decksById.get(
+          [...deckStats.entries()].find(([, stat]) => stat === bestDeck)?.[0]
+        );
+      
+        const artPair = document.createElement("div");
+        artPair.className = "commander-art-pair";
+      
+        const deckCommanders = [
+          deck?.commander_id && commandersById.get(deck.commander_id),
+          deck?.partner_commander_id && commandersById.get(deck.partner_commander_id)
+        ].filter(Boolean);
+      
+        if (deckCommanders.length === 1) artPair.classList.add("single");
+      
+        for (const commander of deckCommanders) {
+          const imageUrl = commander.art_crop_url || commander.image_url;
+          if (!imageUrl) continue;
+      
+          const image = document.createElement("img");
+          image.src = imageUrl;
+          image.alt = `${commander.name} card art`;
+          image.loading = "lazy";
+          artPair.appendChild(image);
+        }
+      
+        const details = document.createElement("div");
+        details.className = "top-deck-content d-flex flex-column justify-content-center";
+      
+        const title = document.createElement("h3");
+        title.className = "h4 fw-bold";
+        title.textContent = bestDeck.name;
+      
+        const commanderNames = document.createElement("p");
+        commanderNames.className = "mb-2";
+        commanderNames.textContent = bestDeck.commanders || "Commander unavailable";
+      
+        const pointsText = document.createElement("strong");
+        pointsText.textContent = `Average Pts: ${bestDeck.points.toFixed(2)}`;
+        const uses = document.createElement("div");
+        uses.className = "small";
+        uses.textContent = `${bestDeck.uses} games played`;
+      
+        details.append(title, commanderNames, pointsText, uses);
+        topPointsDeck.append(artPair, details);
       }
+      
     }
   
     async function initialize() {
