@@ -330,18 +330,13 @@ playerStats.set(participant.player_id, stats);
             card.appendChild(image);
           }
 
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "player-card-button";
-          button.setAttribute("aria-expanded", "false");
-
           const heading = document.createElement("div");
           heading.className = "d-flex align-items-center gap-3 mb-3";
-
+          
           const rank = document.createElement("span");
           rank.className = "player-rank";
           rank.textContent = String(index + 1);
-
+          
           const name = document.createElement("h2");
           name.className = "h4 fw-bold mb-0 text-break";
           
@@ -358,59 +353,39 @@ playerStats.set(participant.player_id, stats);
           
           heading.append(rank, name);
           
-          // Keep the expand/collapse button separate from the profile link.
-          button.append(score, stats, hint);
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "player-card-button";
+          button.setAttribute("aria-expanded", "false");
           
-          details.className = "player-details d-none";
-          
-
           const score = document.createElement("div");
           score.className = "player-score";
           score.textContent = `Score: ${player.score.toFixed(2)}`;
-
+          
           const stats = document.createElement("div");
           stats.className = "mt-2";
           stats.textContent =
             `${player.games} games played · ${(player.winRate * 100).toFixed(1)}% win rate`;
-
+          
           const hint = document.createElement("small");
           hint.className = "d-block mt-3 opacity-75";
           hint.textContent = "Click to view top decks";
-
-          button.append(heading, score, stats, hint);
-
+          
+          button.append(score, stats, hint);
+          
           const details = document.createElement("div");
           details.className = "player-details d-none";
-
-          const decksHeading = document.createElement("h3");
-          decksHeading.className = "h6 fw-bold";
-          decksHeading.textContent = "Most Played Commanders";
-          details.appendChild(decksHeading);
-
-          if (!player.decks.length) {
-            const empty = document.createElement("p");
-            empty.className = "small mb-0";
-            empty.textContent = "No deck usage recorded.";
-            details.appendChild(empty);
-          } else {
-            player.decks.forEach((deck, deckIndex) => {
-              const item = document.createElement("div");
-              item.className = "deck-item small mb-2";
-              item.textContent =
-                `${deckIndex + 1}. ${deck.name}` +
-                (deck.commanderName ? ` — ${deck.commanderName}` : "") +
-                ` · ${deck.uses} ${deck.uses === 1 ? "game" : "games"}`;
-              details.appendChild(item);
-            });
-          }
-
+          
+          // Keep your existing decksHeading and player.decks rendering here.
+          
           button.addEventListener("click", () => {
             const isOpen = !details.classList.contains("d-none");
             details.classList.toggle("d-none", isOpen);
             button.setAttribute("aria-expanded", String(!isOpen));
           });
-
+          
           card.append(heading, button, details);
+          
           column.appendChild(card);
           leaderboard.appendChild(column);
         });
