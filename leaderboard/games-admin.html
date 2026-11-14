@@ -1059,32 +1059,92 @@ async function getOrCreateCsvPlayer(name) {
 
   return player;
 }
+async function askForCsvCommander(deckName) {
+  if (!window.confirm(`Add a commander for "${deckName}"?`)) return [];
 
-async function getOrCreateCsvDeck(playerId, name) {
-  const key = name.trim().toLowerCase();
-  let deck = decks.find(item =>
-    item.player_id === playerId && item.name.trim().toLowerCase() === key
+  const input = window.prompt(
+    "Enter the commander name. For a partner pair, separate names with /."
   );
+  if (!input?.trim()) return [];
 
-  if (!deck) {
+  const names = input.split("/").map(name => name.trim()).filter(Boolean);
+  if (names.length > 2) {
+    throw new Error("Enter one commander or a partner pair (two names maximum).");
+  }
+
+  return Promise.all(names.map(async name => {
+    const existing = commanders.find(
+      item => item.name.trim().toLowerCase() === name.toLowerCase()
+    );
+    if (existing) return existing;
+
+    let cardData = {
+      scryfall_id: null, image_url: null, art_crop_url: null,
+      artist: null, scryfall_uri: null
+    };
+
+    try {
+      cardData = await findScryfallCard(name);
+    } catch {
+      if (!window.confirm(
+        `Could not find "${name}" on Scryfall. Add it as a custom commander?`
+      )) {
+        throw new Error(`Commander "${name}" was not added.`);
+      }
+    }
+
     const { data, error } = await supabase
-      .from("decks")
-      .insert({
-        player_id: playerId,
-        name: name.trim(),
-        created_by: currentUser.id
-      })
-      .select("id, player_id, name, decklist_url, commander_id, partner_commander_id")
-      
+      .from("commanders")
+      .insert({ name, created_by: currentUser.id, ...cardData })
+      .select("id, name")
       .single();
 
     if (error) throw error;
-    deck = data;
-    decks.push(deck);
+    commanders.push(data);
+    return data;
+  }));
+}
+
+async function getOrCreateCsvDeck(playerId, name) {
+  let deck = decks.find(item =>
+    item.player_id === playerId &&
+    item.name.trim().toLowerCase() === name.trim().toLowerCase()
+  );
+
+  if (deck?.commander_id) return deck;
+
+  const selected = await askForCsvCommander(name);
+  const commander_id = selected[0]?.id || null;
+  const partner_commander_id = selected[1]?.id || null;
+
+  if (deck) {
+    if (commander_id) {
+      const { error } = await supabase.from("decks")
+        .update({ commander_id, partner_commander_id })
+        .eq("id", deck.id);
+      if (error) throw error;
+
+      Object.assign(deck, { commander_id, partner_commander_id });
+    }
+    return deck;
   }
 
-  return deck;
+  const { data, error } = await supabase.from("decks")
+    .insert({
+      player_id: playerId,
+      name: name.trim(),
+      commander_id,
+      partner_commander_id,
+      created_by: currentUser.id
+    })
+    .select("id, player_id, name, decklist_url, commander_id, partner_commander_id")
+    .single();
+
+  if (error) throw error;
+  decks.push(data);
+  return data;
 }
+
 
 csvImportForm.addEventListener("submit", async event => {
   event.preventDefault();
