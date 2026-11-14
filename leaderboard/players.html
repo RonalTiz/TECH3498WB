@@ -344,9 +344,25 @@ playerStats.set(participant.player_id, stats);
 
           const name = document.createElement("h2");
           name.className = "h4 fw-bold mb-0 text-break";
-          name.textContent = player.display_name;
-
+          
+          if (player.user_id) {
+            const profileLink = document.createElement("a");
+            profileLink.href =
+              `profile.html?id=${encodeURIComponent(player.user_id)}`;
+            profileLink.className = "text-white text-decoration-none";
+            profileLink.textContent = player.display_name;
+            name.appendChild(profileLink);
+          } else {
+            name.textContent = player.display_name;
+          }
+          
           heading.append(rank, name);
+          
+          // Keep the expand/collapse button separate from the profile link.
+          button.append(score, stats, hint);
+          
+          details.className = "player-details d-none";
+          
 
           const score = document.createElement("div");
           score.className = "player-score";
@@ -394,7 +410,7 @@ playerStats.set(participant.player_id, stats);
             button.setAttribute("aria-expanded", String(!isOpen));
           });
 
-          card.append(button, details);
+          card.append(heading, button, details);
           column.appendChild(card);
           leaderboard.appendChild(column);
         });
