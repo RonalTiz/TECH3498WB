@@ -389,6 +389,28 @@
     
   </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<div class="modal fade" id="commander-search-modal" tabindex="-1"
+     aria-labelledby="commander-search-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title fs-5" id="commander-search-title">
+          Find commander on Scryfall
+        </h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="commander-search-form" class="input-group mb-3">
+          <input id="commander-search-input" class="form-control" required>
+          <button class="btn btn-info" type="submit">Search</button>
+        </form>
+        <div id="commander-search-status" class="small text-secondary mb-2"></div>
+        <div id="commander-search-results" class="list-group"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
   <script type="module">
     import { supabase } from "../supabase-client.js";
@@ -1105,26 +1127,133 @@ async function askForCsvCommander(deckName) {
   }));
 }
 
-async function getOrCreateCsvDeck(playerId, name) {
-  let deck = decks.find(item =>
-    item.player_id === playerId &&
-    item.name.trim().toLowerCase() === name.trim().toLowerCase()
+async function searchScryfallCommander(name) {
+  const response = await fetch(
+    `https://api.scryfall.com/cards/search?q=${encodeURIComponent(name)}&unique=cards&order=name`,
+    { headers: { Accept: "application/json" } }
   );
 
-  if (deck?.commander_id) return deck;
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.details || "No matching commanders found on Scryfall.");
+  }
+  return data.data || [];
+}
 
-  const selected = await askForCsvCommander(name);
-  const commander_id = selected[0]?.id || null;
-  const partner_commander_id = selected[1]?.id || null;
+function chooseScryfallCommander(name) {
+  const modalElement = document.getElementById("commander-search-modal");
+  const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+  const form = document.getElementById("commander-search-form");
+  const input = document.getElementById("commander-search-input");
+  const status = document.getElementById("commander-search-status");
+  const results = document.getElementById("commander-search-results");
+
+  input.value = name;
+  status.textContent = "Search for the missing commander, then select a result.";
+  results.replaceChildren();
+
+  return new Promise(resolve => {
+    let finished = false;
+
+    const finish = value => {
+      if (finished) return;
+      finished = true;
+      modalElement.removeEventListener("hidden.bs.modal", onHidden);
+      resolve(value);
+    };
+
+    const onHidden = () => finish(null);
+    modalElement.addEventListener("hidden.bs.modal", onHidden, { once: true });
+
+    form.onsubmit = async event => {
+      event.preventDefault();
+      status.textContent = "Searching Scryfall…";
+      results.replaceChildren();
+
+      try {
+        const cards = await searchScryfallCommander(input.value.trim());
+
+        if (!cards.length) {
+          status.textContent = "No matching cards found.";
+          return;
+        }
+
+        status.textContent = "Select the commander to add:";
+        cards.slice(0, 10).forEach(card => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "list-group-item list-group-item-action";
+          button.textContent = card.name;
+          button.addEventListener("click", async () => {
+            button.disabled = true;
+            status.textContent = `Adding ${card.name}…`;
+
+            try {
+              const { data, error } = await supabase
+                .from("commanders")
+                .insert({
+                  name: card.name,
+                  created_by: currentUser.id,
+                  scryfall_id: card.id,
+                  image_url: card.image_uris?.normal ||
+                    card.card_faces?.[0]?.image_uris?.normal || null,
+                  art_crop_url: card.image_uris?.art_crop ||
+                    card.card_faces?.[0]?.image_uris?.art_crop || null,
+                  artist: card.artist || card.card_faces?.[0]?.artist || null,
+                  scryfall_uri: card.scryfall_uri || null
+                })
+                .select("id, name")
+                .single();
+
+              if (error) throw error;
+
+              commanders.push(data);
+              finish(data);
+              modal.hide();
+            } catch (error) {
+              button.disabled = false;
+              status.textContent = error.message || "Could not add commander.";
+            }
+          });
+          results.appendChild(button);
+        });
+      } catch (error) {
+        status.textContent = error.message || "Scryfall search failed.";
+      }
+    };
+
+    modal.show();
+  });
+}
+
+async function getOrCreateCsvCommander(name) {
+  const key = name.trim().toLowerCase();
+  const existing = commanders.find(
+    commander => commander.name.trim().toLowerCase() === key
+  );
+  if (existing) return existing;
+
+  const added = await chooseScryfallCommander(name.trim());
+  if (!added) {
+    throw new Error(`Commander "${name}" was not added; CSV import cancelled.`);
+  }
+  return added;
+}
+
+async function getOrCreateCsvDeck(playerId, commanderName) {
+  const commander = await getOrCreateCsvCommander(commanderName);
+  let deck = decks.find(item =>
+    item.player_id === playerId &&
+    item.name.trim().toLowerCase() === commanderName.trim().toLowerCase()
+  );
 
   if (deck) {
-    if (commander_id) {
+    if (!deck.commander_id) {
       const { error } = await supabase.from("decks")
-        .update({ commander_id, partner_commander_id })
+        .update({ commander_id: commander.id })
         .eq("id", deck.id);
       if (error) throw error;
-
-      Object.assign(deck, { commander_id, partner_commander_id });
+      deck.commander_id = commander.id;
     }
     return deck;
   }
@@ -1132,9 +1261,8 @@ async function getOrCreateCsvDeck(playerId, name) {
   const { data, error } = await supabase.from("decks")
     .insert({
       player_id: playerId,
-      name: name.trim(),
-      commander_id,
-      partner_commander_id,
+      name: commanderName.trim(),
+      commander_id: commander.id,
       created_by: currentUser.id
     })
     .select("id, player_id, name, decklist_url, commander_id, partner_commander_id")
