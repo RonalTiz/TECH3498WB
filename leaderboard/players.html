@@ -22,8 +22,14 @@
       background: linear-gradient(135deg, #164e63, #0f172a);
       border: 1px solid var(--border-color);
       border-radius: 1rem;
-    }
+      display: grid;
+      grid-template-rows: 1fr auto auto;
 
+    }
+    .player-card-heading {
+    padding: 1rem 1.25rem 0;
+    text-align: center;
+    }
     .player-card > img {
       position: absolute;
       inset: 0;
@@ -49,6 +55,7 @@
       text-align: left;
       background: transparent;
       border: 0;
+      min-height: 0;
     }
 
     .player-rank {
@@ -332,6 +339,8 @@ playerStats.set(participant.player_id, stats);
 
           const heading = document.createElement("div");
           heading.className = "d-flex align-items-center gap-3 mb-3";
+          heading.className =
+            "player-card-heading d-flex align-items-center justify-content-center gap-3";
           
           const rank = document.createElement("span");
           rank.className = "player-rank";
