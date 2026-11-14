@@ -9,6 +9,12 @@
   <link rel="stylesheet" href="../style.css">
   <script src="../theme.js"></script>
   <style>
+    .list-group-item {
+      color: var(--text-main);
+      background: var(--bg-subtle);
+      border-color: var(--border-color);
+    }
+    
     .profile-stat-card {
       height: 100%;
       padding: 1rem;
@@ -296,7 +302,7 @@
       wld.textContent = `${wins}–${losses}–${draws}`;
   
       const rankedDecks = [...deckStats.entries()].map(([deckId, stat]) => {
-        const deck = decksById.get(deckId);
+        const deck = decksById.get(bestDeck.id);
         const commanderNames = [
           deck?.commander_id && commandersById.get(deck.commander_id)?.name,
           deck?.partner_commander_id &&
@@ -366,6 +372,27 @@
       
         details.append(title, commanderNames, pointsText, uses);
         topPointsDeck.append(artPair, details);
+      }
+      topPlayedDecks.replaceChildren();
+      
+      const mostPlayed = [...rankedDecks]
+        .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name))
+        .slice(0, 3);
+      
+      if (!mostPlayed.length) {
+        const item = document.createElement("li");
+        item.className = "list-group-item";
+        item.textContent = "No deck usage recorded.";
+        topPlayedDecks.appendChild(item);
+      } else {
+        mostPlayed.forEach(deck => {
+          const item = document.createElement("li");
+          item.className = "list-group-item";
+          item.textContent =
+            `${deck.name}${deck.commanders ? ` — ${deck.commanders}` : ""}: ` +
+            `${deck.uses} games, ${deck.points.toFixed(2)} points`;
+          topPlayedDecks.appendChild(item);
+        });
       }
       
     }
