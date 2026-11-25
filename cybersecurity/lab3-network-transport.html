@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab 3: Network Transport and Applications | TECH 3498</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous">
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../style.css">
+
+  <script src="../theme.js"></script>
+  <script src="../auth.js"></script>
+
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="../index.html">
+        <i class="bi bi-shield-check text-info fs-4"></i>
+        <span>TECH 3498<span class="text-info">.sec</span></span>
+      </a>
+
+      <button
+        class="navbar-toggler border-0"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarContent"
+        aria-controls="navbarContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link" href="../index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../about.html">About Me</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../technology.html">Technological Knowledge</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active text-info" aria-current="page" href="index.html">
+              CyberSecurity
+            </a>
+          </li>
+          <li class="nav-item">
+  <a class="nav-link" href="../digital-user.html">Digital User</a>
+</li>
+
+          <li class="nav-item nav-security-item d-none">
+            <a class="nav-link text-warning fw-semibold" href="../Admin_section/security.html">
+              <i class="bi bi-shield-shaded me-1"></i>Security Control
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-outline-info text-info px-3 ms-lg-2 py-1" href="#contact">
+              Contact
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-login-link" href="../leaderboard/index.html">
+              <i class="bi bi-trophy me-1" aria-hidden="true"></i>Leaderboard
+            </a>
+          </li>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <button
+              class="btn btn-outline-warning btn-sm theme-toggle-btn d-flex align-items-center"
+              type="button">
+              <i class="bi bi-sun-fill text-warning me-1"></i>
+              <span class="theme-label">Light Theme</span>
+            </button>
+          </li>
+            <button class="btn btn-outline-warning btn-sm restore-appearance-btn d-flex align-items-center"
+                    type="button">
+              <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i>
+              Restore appearance
+            </button>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-section text-center">
+    <div class="container hero-content">
+      <div class="avatar-wrapper mb-4">
+        <div class="avatar-inner"><i class="bi bi-shield-lock-fill"></i></div>
+      </div>
+      <h1 class="display-5 fw-bold mb-2">Lab 3: Network Transport and Applications</h1>
+      <p class="lead text-light opacity-75 mb-3 mx-auto" style="max-width: 760px;">Network transport, application protocols, and packet analysis.</p>
+    </div>
+  </header>
+<main>
+  <section class="py-5 bg-light" aria-labelledby="lab3-heading"><div class="container py-4">
+    <div class="dropdown mb-4"><button class="btn btn-outline-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Browse cybersecurity topics</button><ul class="dropdown-menu shadow">
+      <li><a class="dropdown-item" href="index.html">All cybersecurity topics</a></li><li><a class="dropdown-item" href="overview.html">Portfolio Security Overview</a></li><li><a class="dropdown-item" href="stride.html">STRIDE Threat Assessment</a></li><li><a class="dropdown-item" href="architecture.html">Security Responsibilities by Layer</a></li><li><a class="dropdown-item" href="limitations.html">Portfolio Security Limitations</a></li><li><a class="dropdown-item" href="input-security.html">Handling User Input Safely</a></li><li><a class="dropdown-item" href="traffic-study.html">DoS/DDoS Traffic Study</a></li><li><a class="dropdown-item" href="lab1-identity-security.html">Lab 1: Identity and Security</a></li><li><a class="dropdown-item" href="lab2-network-configuration.html">Lab 2: Network Configuration and Connectivity</a></li><li><a class="dropdown-item active" href="lab3-network-transport.html" aria-current="page">Lab 3: Network Transport and Applications</a></li><li><a class="dropdown-item" href="../ids_presentation.html">IDS Generalization Study</a></li>
+    </ul></div>
+    <article class="card feature-card shadow-sm p-4 p-md-5">
+      <span class="badge bg-info text-dark align-self-start mb-3">TECH 3498 - Lab 3</span>
+      <h2 id="lab3-heading" class="fw-bold">Network Transport and Applications</h2>
+      <p class="text-secondary">This report describes how ICMP, UDP, and TCP appear in packet captures and how application protocols use them. Replace bracketed fields with values from your capture or account review.</p>
+      <div class="alert alert-warning" role="note"><strong>Security note:</strong> Capture only traffic you are authorized to inspect. Telnet, FTP, and basic email protocols can expose data without encryption. Use assigned lab systems and accounts, and do not place real credentials or private account information in a report.</div>
+
+      <h3 class="h4 fw-bold mt-4">Lab 3.1 - Network transport</h3>
+      <h4 class="h5 fw-semibold mt-4">Lab A - Network communication analysis</h4>
+      <div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th scope="col">Question or observation</th><th scope="col">Response</th></tr></thead><tbody>
+        <tr><th scope="row">What packet types are sent during a ping?</th><td>For an IPv4 ping, the capture shows ICMP Echo Request packets followed by ICMP Echo Reply packets. Address Resolution Protocol (ARP) packets may appear first if the sender needs to learn the gateway's Ethernet address.</td></tr>
+        <tr><th scope="row">What is the Ethernet broadcast address?</th><td><code>ff:ff:ff:ff:ff:ff</code></td></tr>
+        <tr><th scope="row">Which appears first in the Ethernet II header, source or destination?</th><td>Destination appears first, followed by source and the EtherType field.</td></tr>
+        <tr><th scope="row">What else is in the Ethernet II header?</th><td>The source MAC address, destination MAC address, and EtherType identifying the payload protocol.</td></tr>
+        <tr><th scope="row">What fields are in an ARP message?</th><td>Hardware type, protocol type, hardware address length, protocol address length, operation (request or reply), sender hardware and protocol addresses, and target hardware and protocol addresses.</td></tr>
+        <tr><th scope="row">Do all ARP fields have known values in a request?</th><td>No. In a request, the target hardware address is typically unknown and represented as all zeroes. The sender fields and target protocol address identify who is asking and which IPv4 address it wants to resolve.</td></tr>
+        <tr><th scope="row">How does an ARP reply differ from the broadcast request?</th><td>The request is normally sent to the Ethernet broadcast address and asks who owns a target IPv4 address. The reply identifies the target's MAC address and is usually sent directly back to the requester.</td></tr>
+        <tr><th scope="row">What protocol does ping use?</th><td>ICMP carries IPv4 Echo Requests and Replies. For IPv6, the corresponding messages use ICMPv6.</td></tr>
+        <tr><th scope="row">What source and destination ports appear in the DNS over UDP packet?</th><td>Destination port is usually <code>53</code>. The source port is an ephemeral client port and varies; record the captured values: source <code>[source port]</code>, destination <code>[destination port]</code>.</td></tr>
+        <tr><th scope="row">What is the UDP checksum?</th><td>The checksum is calculated from the UDP header and data (and an IP pseudo-header). Record the value shown in the captured packet: <code>[UDP checksum]</code>. It varies by query and capture.</td></tr>
+        <tr><th scope="row">What does <code>cat /etc/passwd</code> display on a Unix-like system?</th><td>It displays account records such as username, a password-field marker, user ID, group ID, descriptive field, home directory, and login shell. On modern systems, password hashes are stored separately in a protected shadow file.</td></tr>
+        <tr><th scope="row">What source and destination ports appear in a Telnet TCP packet?</th><td>Telnet conventionally uses destination port <code>23</code>; the client source port is ephemeral. Record the packet values: source <code>[source port]</code>, destination <code>[destination port]</code>.</td></tr>
+        <tr><th scope="row">What is the TCP checksum?</th><td>TCP includes a checksum over its header and data plus an IP pseudo-header. Record the displayed value from the selected packet: <code>[TCP checksum]</code>.</td></tr>
+        <tr><th scope="row">How do TCP and UDP headers differ?</th><td>Both include source and destination ports and a checksum. TCP also includes sequence and acknowledgment numbers, flags, a window size, and options to support connection setup, ordering, acknowledgments, and retransmission. UDP has a shorter header with a length field and no built-in connection or delivery guarantees.</td></tr>
+      </tbody></table></div>
+
+      <h3 class="h4 fw-bold mt-5">Lab 3.2 - Network applications</h3>
+      <h4 class="h5 fw-semibold mt-4">Lab A - File transfer and web traffic</h4>
+      <div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th scope="col">Question or observation</th><th scope="col">Response</th></tr></thead><tbody>
+        <tr><th scope="row">Does SSH File Transfer appear as FTP in Wireshark?</th><td>No. SFTP is a file-transfer subsystem carried over SSH, usually over TCP port <code>22</code>; it is distinct from FTP. The capture may identify SSH and TCP rather than FTP.</td></tr>
+        <tr><th scope="row">What other protocols may appear besides ARP and TCP?</th><td>Depending on the activity and network, captures may include DNS, SSH, TLS, ICMP, DHCP, or IPv6 neighbor discovery. Record the protocols actually visible: <code>[protocols observed]</code>.</td></tr>
+        <tr><th scope="row">What source and destination ports appear in the SSH packet?</th><td>SSH normally uses destination port <code>22</code>; the client source port is ephemeral. Record the values shown in your packet: source <code>[source port]</code>, destination <code>[destination port]</code>.</td></tr>
+        <tr><th scope="row">Does an HTTPS visit appear as HTTP in the capture?</th><td>Normally no. HTTPS traffic is protected by TLS, so Wireshark generally identifies TLS over TCP port <code>443</code> rather than readable HTTP application data.</td></tr>
+        <tr><th scope="row">What source and destination ports appear in the web connection?</th><td>For HTTPS, the server destination port is usually <code>443</code>; the client source port is ephemeral. Record the capture values: source <code>[source port]</code>, destination <code>[destination port]</code>.</td></tr>
+        <tr><th scope="row">What is the TCP checksum for the web packet?</th><td>Record the value displayed for the selected TCP segment: <code>[TCP checksum]</code>. It changes from packet to packet.</td></tr>
+      </tbody></table></div>
+
+      <h4 class="h5 fw-semibold mt-5">Lab B - Email protocols</h4>
+      <div class="table-responsive"><table class="table table-bordered table-striped align-middle"><thead class="table-dark"><tr><th scope="col">Question or observation</th><th scope="col">Response</th></tr></thead><tbody>
+        <tr><th scope="row">What message may the mail server return?</th><td>The server returns a status response indicating whether it accepted or rejected the message. Record the exact response code and text shown: <code>[server response]</code>.</td></tr>
+        <tr><th scope="row">How can unauthenticated or unencrypted email submission be abused?</th><td>If a server permits relaying without adequate authentication, it can be abused to send spam or forged messages. Unencrypted SMTP can expose message contents and credentials in transit. Authentication, TLS, relay restrictions, and sender-domain checks reduce these risks.</td></tr>
+        <tr><th scope="row">What changes when a message is submitted with a different sender address?</th><td>The visible From or envelope sender may differ from the first message, depending on the mail client and server. Server-added Received and authentication headers can also differ. Record the header fields observed: <code>[header differences]</code>.</td></tr>
+        <tr><th scope="row">Can the true sender always be identified from the From field?</th><td>No. The From field can be forged. Received headers, server logs, and SPF, DKIM, and DMARC authentication results can help trace or validate a message, but a conclusive identity may require trustworthy mail-server records.</td></tr>
+        <tr><th scope="row">Were there other active account sessions?</th><td>Record the account-security page result without including private device details: <code>[no other sessions / other sessions were listed]</code>. Sign out any session you do not recognize.</td></tr>
+        <tr><th scope="row">Did the account show third-party app access?</th><td>Record whether any connected apps were listed: <code>[none / app names or types]</code>. Remove access you do not recognize or no longer need.</td></tr>
+        <tr><th scope="row">Problems encountered and how were they resolved?</th><td><code>[Describe any issue, its cause, and the steps taken to resolve it. If there were no issues, state that.]</code></td></tr>
+      </tbody></table></div>
+      <p class="small text-muted mt-4 mb-0">Do not include passwords, private message contents, full account identifiers, or unredacted capture data in the submitted report.</p>
+    </article>
+    <div class="text-center mt-4"><a href="index.html" class="btn btn-outline-info">Back to cybersecurity topics</a></div>
+  </div></section>
+  <section id="contact" class="py-5 bg-white border-top">
+      <div class="container py-4 text-center">
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="text-muted mx-auto mb-4" style="max-width: 600px;">
+          Feel free to connect regarding course projects, study groups, or
+          cybersecurity discussions.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a href="mailto:student@example.com" class="btn btn-outline-primary px-4 py-2">
+            <i class="bi bi-envelope-fill me-2"></i>Email Me
+          </a>
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline-dark px-4 py-2">
+            <i class="bi bi-github me-2"></i>GitHub Profile
+          </a>
+          <a
+            href="https://linkedin.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline-info px-4 py-2">
+            <i class="bi bi-linkedin me-2"></i>LinkedIn
+          </a>
+        </div>
+      </div>
+    </section>
+</main>
+
+
+  <footer class="pt-5 pb-4">
+    <div class="container">
+      <div id="cyber-tip" class="cyber-tip-box p-4 rounded-4 text-start mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+          <div class="tip-icon">
+            <i class="bi bi-shield-fill-exclamation text-info fs-3"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge bg-info text-dark fw-bold">PRO TIP</span>
+              <h5 class="text-white mb-0 fw-bold">Cybersecurity Tip</h5>
+            </div>
+            <p class="mb-0 text-light opacity-90 small">
+              Use unique passwords, enable multi-factor authentication, and never
+              reuse demo credentials on real accounts.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center pt-3 border-top border-secondary border-opacity-25">
+        <div class="mb-2">
+          <i class="bi bi-shield-lock text-info fs-4"></i>
+        </div>
+        <p class="mb-1 text-light small">
+          &copy; Fall 2026 &bull; TECH 3498: IT Computer Security Portfolio
+        </p>
+        <p class="small mb-0 text-secondary">
+          Built with Bootstrap 5 &bull; Designed for TECH 3498 Project
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <button id="chatbot-toggle" aria-label="Open AI Chatbot" title="Chat with CyberBot">
+    <div class="chatbot-pulse-ring"></div>
+    <i class="bi bi-robot"></i>
+  </button>
+
+  <div
+    id="chatbot-window"
+    class="d-none"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="chatbot-title">
+    <div class="chat-header">
+      <div class="d-flex align-items-center gap-2">
+        <div
+          class="icon-box bg-info bg-opacity-20 text-info p-2 mb-0"
+          style="width: 36px; height: 36px; border-radius: 8px;">
+          <i class="bi bi-robot fs-5"></i>
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h6 id="chatbot-title" class="fw-bold mb-0 text-white">CyberBot</h6>
+            <span class="chat-status-dot" title="Online"></span>
+          </div>
+          <span class="text-secondary" style="font-size: 0.72rem;">
+            TECH 3498 AI Assistant
+          </span>
+        </div>
+      </div>
+      <button
+        id="chatbot-close"
+        class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+        aria-label="Close Chat">
+        <i class="bi bi-x-lg fs-5"></i>
+      </button>
+    </div>
+
+    <div id="chatbot-messages"></div>
+
+    <form id="chatbot-form" class="chat-input-bar d-flex align-items-center gap-2">
+      <input
+        id="chatbot-input"
+        type="text"
+        class="form-control px-3 py-2"
+        placeholder="Ask about Ronald or TECH 3498..."
+        autocomplete="off">
+      <button
+        type="button"
+        id="chatbot-mic"
+        class="chat-mic-btn flex-shrink-0"
+        aria-label="Voice command"
+        title="Speak to CyberBot">
+        <i class="bi bi-mic"></i>
+      </button>
+      <button type="submit" class="chat-send-btn flex-shrink-0" aria-label="Send message">
+        <i class="bi bi-arrow-up-short fs-4"></i>
+      </button>
+    </form>
+  </div>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script src="../chatbot.js"></script>
+</body>
+</html>

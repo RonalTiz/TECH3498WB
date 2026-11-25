@@ -590,7 +590,7 @@
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
 
-        window.location.replace("../login.html");
+        window.location.replace("../leaderboard/login.html");
       } catch (error) {
         console.error("Sign-out failed:", error);
         setStatus(error.message || "Could not sign out. Please try again.", "danger");

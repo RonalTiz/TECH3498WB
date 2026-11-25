@@ -137,7 +137,7 @@
       if (/open|go to|navigate to/.test(query) &&
           /cybersecurity|security learning/.test(query)) {
         setTimeout(() => {
-          window.location.href = "/cybersecurity.html#assessment-heading";
+          window.location.href = "/cybersecurity/index.html#assessment-heading";
         }, 500);
         return "Opening the CyberSecurity learning section.";
       }
